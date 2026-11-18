@@ -28,8 +28,8 @@ In those cases a better answer means a cleaner solution inside the rules.
 
 ## How
 
-Do this in your own reasoning. The candidates and their estimates are scaffolding, so they stay out
-of the deliverable and the final message.
+Do the planning steps in your own reasoning. The candidates and their estimates are scaffolding, so
+they stay out of the deliverable and the final message.
 
 1. Lock what is fixed. Note what the user's words, the existing code or style, and hard constraints
    already decide. The brief wins every time, and only the open parts get explored.

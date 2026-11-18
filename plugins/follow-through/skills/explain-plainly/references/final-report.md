@@ -1,13 +1,13 @@
 # Final message
 
-The final message is the user's first look at the work. They saw their own request and they will see
-this message. They did not see your tool calls, your reasoning, your subagents or your earlier
+The final message is the user's first look at the work. They saw their own messages and they will
+see this message. They did not see your tool calls, your reasoning, your subagents or your earlier
 updates.
 
 ## Shape
 
-Write these parts in this order, as short paragraphs or a short list. Leave out any part that has
-nothing in it, and put no labels in front of them.
+Write these parts in this order, as short paragraphs. Leave out any part that has nothing in it, and
+put no labels in front of them.
 
 1. The answer or the result, in one or two plain sentences. For a "why" question, give the one cause
    that explains most of it and the evidence for it, such as a number, a measurement or a command

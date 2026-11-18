@@ -2,8 +2,8 @@
 
 Fill in the parts in braces and send everything below the line as the task of a new subagent each
 round, started without your conversation history (with `fork_turns` set to `none` where the spawn
-tool has that option). Give the brief and the bar as written. Leave out your own view of how good the result is, because a reviewer who reads it tends to
-agree with it.
+tool has that option). Give the brief and the bar as written. Leave out your own view of how good
+the result is, because a reviewer who reads it tends to agree with it.
 
 ---
 

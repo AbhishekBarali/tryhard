@@ -2,8 +2,8 @@
 
 Fill in the three parts in braces and send everything below the line as the task of a subagent
 started without your conversation history (with `fork_turns` set to `none` where the spawn tool has
-that option). Paste the user's request and the done checks as they are. Leave out your own account of how the work went, because a reviewer who
-reads the author's summary tends to agree with it.
+that option). Paste the user's request and the done checks as they are. Leave out your own account
+of how the work went, because a reviewer who reads the author's summary tends to agree with it.
 
 ---
 

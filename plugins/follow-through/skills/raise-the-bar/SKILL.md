@@ -49,9 +49,9 @@ Read [references/expert-review.md](references/expert-review.md), fill it in, and
 subagent each round, started without your conversation history (with `fork_turns` set to `none`
 where the spawn tool has that option). A fresh reviewer each round judges the result itself, without
 anchoring on the last round's verdict. If subagents are unavailable, do the review yourself,
-starting from only the brief, the bar and the result. Either
-way, the review ends with the gaps ranked and each one marked as blocking the bar, visibly weaker
-than an expert would accept, or minor.
+starting from only the brief, the bar and the result. Either way, the review ends with the gaps
+ranked and each one marked as blocking the bar, visibly weaker than an expert would accept, or
+minor.
 
 ## Fix the biggest gaps
 

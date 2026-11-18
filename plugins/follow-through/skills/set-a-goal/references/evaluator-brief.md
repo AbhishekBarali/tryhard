@@ -2,8 +2,8 @@
 
 Fill in the parts in braces and send everything below the line as the task of a subagent started
 without your conversation history (with `fork_turns` set to `none` where the spawn tool has that
-option). Give it the contract, the diff and the commands. Leave out your own summary of the run, because an evaluator who reads the worker's
-account tends to accept it.
+option). Give it the contract, the diff and the commands. Leave out your own summary of the run,
+because an evaluator who reads the worker's account tends to accept it.
 
 ---
 

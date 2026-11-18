@@ -62,11 +62,12 @@ it. When two candidates conflict, pick using the evidence. Note each decision in
 next update, with what you chose and how to change it, and keep going. Where it costs nothing extra,
 keep the choice in one place so it is easy to change later.
 
-When a question only the user can answer does come up, finish everything that does not depend on it.
-If a non-blocking question tool such as `request_user_input_async` is available, ask there with your
-recommended option and keep working. Otherwise put the question in the final message with the default
-you already applied. Wait for the answer only when every remaining step depends on it and every
-default would be costly to undo, and even then hand over the finished, reviewable part first.
+When a question does pass all three, finish everything that does not depend on it. If a
+non-blocking question tool such as `request_user_input_async` is available, ask there with your
+recommended option first and keep working on the rest. Otherwise ask in the final message, with your
+recommendation first, after handing over the finished, reviewable part. Leave only the steps that
+depend on the answer until it arrives. A question that fails the test becomes a decision, and the
+final message lists it with the default you applied.
 
 Reading, edits inside the workspace, builds, tests, linters, local servers, installing dependencies
 the project already declares, temporary files, and local commits on a work branch need no
@@ -78,8 +79,9 @@ you did not create, deploying or publishing where other people use it, sending m
 to other people, spending money or large paid quotas, changing shared infrastructure or production
 data, and changing the goal or the done checks. Ask in the final message, or through the approval
 prompt when a tool raises one. When the sandbox blocks a command you need, request escalation
-through the tool with a one-line reason. If a path you need is not writable, request access or report it as a blocker,
-because a file quietly written somewhere else is a result the user cannot find.
+through the tool with a one-line reason. If a path you need is not writable, request access or
+report it as a blocker, because a file quietly written somewhere else is a result the user cannot
+find.
 
 ## Keep the scope
 
@@ -116,8 +118,9 @@ For substantial work (changes across three or more files, a new feature, a long 
 the user called important), add an independent review before the final message. Read
 [references/reviewer-brief.md](references/reviewer-brief.md), fill it in, and give it to a fresh
 subagent started without your conversation history (with `fork_turns` set to `none` where the spawn
-tool has that option). Fix what it marks serious in one pass, rerun the affected checks, and stop. If subagents are unavailable, do the same
-review yourself, starting from only the request, the done checks and the diff.
+tool has that option). Fix what it marks serious in one pass, rerun the affected checks, and stop.
+If subagents are unavailable, do the same review yourself, starting from only the request, the done
+checks and the diff.
 
 ## When it stalls
 

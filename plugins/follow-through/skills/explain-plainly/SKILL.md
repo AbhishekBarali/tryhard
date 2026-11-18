@@ -5,9 +5,9 @@ description: Use when the user asks why something happens, asks for an explanati
 
 # Explain plainly
 
-The person reading has seen their own question and nothing else. They did not see your commands,
-your reasoning, your subagents or your notes. Write for an intelligent reader who knows the field in
-general and has no context on this session.
+The person reading has seen their own messages and your earlier final answers, and none of your
+working. They did not see your commands, your reasoning, your subagents or your notes. Write for an
+intelligent reader who knows the field in general and has no other context on this session.
 
 ## Lead with the answer
 

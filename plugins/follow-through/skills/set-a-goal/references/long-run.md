@@ -9,9 +9,9 @@ work is judged by the numbers in `.goal/contract.md`.
 Read `.goal/status.md`, the last lines of `.goal/ledger.tsv` and `git log --oneline -10`. The best
 commit is the latest keep in the ledger, or the baseline commit before the first keep. If the
 checkout holds an attempt that was never measured, measure it and keep or discard it as usual. If
-the checkout is anywhere else, or anything changed since the last measurement, return to the best
-commit and rerun the primary measurement before new work. Finished attempts stay finished, so pick
-up from the next step in the status file.
+the checkout is anywhere else, return to the best commit the same way as a discard. If anything
+changed since the last measurement, rerun the primary measurement before new work. Finished
+attempts stay finished, so pick up from the next step in the status file.
 
 ## The primary goal wins
 
@@ -26,8 +26,8 @@ changes that leave the primary metric level or better. Guardrails hold throughou
 3. Measure with the contract's command. Iterate on a fast sample when the full run is slow, and run
    the full measurement before any keep.
 4. Keep the commit only if it beats the best result so far by more than the noise level and every
-   guardrail holds. Otherwise check `git status` for anything that is not part of the attempt, then
-   reset to the best commit with `git reset --hard`, which discards only your own attempt.
+   guardrail holds. Otherwise go back with `git reset --keep` and the best commit, which drops your
+   attempt and leaves any other local changes in place.
 5. Append one row to the ledger.
 
 Stop an attempt that runs past twice its expected time and log it as a crash. Measure each change on
@@ -83,7 +83,7 @@ Before claiming the goal is complete, have a fresh evaluator check the work usin
 unavailable, do the same check yourself, starting from only the contract, the diff and the commands.
 
 When the evaluator fails an item, fix it or revert, then run the evaluator again. If the same item
-fails twice after fixes, handle it under the stall rule.
+fails twice after fixes, write the stall report for that item and follow the blocked rule above.
 
 When every done item passes, close the run.
 
