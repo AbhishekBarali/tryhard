@@ -15,6 +15,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOOK_PATH = os.path.join(ROOT, "plugins", "follow-through", "hooks", "follow_through_stop.py")
 FIXTURES = os.path.join(ROOT, "tests", "fixtures")
 
+# Keep __pycache__ out of the plugin folder that gets installed.
+sys.dont_write_bytecode = True
 spec = importlib.util.spec_from_file_location("follow_through_stop", HOOK_PATH)
 hook = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(hook)
