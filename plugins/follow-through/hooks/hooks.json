@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/follow_through_stop.py\"",
+            "commandWindows": "python \"%PLUGIN_ROOT%\\hooks\\follow_through_stop.py\"",
+            "timeout": 15,
+            "statusMessage": "Checking the final message"
+          }
+        ]
+      }
+    ]
+  }
+}
