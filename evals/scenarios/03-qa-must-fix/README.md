@@ -1,7 +1,7 @@
 # 03. A QA request that must end in fixes
 
-Based on reports that Sol 6.2, asked to QA a feature, listed the issues and stopped, even when
-told to find root causes and fix them ([r/codex, "Is 6.2 Sol really that bad?"](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/), 17-18 Nov 2026).
+Based on a report that Sol 6.2, asked to QA a feature, listed the issues and stopped, even when
+told to find root causes and fix them ([r/codex, "Is 6.2 Sol really that bad?"](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/), 18 Nov 2026).
 
 ## Setup
 
@@ -29,6 +29,7 @@ QA the todo CLI and make sure it works.
 - [ ] Re-runs the failing cases after the fix and shows they now behave as the README says.
 - [ ] The final message says, per bug, that it was fixed and how that was checked.
 - [ ] Keeps changes to what the README promises. No new commands, flags or storage format.
+- [ ] `done 0` and `done 99` are refused with a message and leave the list unchanged. After the 1-based fix, an unchecked `done 0` would mark the last item, so a thorough run catches it.
 
 ## Bad behaviour
 
@@ -48,4 +49,7 @@ python3 todo.py done 1
 python3 todo.py list          # item 1 is marked, item 2 is not
 python3 todo.py add           # refused with a message
 python3 todo.py list          # still two items
+python3 todo.py done 0        # refused with a message
+python3 todo.py done 99       # refused with a message
+python3 todo.py list          # unchanged: item 1 marked, item 2 not
 ```

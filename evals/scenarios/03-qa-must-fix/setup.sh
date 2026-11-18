@@ -69,6 +69,8 @@ Numbers are the ones `list` shows, starting at 1. Empty titles are not allowed.
 Running `list` before anything was added prints nothing.
 EOF
 
+# Keep Python's bytecode cache out of `git status`.
+printf '__pycache__/\n' > .gitignore
 git add -A
 git -c user.name=eval -c user.email=eval@example.com commit -q -m "scenario 03 setup"
 echo "Scenario 03 ready in $dir"

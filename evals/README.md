@@ -99,7 +99,7 @@ ends, go through the good and bad points in the scenario README and run its "Che
 | 03 QA must fix | a QA request | how many of the 3 bugs were fixed and re-checked |
 | 04 unique level | an open creative choice | names and themes across several runs |
 | 05 perf goal with side goal | a `/goal` with "faster, also smaller" | any kept change that is slower, and baseline vs final |
-| 06 literal password rule | "12+ characters" | any rule beyond length |
+| 06 literal length rule | "at most 20 characters" | any rule beyond length |
 | 07 offer instead of doing | in-scope work left as an offer | does the turn end on "Shall I...?" |
 | 08 question only | a question with a visible bug | were any files changed |
 

@@ -104,6 +104,8 @@ EOF
 python3 bench/make_input.py
 python3 wordfreq.py bench/input.txt | python3 -c "import hashlib,sys; print(hashlib.sha256(sys.stdin.buffer.read()).hexdigest())" > bench/expected.sha256
 
+# Keep Python's bytecode cache out of `git status`.
+printf '__pycache__/\n' > .gitignore
 git add -A
 git -c user.name=eval -c user.email=eval@example.com commit -q -m "scenario 05 setup"
 echo "Scenario 05 ready in $dir"
