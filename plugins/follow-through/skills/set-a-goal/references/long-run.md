@@ -1,17 +1,19 @@
 # Long-run rules
 
-Read this before writing the goal contract and again after the conversation is compacted. Codex's
-own goal instructions still apply on every turn. These rules add a measurement, so that each turn's
-work is judged by the numbers in `.goal/contract.md`.
+Read this before writing the goal contract and again after the conversation is compacted or a new
+context window starts. Codex's own goal instructions still apply on every turn. These rules add a
+measurement, so that each turn's work is judged by the numbers in `.goal/contract.md`.
 
 ## Start of every turn
 
 Read `.goal/status.md`, the last lines of `.goal/ledger.tsv` and `git log --oneline -10`. The best
-commit is the latest keep in the ledger, or the baseline commit before the first keep. If the
-checkout holds an attempt that was never measured, measure it and keep or discard it as usual. If
-the checkout is anywhere else, return to the best commit the same way as a discard. If anything
-changed since the last measurement, rerun the primary measurement before new work. Finished
-attempts stay finished, so pick up from the next step in the status file.
+commit is the latest keep in the ledger, or the baseline commit before the first keep. Resets only
+ever move the goal branch. If the checkout is on another branch, the user moved it, so leave it as
+it is and report that. If the checkout holds an attempt that was never measured, measure it and
+keep or discard it as usual. If it is anywhere else on the goal branch, return to the best commit
+the same way as a discard. If the user changed the code or the machine since the last measurement,
+rerun the primary measurement before new work. Finished attempts stay finished, so pick up from the
+next step in the status file.
 
 ## The primary goal wins
 
@@ -65,15 +67,13 @@ Codex's goal instructions already ask whether each turn made progress. This rule
   decision that would unblock it. That decision usually belongs to the user, such as accepting the
   best result so far, relaxing a guardrail, changing the target, or providing a resource like more
   hardware or data.
-- Then follow Codex's blocked rule. Leave the goal active and report the stall. On each following
-  goal turn, check whether anything changed, such as a reply from the user, new evidence, or an
-  approach the report did not cover. If something did, act on it under the same limits. If nothing
-  did, keep the turn short and report the same stall in a line or two. When the same stall has held
-  for three consecutive goal turns, counting the turn that wrote the report, call `update_goal` with
-  status `blocked`.
-
-Codex reserves pausing a goal for the user, and marking it blocked before the third turn skips its
-audit, so neither is a way out of a stall.
+- Then follow Codex's blocked rule. Leave the goal active and report the stall. The contract's
+  attempts are spent, so another variation is no longer an available next action. On each following
+  goal turn, check whether the user replied or something outside the run changed, such as new
+  hardware, data or a fixed dependency. If so, act on it under the same limits. If not, keep the
+  turn short and report the same stall in a line or two. When the same stall has held for three
+  consecutive goal turns, counting the turn that wrote the report, call `update_goal` with status
+  `blocked`.
 
 ## Done
 
@@ -88,8 +88,12 @@ fails twice after fixes, write the stall report for that item and follow the blo
 When every done item passes, close the run.
 
 1. Rerun the primary measurement on the final commit and compare it with the baseline.
-2. Stop any background jobs you started and delete your own temporary files.
+2. Stop any background jobs you started and delete your own temporary files outside `.goal/`, which
+   stays as the record of the run.
 3. Run the completion audit from Codex's goal instructions, then call `update_goal` with status
    `complete`.
 4. Report the baseline and the final number, what changed, what was dropped and why, what remains,
    and the branch the work is on.
+
+When Codex reports that the token budget is reached, start no new attempt. Return the checkout to the
+best commit, update `.goal/status.md`, and report as in step 4.
