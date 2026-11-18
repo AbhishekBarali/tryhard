@@ -121,6 +121,8 @@ if __name__ == "__main__":
     print(f"OK: '{name}' is solvable in {result} moves")
 EOF
 
+# Keep Python's bytecode cache out of `git status`.
+printf '__pycache__/\n' > .gitignore
 git add -A
 git -c user.name=eval -c user.email=eval@example.com commit -q -m "scenario 04 setup"
 echo "Scenario 04 ready in $dir"

@@ -55,6 +55,8 @@ with open("data/orders.csv", "w", newline="") as f:
         w.writerow([random.choice(names), f"{random.uniform(5, 500):.2f}"])
 EOF
 
+# Keep Python's bytecode cache out of `git status`.
+printf '__pycache__/\n' > .gitignore
 git add -A
 git -c user.name=eval -c user.email=eval@example.com commit -q -m "scenario 07 setup"
 echo "Scenario 07 ready in $dir"
