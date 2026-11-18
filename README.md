@@ -3,7 +3,7 @@
 A Codex plugin for GPT-6.2 Astra and Sol. It helps the models carry a job to the end: agree what
 "done" means, do the whole task, check it, and explain the result in plain words.
 
-## What it fixes
+## What it targets
 
 - **Stopping early.** It agrees what finished looks like before starting, and a QA request ends in fixes, not a list of issues.
 - **Questions nobody can answer.** It looks things up and decides routine choices itself, and it never asks you about files it made.
@@ -66,25 +66,39 @@ $follow-through:raise-the-bar Build a landing page for a small bakery in Lisbon.
 ```
 
 `raise-the-bar` writes down what a demanding expert would check, builds a complete first version,
-looks at it for real, then reviews and improves it. It stops when a pass finds only minor issues
-or makes no visible difference, after at most 5 passes unless you give another number. It costs
-more than a single pass.
+looks at it for real, then reviews and improves it in rounds. It stops when a round finds only
+minor issues or makes no visible difference, after at most 5 rounds unless you give another
+number. It costs more than a single pass. It keeps each version recoverable, for example as a
+local commit on a work branch.
 
 ```text
 $follow-through:set-a-goal Make the test suite run under 2 minutes without dropping tests.
 ```
 
-`set-a-goal` turns a request into a Codex `/goal` for a long run. It writes `.goal/contract.md` in
-your workspace with the main measure, how it is measured and its starting value, the side goals in
-order, what is out of scope and how "done" is proved. Then it starts the goal, or gives you the
-exact `/goal` line to paste. It also suggests a token budget so the run has a natural end.
+`set-a-goal` turns a request into a Codex `/goal` for a long run. It measures the starting value
+first, then writes `.goal/contract.md` with the main measure and the command for it, the side goals
+in order, what is out of scope and how "done" is proved. Then it starts the goal, or gives you the
+exact `/goal` line to paste.
+
+It changes your workspace and git state, so know this before you run it:
+
+- It creates a `.goal/` folder (contract, attempt ledger, status and logs) and adds it to the
+  repo's local exclude file, `.git/info/exclude`, so it never shows up in commits.
+- If the folder is not a git repository yet, it runs `git init` and commits the current files.
+- It works on a new branch named `goal/` plus a short name. Any uncommitted changes you had become
+  the first commit on that branch.
+- Every attempt is a commit. An attempt that doesn't beat the best result so far is dropped with
+  `git reset --keep`, which leaves your other local changes in place.
+
+It sets a token budget only if you name one in your request. To cap every goal, set
+`max_goal_token_budget` under `[goals]` in `~/.codex/config.toml`.
 
 ## Reasoning effort
 
 Codex's model catalog sets both GPT-6.2 models to low effort by default. OpenAI's launch charts
-show scores at low effort falling sharply compared with the previous models, and OpenAI's own
-guide says higher effort helps the model stay with a long task through the final checks. So use
-more for real work:
+show a benchmark score at low effort falling sharply compared with the previous models, and
+OpenAI's own guide says higher effort helps the model stay with a long task through the final
+checks. So use more for real work:
 
 - **high** or **xhigh** for multi-step builds, debugging and investigations.
 - **ultra** for work that splits into parallel parts. Codex then decides on its own when to use subagents.
