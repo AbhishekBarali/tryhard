@@ -1,6 +1,6 @@
 ---
 name: finish-the-job
-description: Use for multi-step coding, debugging, QA, build or investigation work that should end fixed and verified, including requests to test or check something when you can edit the files. Not for quick questions, explanations or one-line edits.
+description: Use for multi-step coding, debugging, QA, build or investigation work that should end fixed and verified, including requests to test something or check that it works when you can edit the files. Not for questions, explanations, plans, review-only requests or one-line edits.
 ---
 
 # Finish the job
@@ -34,14 +34,14 @@ to confirm it. Write the checks in the user's terms, as things someone can obser
 
 ## Do the whole job
 
-With write access, "QA, test, check or debug X" means find the problems, reproduce each one, find
-the cause, fix it, re-check, and report. Each issue ends in one of three states that the report
+With write access, a request to QA, test or debug X, or to check that X works, means find the
+problems, reproduce each one, find the cause, fix it, re-check, and report. Each issue ends in one of three states that the report
 names. It is fixed and you say how you confirmed it, it is left open and you say why, or it is left
 as it is on purpose and you say why. A list of issues with nothing fixed is an unfinished task.
 
 Deliver only a report when the user says so, or asks for a review, a plan or an explanation. In Plan
-mode, deliver the plan. A plain question gets an answer, and code changes only when the request asks
-for a change or for QA, testing or debugging.
+mode, deliver the plan. A question about how things stand, such as whether the server is up or why CI
+is red, gets the answer with its evidence and leaves the files as they are.
 
 When the next step is inside the task and reversible, do it, then report it. Ending on an offer to do
 that step hands the work back to someone who already asked for it.
@@ -55,6 +55,8 @@ Ask the user only when all three of these hold.
 2. It matters, because different answers lead to results that are costly to redo.
 3. No safe default exists, meaning you cannot pick a reasonable, reversible option now and change it
    later.
+
+In Plan mode, Plan mode's own rules for questions apply.
 
 Everything else, find out or decide. Read, run, search, check the git history, try it. Anything you
 or your subagents made in this session (files, clips, branches, logs, reports) is on disk, so inspect
@@ -114,20 +116,24 @@ another validation pass, more polish or a drive-by cleanup costs the user time a
 asked for. When the user asked for repeated improvement rounds, their stopping rule decides when the
 work is done.
 
-For substantial work (changes across three or more files, a new feature, a long run, or anything
+For substantial work (changes across five or more files, a new feature, a long run, or anything
 the user called important), add an independent review before the final message. Read
 [references/reviewer-brief.md](references/reviewer-brief.md), fill it in, and give it to a fresh
 subagent started without your conversation history (with `fork_turns` set to `none` where the spawn
 tool has that option). Fix what it marks serious in one pass, rerun the affected checks, and stop.
 If subagents are unavailable, do the same review yourself, starting from only the request, the done
-checks and the diff.
+checks and the diff. A fresh review that already ran on the finished result, such as the last
+raise-the-bar round or a goal's evaluator, counts as this review.
 
 ## When it stalls
 
-An attempt that moves no done check has failed. After three failed attempts in a row, switch to a
-different mechanism, since a fourth variation of the same idea rarely lands. Allow three approaches
-in all. When the third approach has also failed three times in a row, stop and report what you
-tried, what blocks it, and the one decision or resource that would unblock it.
+An attempt is one change you try for a problem, judged by the done checks. Reading, searching and
+running diagnostics are investigation and do not count. After three attempts in a row that move no
+done check, switch to a different mechanism, since a fourth variation of the same idea rarely lands.
+Allow three approaches in all. When the third approach has also failed three times in a row, stop
+working on that problem, finish the parts that do not depend on it, and report what you tried, what
+blocks it, and the one decision or resource that would unblock it. In a Codex goal, leave the goal
+active and follow its blocked rule.
 
 ## Thoughts that mean you are about to stop early
 
@@ -138,7 +144,7 @@ tried, what blocks it, and the one decision or resource that would unblock it.
 | "I'll ask which file they meant." | If it is in the repo or you made it, you can look. Check, pick, note it. |
 | "One more check to be safe." | Once the done checks pass with fresh evidence, the job is done. Stop. |
 | "Good enough for a first version." | The user asked for the finished thing. Keep going until the checks pass. |
-| "This part is hard, I'll leave it." | Keep at it. If it truly cannot be done, report that part as open with the reason. |
+| "This part is hard, I'll leave it." | Keep at it until the stall rule says to stop, then report that part as open with what blocks it. |
 
 ## Final message
 
