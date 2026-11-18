@@ -1,0 +1,6 @@
+interface:
+  display_name: "Raise the bar"
+  short_description: "Review and improve a result until it stops improving"
+  default_prompt: "Use $follow-through:raise-the-bar to build this and keep improving it until an expert would sign off."
+policy:
+  allow_implicit_invocation: false

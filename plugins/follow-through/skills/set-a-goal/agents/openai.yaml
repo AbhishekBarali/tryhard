@@ -1,0 +1,6 @@
+interface:
+  display_name: "Set a goal"
+  short_description: "Start a measured, self-checking Codex goal"
+  default_prompt: "Use $follow-through:set-a-goal to set up a goal that makes this measurably faster without breaking the tests."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Finish the job"
+  short_description: "Carry multi-step work to a checked finish"
+  default_prompt: "Use $follow-through:finish-the-job to fix this, confirm it works, and tell me plainly what changed."

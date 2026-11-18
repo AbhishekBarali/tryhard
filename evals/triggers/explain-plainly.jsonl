@@ -1,0 +1,20 @@
+{"id": "ep-01", "skill": "explain-plainly", "prompt": "Why are git worktrees so slow on this machine?", "should_trigger": true, "why": "a why question"}
+{"id": "ep-02", "skill": "explain-plainly", "prompt": "Why does the app use 4 GB of memory after an hour?", "should_trigger": true, "why": "a why question"}
+{"id": "ep-03", "skill": "explain-plainly", "prompt": "I'm confused. What did you actually change in the last run?", "should_trigger": true, "why": "user is confused, asks for a summary"}
+{"id": "ep-04", "skill": "explain-plainly", "prompt": "Explain how the caching layer in this repo decides when to refresh.", "should_trigger": true, "why": "explanation request"}
+{"id": "ep-05", "skill": "explain-plainly", "prompt": "Summarise what this branch does compared with main.", "should_trigger": true, "why": "summary of work"}
+{"id": "ep-06", "skill": "explain-plainly", "prompt": "Why did the build pass locally but fail in CI?", "should_trigger": true, "why": "a why question"}
+{"id": "ep-07", "skill": "explain-plainly", "prompt": "Can you explain the error in the log I pasted? I don't follow it.", "should_trigger": true, "why": "explanation of an error"}
+{"id": "ep-08", "skill": "explain-plainly", "prompt": "What's going on with the flaky login test? Give me the short version first.", "should_trigger": true, "why": "diagnosis explanation"}
+{"id": "ep-09", "skill": "explain-plainly", "prompt": "Explain to my manager why the release slipped, based on the commit history.", "should_trigger": true, "why": "explanation for a reader without context"}
+{"id": "ep-10", "skill": "explain-plainly", "prompt": "Why does parse_date('2026-02-30') return March 2 instead of failing?", "should_trigger": true, "why": "a why question about behaviour"}
+{"id": "ep-11", "skill": "explain-plainly", "prompt": "Add docstrings to every public function in utils.py.", "should_trigger": false, "why": "writing code comments, not explaining to the user"}
+{"id": "ep-12", "skill": "explain-plainly", "prompt": "Fix the flaky login test.", "should_trigger": false, "why": "a fix request"}
+{"id": "ep-13", "skill": "explain-plainly", "prompt": "Write the CHANGELOG entry for version 2.4.", "should_trigger": false, "why": "a deliverable document"}
+{"id": "ep-14", "skill": "explain-plainly", "prompt": "Generate API reference docs from the OpenAPI spec.", "should_trigger": false, "why": "generation task"}
+{"id": "ep-15", "skill": "explain-plainly", "prompt": "Make the error message for a missing config file clearer for users.", "should_trigger": false, "why": "code change to user-facing copy"}
+{"id": "ep-16", "skill": "explain-plainly", "prompt": "Convert this README to Spanish.", "should_trigger": false, "why": "translation"}
+{"id": "ep-17", "skill": "explain-plainly", "prompt": "Run the benchmarks and save the results to bench.csv.", "should_trigger": false, "why": "a run task"}
+{"id": "ep-18", "skill": "explain-plainly", "prompt": "Format all Python files with black.", "should_trigger": false, "why": "a mechanical task"}
+{"id": "ep-19", "skill": "explain-plainly", "prompt": "Add a --verbose flag that prints each step.", "should_trigger": false, "why": "a feature request"}
+{"id": "ep-20", "skill": "explain-plainly", "prompt": "Write a blog post announcing the new release.", "should_trigger": false, "why": "a writing deliverable, not an explanation of work or behaviour"}
