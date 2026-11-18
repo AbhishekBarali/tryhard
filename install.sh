@@ -167,7 +167,8 @@ Next steps for Codex:
        codex plugin marketplace add "$script_dir"
 
   2. Start Codex, type /hooks and trust the Follow Through Stop hook. Codex skips
-     plugin hooks until you trust them, and asks again when an update changes the hook.
+     plugin hooks until you trust them. The approval covers every file in the plugin,
+     so Codex asks again after each plugin update.
 
   3. Optional: use the higher-effort profile.
 
