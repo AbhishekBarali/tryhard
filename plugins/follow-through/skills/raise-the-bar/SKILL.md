@@ -55,7 +55,8 @@ minor.
 
 ## Fix the biggest gaps
 
-Fix everything that blocks the bar, then the visibly weaker items in order. Then look at the result
+Fix everything that blocks the bar, then the visibly weaker items in order. A gap that three
+different tries have not closed stays open for the final message. Then look at the result
 for real again and compare it with the previous version. When a fix improves a lower-ranked check
 but makes a higher-ranked one worse, undo it, because the main goal outranks every side goal.
 
