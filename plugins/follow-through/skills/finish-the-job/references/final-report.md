@@ -14,7 +14,7 @@ put no labels in front of them.
    result.
 2. What changed, in plain words. Give a path when the user will want to open the file.
 3. How you checked it, and plainly what you could not check.
-4. What is still open or was left out of the request, and why.
+4. Any part of the request that is still open, and why.
 5. Decisions you made for the user that they may want to change, and anything only they can decide.
    Give each with the default you already applied and how to change it. Where no safe default
    existed, give the options with your recommendation first.
