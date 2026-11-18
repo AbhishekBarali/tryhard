@@ -58,17 +58,23 @@ has_start() { [ -f "$agents" ] && grep -qxF "$START_MARKER" "$agents"; }
 has_end() { [ -f "$agents" ] && grep -qxF "$END_MARKER" "$agents"; }
 
 # Print the current file with the marked block replaced by the file in $1
-# (or removed when $1 is empty). Lines outside the block are kept as they are.
+# (or removed when $1 is empty). Lines outside the block are kept as they are,
+# except that removing the block also drops the one blank line the installer
+# put before it, so install then remove gives back the original file.
 rewrite() {
   awk -v start="$START_MARKER" -v end="$END_MARKER" -v block="${1:-}" '
+    function flush() { if (held) { print last; held = 0 } }
     $0 == start {
+      if (block == "" && held && last == "") { held = 0 } else { flush() }
       if (block != "" && !written) { while ((getline line < block) > 0) print line }
       written = 1
       skipping = 1
       next
     }
     skipping && $0 == end { skipping = 0; next }
-    !skipping { print }
+    skipping { next }
+    { flush(); last = $0; held = 1 }
+    END { flush() }
   ' "$agents"
 }
 

@@ -102,11 +102,26 @@ class InstallTests(unittest.TestCase):
         self.run_install()
         result = self.run_install("--remove")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertNotIn(START, self.read(self.agents))
-        self.assertIn("Before.", self.read(self.agents))
+        self.assertEqual(self.read(self.agents), "Before.\n")
         self.assertIn("codex plugin remove follow-through@follow-through", result.stdout)
         again = self.run_install("--remove")
         self.assertIn("Nothing changed", again.stdout)
+
+    def test_install_then_remove_gives_back_the_original(self):
+        os.makedirs(self.home)
+        original = "# My rules\n\nUse tabs.\n"
+        self.write(self.agents, original)
+        for _ in range(3):
+            self.run_install()
+            self.run_install("--remove")
+        self.assertEqual(self.read(self.agents), original)
+
+    def test_remove_from_the_middle_keeps_the_text_around_it(self):
+        os.makedirs(self.home)
+        self.write(self.agents, "Before.\n\n" + START + "\nold text\n" + END + "\n\nAfter.\n")
+        result = self.run_install("--remove")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.read(self.agents), "Before.\n\nAfter.\n")
 
     def test_missing_snippet_is_reported_and_nothing_is_written(self):
         os.remove(self.snippet)
