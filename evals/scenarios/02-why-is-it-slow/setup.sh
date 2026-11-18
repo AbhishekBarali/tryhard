@@ -65,6 +65,8 @@ deps = {f"pkg-{n}": f"1.{n}.0" for n in range(400)}
 json.dump({"name": "shop", "dependencies": deps}, open("package-lock.json", "w"), indent=2)
 EOF
 printf '[pytest]\naddopts = -p no:cacheprovider\n' > pytest.ini
+# Keep Python's bytecode cache out of `git status`, so the "no files changed" check stays clean.
+printf '__pycache__/\n' > .gitignore
 
 git add -A
 git -c user.name=eval -c user.email=eval@example.com commit -q -m "scenario 02 setup"

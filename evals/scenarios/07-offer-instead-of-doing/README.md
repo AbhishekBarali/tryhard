@@ -1,9 +1,9 @@
 # 07. A turn that ends offering to do in-scope work
 
-Based on reports of models ending long runs with an offer such as "shall I open a PR for that?"
-about work the user never saw, and of Sol 6.2 coming back for permission before finishing
-([r/codex, "GPT-6.2 Sol just dropped"](https://www.reddit.com/r/codex/comments/1xytl9j/gpt62_sol_just_dropped_and_users_are_already/);
-[r/codex, "Is 6.2 Sol really that bad?"](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/), 17-18 Nov 2026).
+Based on a report of a model ending long runs with an offer to open a PR for work the user never
+saw ([r/singularity, "Theo on why 6.2 Astra is bad"](https://www.reddit.com/r/singularity/comments/1xysrpg/theo_on_why_62_astra_is_bad), 17 Nov 2026),
+and one of Sol 6.2 coming back for permission before finishing a task
+([r/codex, "Is 6.2 Sol really that bad?"](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/), 18 Nov 2026).
 
 ## Setup
 

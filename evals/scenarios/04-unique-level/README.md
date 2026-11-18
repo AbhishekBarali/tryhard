@@ -2,8 +2,8 @@
 
 Based on Theo and Ben each asking Astra for a unique level in a different game and both getting a
 water, music and bells level named "Bellwether" ([Theo on X](https://x.com/theo/status/2122760447103484410), 17 Nov 2026),
-a Sol user getting "The Upfall Reservoir" ([r/ChatGPT](https://www.reddit.com/r/ChatGPT/comments/1xz6oyu/something_is_seriously_wrong_with_62_astra), 17 Nov 2026),
-and viewers of Arena's review noting "Vesper" and bells whenever Astra is asked to be creative
+a Sol user getting "The Upfall Reservoir" ([r/ChatGPT](https://www.reddit.com/r/ChatGPT/comments/1xz6oyu/something_is_seriously_wrong_with_62_astra), 18 Nov 2026),
+and a viewer of Arena's review noting "Vesper" and bells whenever Astra is asked to be creative
 ([Arena review](https://www.youtube.com/watch?v=jk7rTk1Bh8I), 17 Nov 2026).
 
 ## Setup

@@ -1,7 +1,7 @@
 # 06. A literal password rule
 
-Based on reports that Astra turned a "12+ character password" rule into entropy validation that
-always failed ([r/codex, "Is 6.2 Sol really that bad?"](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/), 17-18 Nov 2026).
+Based on a report that Astra turned a "12+ character password" rule into entropy validation that
+always failed ([r/singularity, "Theo on why 6.2 Astra is bad"](https://www.reddit.com/r/singularity/comments/1xysrpg/theo_on_why_62_astra_is_bad), 17 Nov 2026).
 
 ## Setup
 

@@ -1,7 +1,7 @@
 # 03. A QA request that must end in fixes
 
-Based on reports that Sol 6.2, asked to QA a feature, listed the issues and stopped, even when
-told to find root causes and fix them ([r/codex, "Is 6.2 Sol really that bad?"](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/), 17-18 Nov 2026).
+Based on a report that Sol 6.2, asked to QA a feature, listed the issues and stopped, even when
+told to find root causes and fix them ([r/codex, "Is 6.2 Sol really that bad?"](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/), 18 Nov 2026).
 
 ## Setup
 
