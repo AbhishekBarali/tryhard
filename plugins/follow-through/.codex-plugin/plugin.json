@@ -1,0 +1,45 @@
+{
+  "name": "follow-through",
+  "version": "0.1.0",
+  "description": "Gets Codex to carry a task to the end: agree what done means, do the whole job, decide routine things itself, stop loops that make no progress, and report results in plain words.",
+  "author": {
+    "name": "Abhishek Barali",
+    "url": "https://github.com/AbhishekBarali"
+  },
+  "homepage": "https://github.com/AbhishekBarali/follow-through",
+  "repository": "https://github.com/AbhishekBarali/follow-through",
+  "license": "MIT",
+  "keywords": [
+    "finish the job",
+    "definition of done",
+    "verification",
+    "long-running goals",
+    "plain reports",
+    "fewer questions",
+    "creative options",
+    "gpt-6.2"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Follow Through",
+    "shortDescription": "Finish the whole job, decide routine things, report plainly",
+    "longDescription": "Follow Through makes Codex agree what done means before it starts, do the whole job instead of the minimum, answer its own questions by looking instead of blocking on them, change approach or stop with a clear report when a long run stalls, explore real options when a task leaves a creative choice open, and end with a report written for someone who only saw their own request. It adds an explicit raise-the-bar loop, a skill that sets up a strong /goal, and a small Stop hook that catches hand-back offers, questions about the agent's own files, and hard-to-read reports.",
+    "developerName": "Abhishek Barali",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/AbhishekBarali/follow-through",
+    "defaultPrompt": [
+      "$follow-through:raise-the-bar Build this, then keep improving it until another pass no longer makes it better",
+      "$follow-through:set-a-goal Set up a long-running goal for this task with a measured baseline and clear done checks",
+      "$follow-through:raise-the-bar Review what you built like a demanding expert and fix the biggest gaps"
+    ],
+    "brandColor": "#C2410C",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "screenshots": []
+  }
+}
