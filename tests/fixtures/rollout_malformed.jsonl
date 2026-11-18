@@ -1,0 +1,12 @@
+this line is not json at all
+{"timestamp":"2026-11-18T12:00:00.000Z","type":"event_msg","payload":{"type":"item_completed","item":{"type":"UserMessage","content":[{"type":"text","text":"Rename the config loader in lib/config_loader.rb."
+[1, 2, "user"]
+"just a string with user in it"
+{"type":"event_msg","payload":"user_message as a string"}
+{"type":"event_msg","payload":{"type":"user_message","message":["not","a","string"]}}
+{"type":"event_msg","payload":{"type":"item_completed","item":{"type":"UserMessage","content":"not a list"}}}
+{"type":"event_msg","payload":{"type":"item_completed","item":{"type":"UserMessage","content":[{"type":"text","text":42},{"type":"image","image_url":"data:image/png;base64,AAAA"},"user"]}}}
+{"type":"turn_context","payload":{"collaboration_mode":"plan"}}
+{"type":"response_item","payload":{"type":"message","role":"user","content":null}}
+
+{"timestamp":"2026-11-18T12:00:09.000Z","type":"event_msg","payload":{"type":"item_completed","thread_id":"t","turn_id":"u","item":{"type":"UserMessage","id":"m","content":[{"type":"text","text":"Rename the config loader in lib/config_loader.rb.","text_elements":[]}]}}}

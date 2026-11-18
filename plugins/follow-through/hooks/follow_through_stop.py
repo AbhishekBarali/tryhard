@@ -297,7 +297,8 @@ def extract_identifiers(text):
     for pattern in (PATH_RE, FILENAME_RE, UUID_RE, HEX_ID_RE, RUN_ID_RE):
         for match in pattern.finditer(outside):
             spans.append((match.start(), match.group(match.lastindex or 0)))
-    for _, token in sorted(spans):
+    # Longest match first where two start together ("24_g521.mp4" before "24_g521").
+    for _, _, token in sorted((start, -len(token), token) for start, token in spans):
         add(token)
     return found
 
@@ -388,7 +389,7 @@ def own_work_reason(names):
 # ---------------------------------------------------------------------------
 # Check 3: hard-to-read reports
 
-LONG_MESSAGE_CHARS = 1000
+LONG_MESSAGE_CHARS = 800
 DENSE_MIN_WORDS = 30
 DENSE_MIN_CODE = 7
 DENSE_RATIO = 0.15
@@ -439,6 +440,23 @@ def semicolons(text):
     return CODE_SPAN_RE.sub(" ", text).count(";")
 
 
+LINE_BREAK_END_RE = re.compile(r"(?:[.!?:)]|  |\\)$")
+
+
+def units(block):
+    """Split a block into what a reader sees as separate pieces.
+
+    List items and lines that end in a hard break or a full stop each count on
+    their own; a paragraph that is merely wrapped across lines stays whole.
+    """
+    if is_list_block(block):
+        return [unit for unit in re.split(r"\n(?=\s*(?:[-*+]|\d+[.)])\s+)", block) if unit.strip()]
+    lines = [line for line in block.split("\n") if line.strip()]
+    if len(lines) > 1 and sum(1 for line in lines[:-1] if LINE_BREAK_END_RE.search(line)) == len(lines) - 1:
+        return lines
+    return [block]
+
+
 def check_readability(message):
     """Return a short description of what makes the report hard to read."""
     prose = strip_code_blocks(message)
@@ -450,7 +468,7 @@ def check_readability(message):
     if not blocks:
         return None
 
-    opening = blocks[0]
+    opening = units(blocks[0])[0]
     words = word_count(opening)
     code = count_code_names(opening)
     opening_semis = semicolons(opening)
@@ -463,10 +481,7 @@ def check_readability(message):
         )
 
     for block in blocks:
-        units = [block]
-        if is_list_block(block):
-            units = re.split(r"\n(?=\s*(?:[-*+]|\d+[.)])\s+)", block)
-        for unit in units:
+        for unit in units(block):
             count = semicolons(unit)
             if count >= SEMICOLON_LIMIT:
                 return "one paragraph strings %d clauses together with semicolons" % (count + 1)
@@ -630,27 +645,36 @@ ASK_ME_RE = re.compile(
     r"\b(?:ask me|interview me|check with me|confirm with me|ask before|ask first|"
     r"before you (?:start|change|edit|do|implement))\b"
 )
-ACTION_RE = re.compile(
-    r"\b(?:fix|implement|add|build|create|make|update|change|refactor|write|remove|delete|migrate|"
-    r"set up|setup|install|run|test|debug|qa|finish|complete|do it|go ahead|resolve|patch|optimi[sz]e|"
-    r"improve|rename|move|convert|port|upgrade|clean up|wire|ship|deploy|generate|draft)\b"
+# A sentence that starts with an instruction ("Fix ...", "Can you add ...",
+# "Please run ...") makes the request a task.
+INSTRUCTION_RE = re.compile(
+    r"^(?:(?:ok|okay|so|now|then|also|and|great|thanks|cool|good|perfect|looks good),?\s+)*"
+    r"(?:please\s+|(?:can|could|would|will) you\s+(?:please\s+)?|i (?:need|want) you to\s+|"
+    r"(?:go ahead and|let's|lets)\s+)?"
+    r"(?:fix|implement|add|build|create|make|update|change|refactor|write|remove|delete|migrate|"
+    r"set up|setup|install|run|test|debug|qa|finish|complete|do|resolve|patch|optimi[sz]e|improve|"
+    r"rename|move|convert|port|upgrade|clean up|wire|ship|deploy|generate|draft|cut|export|get|put|"
+    r"use|try|continue|keep going|go ahead|redo|rewrite|replace|split|merge|bump|speed up|check|"
+    r"verify|find and fix|investigate and fix)\b"
 )
-QUESTION_START_RE = re.compile(
-    r"^(?:what|why|how|when|where|which|who|whose|is|are|was|were|does|do|did|can|could|should|"
-    r"would|will|explain|tell me)\b"
-)
+WH_QUESTION_RE = re.compile(r"^(?:what|why|how|when|where|which|who|whose|explain|tell me)\b")
+YES_NO_QUESTION_RE = re.compile(r"^(?:is|are|was|were|does|do|did|has|have|should|can|could|would|will)\b")
 
 
 def wants_answer_only(user_text):
-    """True when the latest request reads as a question, review or plan."""
+    """True when the latest request reads as a question, a review or a plan."""
     text = plain(user_text).strip()
     if not text:
         return False
     if ANSWER_ONLY_RE.search(text) or ASK_ME_RE.search(text):
         return True
-    if ACTION_RE.search(text):
+    parts = sentences(text) or [text]
+    if any(INSTRUCTION_RE.match(part) for part in parts):
         return False
-    return text.endswith("?") or bool(QUESTION_START_RE.match(text))
+    return any(
+        WH_QUESTION_RE.match(part) or (part.endswith("?") and YES_NO_QUESTION_RE.match(part))
+        for part in parts
+    )
 
 
 # ---------------------------------------------------------------------------
