@@ -23,9 +23,15 @@ codex plugin marketplace add AbhishekBarali/follow-through
 codex plugin add follow-through@follow-through
 ```
 
+From a local clone you can pass the folder instead: `codex plugin marketplace add
+/path/to/follow-through`. Codex copies the plugin when you install it, so after pulling changes run
+`codex plugin marketplace upgrade follow-through` and then `codex plugin add
+follow-through@follow-through` again.
+
 Then start Codex, open `/hooks` and trust the Follow Through Stop hook. Codex skips plugin hooks
 until you trust them, so without this step the hook never runs. In the desktop app the same list
-is under Settings > Hooks. You will be asked again after an update changes the hook.
+is under Settings > Hooks. Codex asks again after any update to the plugin, because the approval
+covers every file in it, not only the hook. Editing a skill is enough to trigger it.
 
 ### Optional: the always-on block
 
@@ -38,9 +44,10 @@ cd follow-through
 ./install.sh
 ```
 
-`install.sh` backs up `~/.codex/AGENTS.md`, adds the block between clear markers (running it again
-does not add a second copy) and prints the plugin steps above. It changes nothing else. The block
-itself is in `agents-md/AGENTS.snippet.md` if you prefer to paste it by hand.
+`install.sh` backs up `~/.codex/AGENTS.md` (or `$CODEX_HOME/AGENTS.md` if you set `CODEX_HOME`),
+adds the block between two marker lines (running it again does not add a second copy) and prints
+the plugin steps above. It changes nothing else. The block itself is in
+`agents-md/AGENTS.snippet.md` if you prefer to paste it by hand.
 
 ### Optional: a profile with higher effort
 
@@ -50,6 +57,10 @@ See [Reasoning effort](#reasoning-effort) for why. From the clone:
 cp profiles/follow-through.config.toml ~/.codex/follow-through.config.toml
 codex --profile follow-through
 ```
+
+The profile sets reasoning effort to high, including in Plan mode and for subagents, and
+verbosity to medium. Its comments say when to switch to xhigh or ultra. Codex layers it on top of
+your `~/.codex/config.toml`, so nothing else changes.
 
 ## How to use it
 
@@ -104,12 +115,17 @@ checks. So use more for real work:
 - **ultra** for work that splits into parallel parts. Codex then decides on its own when to use subagents.
 - **medium** is fine for quick look-ups and small edits.
 
-Set it with `/model` in the CLI, or in a profile:
+Set it with `/model` in the CLI, or in a profile. The one in `profiles/follow-through.config.toml`
+sets these:
 
 ```toml
-model_reasoning_effort = "xhigh"
-# Optional. Codex defaults to low verbosity, and the launch reviews found 6.2 answers over-compressed.
+model_reasoning_effort = "high"        # "xhigh" for hard investigations, "ultra" for parallel work
+plan_mode_reasoning_effort = "high"
+# Codex defaults to low verbosity, and the launch reviews found 6.2 answers over-compressed.
 model_verbosity = "medium"
+
+[agents]
+default_subagent_reasoning_effort = "high"
 ```
 
 ## The Stop hook
@@ -125,20 +141,31 @@ It sends the model back at most once per turn, goes quiet for the session after 
 fires 3 times in a row, and does nothing if anything goes wrong. A plain question or a plan you
 asked for is left alone.
 
-To turn it off, untrust or disable it in `/hooks`. To turn it off from the shell you start Codex
-from, set `FOLLOW_THROUGH_HOOK=off`. To keep only some checks, set `FOLLOW_THROUGH_CHECKS` to a
-comma-separated list of `handback`, `own-work` and `readability`.
+To turn it off, untrust or disable it in `/hooks`. The hook also reads two environment variables,
+which have to be set in the environment Codex starts with:
+
+```bash
+FOLLOW_THROUGH_HOOK=off codex                       # hook off for this session
+FOLLOW_THROUGH_CHECKS=handback,own-work codex       # run only these checks
+```
+
+`FOLLOW_THROUGH_CHECKS` takes a comma-separated list of `handback`, `own-work` and `readability`,
+or `all` or `none`.
 
 ## Uninstall
+
+If you added the always-on block, run `./install.sh --remove` from the clone. You can also delete
+the two Follow Through marker lines and everything between them in `~/.codex/AGENTS.md` (the
+installer left a backup next to it). Then remove the plugin:
 
 ```bash
 codex plugin remove follow-through@follow-through
 codex plugin marketplace remove follow-through
 ```
 
-If you added the always-on block, delete the lines between the Follow Through markers in
-`~/.codex/AGENTS.md` (the installer left a backup next to it). If you copied the profile, delete
-`~/.codex/follow-through.config.toml`.
+To forget the hook approval too, delete the
+`[hooks.state."follow-through@follow-through:hooks/hooks.json:stop:0:0"]` table from
+`~/.codex/config.toml`. If you copied the profile, delete `~/.codex/follow-through.config.toml`.
 
 ## Evals
 
