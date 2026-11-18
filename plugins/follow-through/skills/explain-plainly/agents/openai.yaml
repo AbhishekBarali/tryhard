@@ -1,0 +1,4 @@
+interface:
+  display_name: "Explain plainly"
+  short_description: "Lead with the cause or result, in plain words"
+  default_prompt: "Use $explain-plainly to tell me why this happens, starting with the main cause."
