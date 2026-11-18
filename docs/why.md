@@ -90,7 +90,7 @@ The `set-a-goal` skill writes `.goal/contract.md` before a long run. It holds th
 - The primary metric wins. A change that makes it worse by more than noise is dropped, whatever it does for a side goal.
 - One idea per attempt. Commit, measure, keep it only if it beats the best so far by more than noise, otherwise reset to the best commit.
 - An append-only ledger of attempts and a short status file, read at the start of each turn.
-- A stall rule. After 3 attempts without a keep, change to a different mechanism. After 2 such changes without a keep, write a stall report that says what would unblock it.
+- A stall rule. Reading and investigating don't count as attempts, only changes that get measured do. After 3 attempts without a keep, change to a different mechanism. After 2 such changes without a keep, write a stall report that says what would unblock it.
 - Tests and benchmarks are read-only. A fresh evaluator decides "done".
 - A token budget is set only when you name one. Without one, the stall rule still ends the run with a report.
 - For tasks without a number, such as a game level or a design, the done-when checks plus an evaluator's rubric take the metric's place.
@@ -148,8 +148,8 @@ The `fresh-ideas` skill runs only when a task leaves open a choice the user will
 1. The answer or result in one or two plain sentences. For a "why", the main cause and its evidence.
 2. What changed, in plain words.
 3. How it was checked, and plainly what was not checked.
-4. What is still open or was left out of the request, and why.
-5. Decisions made for the user that they may want to change, each with the default already applied.
+4. Any part of the request that was not done or could not be finished, and why.
+5. Decisions made for the user that they may want to change, each with the default already applied, and anything only they can decide.
 
 Empty parts are left out. The message is written for someone who saw only their own request, so it contains no run numbers, subagent names or labels made up during the work. The `explain-plainly` skill adds a pre-send check and one worked before-and-after example. The Stop hook asks for one rewrite when a long message opens with a wall of code names or stacked semicolons.
 

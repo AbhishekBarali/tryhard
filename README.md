@@ -94,10 +94,15 @@ exact `/goal` line to paste.
 It changes your workspace and git state, so know this before you run it:
 
 - It creates a `.goal/` folder (contract, attempt ledger, status and logs) and adds it to the
-  repo's local exclude file, `.git/info/exclude`, so it never shows up in commits.
-- If the folder is not a git repository yet, it runs `git init` and commits the current files.
-- It works on a new branch named `goal/` plus a short name. Any uncommitted changes you had become
-  the first commit on that branch.
+  repo's local exclude file, `.git/info/exclude`, so it never shows up in commits. Dependency
+  folders, build output, large data files and anything that looks like a secret go in the same
+  exclude file if git doesn't already ignore them.
+- If the project folder is not a git repository yet, it runs `git init` there and commits the
+  current files. It won't do this in your home folder or in a folder that holds other repositories.
+- It works on a new branch named `goal/` plus a short name and leaves your own branch where it was.
+  Any uncommitted changes you had become the first commit on that branch. To get them back on your
+  branch, `git switch` to it and run `git cherry-pick --no-commit` on that first commit. The final
+  message tells you which of these steps it took.
 - Every attempt is a commit. An attempt that doesn't beat the best result so far is dropped with
   `git reset --keep`, which leaves your other local changes in place.
 
