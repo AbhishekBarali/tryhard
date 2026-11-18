@@ -1,13 +1,15 @@
 ---
 name: explain-plainly
-description: Use when the user asks why something happens, asks for an explanation or a summary of finished work, or says an answer was confusing. Puts the main cause or result first, in plain words, for a reader who has not seen the work. Not for drafting documents or messages for other people.
+description: Use when the user asks why something happens or what is going on, asks for an explanation or a summary of work, or says an answer was confusing. Puts the main cause or result first, in plain words, for a reader who has not seen the work. Not for writing documents such as READMEs, changelogs, posts or code comments.
 ---
 
 # Explain plainly
 
 The person reading has seen their own messages and your earlier final answers, and none of your
 working. They did not see your commands, your reasoning, your subagents or your notes. Write for an
-intelligent reader who knows the field in general and has no other context on this session.
+intelligent reader who knows the field in general and has no other context on this session. When the
+explanation is for someone else, such as the user's manager, write for that person, who has seen
+even less.
 
 ## Lead with the answer
 
@@ -16,7 +18,13 @@ person can act on.
 
 For a "why" question, name the one cause that explains most of the effect and give the evidence for
 it, such as a measurement, a number or a command result. Put smaller causes in one line or leave
-them out. Go into internals only when the user asked for them or the fix depends on them.
+them out. Go into internals only when the user asked for them or the fix depends on them. Once you
+have evidence for a cause that explains most of the effect, stop digging and write. If there is an
+obvious fix, name it in one line after the cause.
+
+A question leaves the working tree as you found it, even when the answer is a bug, unless the user
+also asked for a change. Remove caches and other files your commands created that were not there
+before.
 
 ## Write it so it reads in one pass
 

@@ -59,10 +59,11 @@ they stay out of the deliverable and the final message.
 
 ## Decide
 
-Go ahead with the winner. In the final message, give it in one line with why it fits the brief, and
-the runner-up in one line. The user asked for a result, and a menu of options would hand the work
-back. Ask first only when the choice is purely a matter of taste, would be expensive to reverse, and
-a non-blocking question tool is available. Then ask with your pick as the default and keep working.
+If the user asked for options, give as many as they asked for, best first. Otherwise go ahead with
+the winner. In the final message, give it in one line with why it fits the brief, and the runner-up
+in one line. The user asked for a result, and a menu of options would hand the work back. Ask first
+only when the choice is purely a matter of taste, would be expensive to reverse, and a non-blocking
+question tool is available. Then ask with your pick as the default and keep working.
 
 Keep to what was asked. A new name does not come with a tagline, a logo or an extra section unless
 the user wanted one.

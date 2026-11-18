@@ -1,4 +1,4 @@
 interface:
   display_name: "Fresh ideas"
   short_description: "Explore real options before an open creative choice"
-  default_prompt: "Use $fresh-ideas to come up with a concept for this that fits the brief and stands apart from the obvious answers."
+  default_prompt: "Use $follow-through:fresh-ideas to come up with a concept for this that fits the brief and stands apart from the obvious answers."
