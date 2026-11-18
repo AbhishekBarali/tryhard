@@ -16,11 +16,12 @@ nothing in it, and put no labels in front of them.
 3. How you checked it, and plainly what you could not check.
 4. What is still open or was left out of the request, and why.
 5. Decisions you made for the user that they may want to change, and anything only they can decide.
-   Give each with the default you already applied and how to change it.
+   Give each with the default you already applied and how to change it. Where no safe default
+   existed, give the options with your recommendation first.
 
 A one-line fix may need only the first part and a short note of how it was checked. A long run needs
-all five. Parts 4 and 5 stay in even when everything else is short, because a hidden blocker or a
-silent decision is what the user most needs to hear about.
+all five. When parts 4 and 5 have something in them, they stay in even if everything else is short,
+because a hidden blocker or a silent decision is what the user most needs to hear about.
 
 ## Writing it
 

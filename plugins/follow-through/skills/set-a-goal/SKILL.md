@@ -18,7 +18,10 @@ Read the request and the repo. Find how the main outcome can be measured (a benc
 a size, a timing, a score) and how to run it. If the user gave no number, pick the measurement that
 best represents the main request. Decide the rest yourself and record each decision in the contract.
 Ask the user only when the answer is something only they know, it would change the result in a way
-that is costly to redo, and no reasonable default exists.
+that is costly to redo, and no safe default exists. In that rare case, finish the baseline and the
+contract with the question marked open, then ask with your recommended option first, through a
+question tool if one is available or in the final message otherwise. Start the goal once it is
+answered, since a goal started on the wrong target would spend the whole run on it.
 
 ## 2. Prepare the workspace and measure the baseline
 
@@ -35,7 +38,9 @@ output under `.goal/logs/` and keep what you read back to a short summary.
 
 ## 3. Write the contract
 
-Write `.goal/contract.md` with one heading per section and short plain text under each.
+Read [references/long-run.md](references/long-run.md) first, because the contract records its limits
+and the run follows its rules. Then write `.goal/contract.md` with one heading per section and short
+plain text under each.
 
 - The objective, in one sentence and in the user's terms.
 - The primary metric, with what is measured, the exact command, the baseline and the commit it was
@@ -45,8 +50,8 @@ Write `.goal/contract.md` with one heading per section and short plain text unde
 - Non-goals.
 - Done when, as a short list of checkable items, each with the command or observation that proves
   it.
-- Budgets, giving a time limit per attempt, the stall limits from the long-run rules, and the token
-  budget if the user gave one.
+- Budgets, giving the expected time for one attempt, the stall limits from the long-run rules, and
+  the token budget if the user gave one.
 - Decisions, one line each, giving what you chose, why, and how to change it.
 
 For work without a number, such as a game level or a design, leave out the primary metric. The done
@@ -57,11 +62,12 @@ passing one.
 ## 4. Start the goal
 
 If the `create_goal` tool is available, call it. The user invoked this skill to set up a goal, which
-is the explicit request the tool asks for. Keep the objective short and point it at the contract, for
-example like this.
+is the explicit request the tool asks for. Keep the objective short. Start it with the one-sentence
+objective from the contract and point it at the contract for the rest, for example like this.
 
-    Meet every "Done when" item in .goal/contract.md. The primary metric, its baseline and the
-    rules for keeping or discarding changes are in that file and in .goal/status.md.
+    {The one-sentence objective.} Done means every "Done when" item in .goal/contract.md passes.
+    The primary metric, its baseline and the rules for keeping or discarding changes are in that
+    file and in .goal/status.md.
 
 Pass `token_budget` only when the user named a budget. If `create_goal` fails because an unfinished
 goal already exists, leave that goal alone, since replacing it is the user's call. Give them the
@@ -72,13 +78,15 @@ the exact line to paste, starting with `/goal `.
 
 ## 5. Run it
 
-Once the goal is running, read [references/long-run.md](references/long-run.md) and start the first
-attempt in the same turn. Read it again after the conversation is compacted. Before each evaluation,
-read [references/evaluator-brief.md](references/evaluator-brief.md).
+Once the goal is running, start the first attempt in the same turn, following
+[references/long-run.md](references/long-run.md). Read that file again after the conversation is
+compacted. Before each evaluation, read
+[references/evaluator-brief.md](references/evaluator-brief.md).
 
 ## The first turn's final message
 
 Say that the goal is set, what it measures, the baseline and the target, the branch the work is on,
-and the main decisions you made. If the user gave no token budget, say so in one line, and mention
-that naming a budget when invoking this skill, or setting `max_goal_token_budget` under `[goals]` in
-Codex's `config.toml`, puts a hard cap on future runs. The stall rule ends this run either way.
+and the main decisions you made. If the user gave no token budget, say so in one line. Mention that
+naming a budget when invoking this skill, or setting `max_goal_token_budget` under `[goals]` in
+Codex's `config.toml`, puts a hard cap on future runs, and that this run still ends with a report if
+it stops improving.

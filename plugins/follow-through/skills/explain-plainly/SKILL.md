@@ -59,10 +59,11 @@ Check the draft against these questions.
 
 If any answer is no, rewrite the whole message, check it once more, and send it.
 
-A long report at the end of a long run benefits from a cold read when a subagent is available. Give
-a fresh subagent (`fork_turns` set to `none`) only the user's request and your draft. Ask it to list
-every term or reference it cannot follow and to say in one sentence what it thinks the answer is. If
-its answer differs from yours or it lists terms, rewrite once and send.
+After a long run (an hour or more of work, or a report longer than about twenty lines), get a cold
+read when subagents are available. Give a fresh subagent, started without your conversation history,
+only the user's request and your draft. Ask it to list every term or reference it cannot follow and
+to say in one sentence what it thinks the answer is. If its answer differs from yours or it lists
+terms, rewrite once and send.
 
 ## Example
 

@@ -34,8 +34,8 @@ ask for are outside it.
 ## Build a complete first version
 
 Every part of the brief is present and working, and nothing is stubbed. Keep each version
-recoverable, for example as a local commit on a work branch or a copy, so a round that makes things
-worse can be undone.
+recoverable, for example as a local commit on a work branch or a copy in a temporary folder outside
+the deliverable, so a round that makes things worse can be undone.
 
 ## Look at it for real
 
@@ -45,9 +45,11 @@ real check and say in the final message what you could not see.
 
 ## Review it as the expert
 
-Read [references/expert-review.md](references/expert-review.md), fill it in, and give it to a fresh
-subagent started without your conversation history (`fork_turns` set to `none`). If subagents are
-unavailable, do the review yourself, starting from only the brief, the bar and the result. Either
+Read [references/expert-review.md](references/expert-review.md), fill it in, and give it to a new
+subagent each round, started without your conversation history (with `fork_turns` set to `none`
+where the spawn tool has that option). A fresh reviewer each round judges the result itself, without
+anchoring on the last round's verdict. If subagents are unavailable, do the review yourself,
+starting from only the brief, the bar and the result. Either
 way, the review ends with the gaps ranked and each one marked as blocking the bar, visibly weaker
 than an expert would accept, or minor.
 

@@ -67,7 +67,7 @@ a non-blocking question tool is available. Then ask with your pick as the defaul
 Keep to what was asked. A new name does not come with a tagline, a logo or an extra section unless
 the user wanted one.
 
-If the project already keeps a notes or memory file, add the names and themes you used so the next
+If the project already keeps a file that lists names or themes in use, add yours to it so the next
 request can avoid them.
 
 ## Technical approaches
