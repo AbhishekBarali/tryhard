@@ -35,9 +35,10 @@ to confirm it. Write the checks in the user's terms, as things someone can obser
 ## Do the whole job
 
 With write access, a request to QA, test or debug X, or to check that X works, means find the
-problems, reproduce each one, find the cause, fix it, re-check, and report. Each issue ends in one of three states that the report
-names. It is fixed and you say how you confirmed it, it is left open and you say why, or it is left
-as it is on purpose and you say why. A list of issues with nothing fixed is an unfinished task.
+problems, reproduce each one, find the cause, fix it, re-check, and report. Each issue ends in one
+of three states that the report names. It is fixed and you say how you confirmed it, it is left
+open and you say why, or it is left as it is on purpose and you say why. A list of issues with
+nothing fixed is an unfinished task.
 
 Deliver only a report when the user says so, or asks for a review, a plan or an explanation. In Plan
 mode, deliver the plan. A question about how things stand, such as whether the server is up or why CI
