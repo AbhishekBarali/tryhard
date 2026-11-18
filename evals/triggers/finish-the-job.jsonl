@@ -1,0 +1,20 @@
+{"id": "ftj-01", "skill": "finish-the-job", "prompt": "QA the checkout flow in this repo and make sure it works end to end.", "should_trigger": true, "why": "QA request with write access means find, fix, re-check, report"}
+{"id": "ftj-02", "skill": "finish-the-job", "prompt": "The nightly export job fails about one run in five. Find out why and fix it.", "should_trigger": true, "why": "multi-step debugging"}
+{"id": "ftj-03", "skill": "finish-the-job", "prompt": "Add CSV import to the admin page, with validation for the date column and tests that match the existing ones.", "should_trigger": true, "why": "multi-step feature build"}
+{"id": "ftj-04", "skill": "finish-the-job", "prompt": "Our Docker image went from 300 MB to 1.2 GB after last week's changes. Track down what happened and bring it back down.", "should_trigger": true, "why": "investigation plus fix"}
+{"id": "ftj-05", "skill": "finish-the-job", "prompt": "Migrate the settings screen from the old form library to the new one and keep every field working.", "should_trigger": true, "why": "multi-step migration"}
+{"id": "ftj-06", "skill": "finish-the-job", "prompt": "Users say search returns nothing for words with accents. Reproduce it and fix it.", "should_trigger": true, "why": "reproduce and fix"}
+{"id": "ftj-07", "skill": "finish-the-job", "prompt": "Get the test suite green again on main. Something broke after the dependency bump.", "should_trigger": true, "why": "debug until checks pass"}
+{"id": "ftj-08", "skill": "finish-the-job", "prompt": "Build a small CLI that reads our access logs and prints the 10 slowest endpoints, with a README section on how to run it.", "should_trigger": true, "why": "build task with a clear deliverable"}
+{"id": "ftj-09", "skill": "finish-the-job", "prompt": "Check the mobile layout of every page in the marketing site and fix whatever is broken.", "should_trigger": true, "why": "check means fix too"}
+{"id": "ftj-10", "skill": "finish-the-job", "prompt": "Investigate the memory leak in the worker process and land a fix with a before and after measurement.", "should_trigger": true, "why": "investigation with proof"}
+{"id": "ftj-11", "skill": "finish-the-job", "prompt": "What does the --frozen-lockfile flag do in pnpm?", "should_trigger": false, "why": "quick factual question"}
+{"id": "ftj-12", "skill": "finish-the-job", "prompt": "Rename the variable `tmp` to `buffer` in utils.py line 40.", "should_trigger": false, "why": "one-line edit"}
+{"id": "ftj-13", "skill": "finish-the-job", "prompt": "Fix the typo in the README heading: 'Instalation'.", "should_trigger": false, "why": "one-line edit"}
+{"id": "ftj-14", "skill": "finish-the-job", "prompt": "Which file defines the User model?", "should_trigger": false, "why": "quick lookup"}
+{"id": "ftj-15", "skill": "finish-the-job", "prompt": "Just list the failing tests in CI, don't change anything.", "should_trigger": false, "why": "explicit report-only request"}
+{"id": "ftj-16", "skill": "finish-the-job", "prompt": "Which Node version does this repo need?", "should_trigger": false, "why": "quick lookup"}
+{"id": "ftj-17", "skill": "finish-the-job", "prompt": "Write me a plan for splitting the monolith into services. No code yet.", "should_trigger": false, "why": "plan request"}
+{"id": "ftj-18", "skill": "finish-the-job", "prompt": "What's the difference between a merge and a rebase?", "should_trigger": false, "why": "general question"}
+{"id": "ftj-19", "skill": "finish-the-job", "prompt": "Bump the version in package.json to 2.4.1.", "should_trigger": false, "why": "one-line edit"}
+{"id": "ftj-20", "skill": "finish-the-job", "prompt": "Is it safe to delete the old_migrations folder? Just tell me, don't delete it.", "should_trigger": false, "why": "question, no action"}

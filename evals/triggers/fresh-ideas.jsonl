@@ -1,0 +1,20 @@
+{"id": "fi-01", "skill": "fresh-ideas", "prompt": "Make a unique new level for this puzzle game, with a name and a theme.", "should_trigger": true, "why": "open creative choice the user will see"}
+{"id": "fi-02", "skill": "fresh-ideas", "prompt": "Name our new internal deploy tool. Something people will remember.", "should_trigger": true, "why": "naming"}
+{"id": "fi-03", "skill": "fresh-ideas", "prompt": "Design a landing page for a small ceramics studio in Porto. Pick the visual direction yourself.", "should_trigger": true, "why": "open visual direction"}
+{"id": "fi-04", "skill": "fresh-ideas", "prompt": "Write a short story concept for the tutorial of our sailing game.", "should_trigger": true, "why": "story concept"}
+{"id": "fi-05", "skill": "fresh-ideas", "prompt": "Come up with a theme and colour palette for the conference app. Nothing is decided yet.", "should_trigger": true, "why": "theme and palette"}
+{"id": "fi-06", "skill": "fresh-ideas", "prompt": "We need a mascot and a tone of voice for the onboarding emails.", "should_trigger": true, "why": "copy tone and concept"}
+{"id": "fi-07", "skill": "fresh-ideas", "prompt": "Propose an approach for syncing offline edits. I want genuinely different options weighed before you build one.", "should_trigger": true, "why": "different technical approaches"}
+{"id": "fi-08", "skill": "fresh-ideas", "prompt": "Create a boss fight for the final level. Surprise me.", "should_trigger": true, "why": "open game design"}
+{"id": "fi-09", "skill": "fresh-ideas", "prompt": "Give the five chapters of the docs site distinct names and an illustration idea for each.", "should_trigger": true, "why": "names and visual concepts"}
+{"id": "fi-10", "skill": "fresh-ideas", "prompt": "Redesign the empty state of the dashboard so it feels less generic.", "should_trigger": true, "why": "visual direction"}
+{"id": "fi-11", "skill": "fresh-ideas", "prompt": "Fix the crash when the level file has trailing whitespace.", "should_trigger": false, "why": "bug fix"}
+{"id": "fi-12", "skill": "fresh-ideas", "prompt": "Add a settings page that matches the existing design system exactly.", "should_trigger": false, "why": "must follow existing conventions"}
+{"id": "fi-13", "skill": "fresh-ideas", "prompt": "Name the new helper function that parses dates. Follow the repo's naming style.", "should_trigger": false, "why": "internal identifier"}
+{"id": "fi-14", "skill": "fresh-ideas", "prompt": "Use the name 'Harbor' for the new tool and set up the repo for it.", "should_trigger": false, "why": "user already chose"}
+{"id": "fi-15", "skill": "fresh-ideas", "prompt": "Implement JWT auth for the API with the standard library we already use.", "should_trigger": false, "why": "security code, stay standard"}
+{"id": "fi-16", "skill": "fresh-ideas", "prompt": "Write a database migration that adds an index on orders.created_at.", "should_trigger": false, "why": "migration, stay standard"}
+{"id": "fi-17", "skill": "fresh-ideas", "prompt": "Make the button colours match the brand guide in docs/brand.md.", "should_trigger": false, "why": "matching an existing style"}
+{"id": "fi-18", "skill": "fresh-ideas", "prompt": "Translate the onboarding emails into Spanish, keeping the same tone.", "should_trigger": false, "why": "tone already fixed"}
+{"id": "fi-19", "skill": "fresh-ideas", "prompt": "Our level loader is slow. Make it faster.", "should_trigger": false, "why": "performance work, no visible open choice"}
+{"id": "fi-20", "skill": "fresh-ideas", "prompt": "Rename the CSS classes to BEM so they match the rest of the project.", "should_trigger": false, "why": "convention-following"}
