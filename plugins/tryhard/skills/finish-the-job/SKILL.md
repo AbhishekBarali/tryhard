@@ -6,7 +6,7 @@ description: Use for real work that should end finished and good, such as buildi
 # Finish the job
 
 This skill gets a result a demanding expert would accept from one normal request, so the user
-never has to spell everything out or push twice. It takes longer than one pass, on purpose.
+never has to spell everything out or push twice.
 
 The user's own instructions win over anything here.
 
@@ -14,11 +14,12 @@ The user's own instructions win over anything here.
 
 - A one-line edit, rename or version bump gets no brief and no judge. Make it, check it the
   quickest real way, and report in a sentence or two.
-- A small but real change, such as a fix in one place or a new option on an existing command, gets
-  a three-line brief (the request, the fixed constraints, the review bar), a real run of the changed
-  path plus one case off the happy path, and one judge pass. Fix what you confirm as blocking or
-  visibly weaker, check each fix the quickest real way, and stop.
-- A new feature, command, page, game, design, document or a QA pass over a flow gets the whole loop.
+- A small change fits inside an existing file and pattern, such as a fix in one place or a new
+  option or subcommand shaped like its neighbours. It gets a short brief (the request, the fixed
+  constraints and two to four bar lines), a real run of the changed path plus one case off the happy
+  path, and one judge pass. Fix what you confirm as blocking or visibly weaker, check each fix the
+  quickest real way, and stop.
+- A new feature, page, game, design or document, or a QA pass over a flow, gets the whole loop.
 - Questions, explanations and reviews get only an answer, as "Do the whole job" says. In Plan mode,
   put the brief in the plan and leave building and judging for after Plan mode ends. Once building
   starts, that plan is the brief.
@@ -35,32 +36,35 @@ The user's own instructions win over anything here.
    brief with [../fresh-ideas/SKILL.md](../fresh-ideas/SKILL.md).
 3. Build the whole thing, every part of the brief, working and with nothing stubbed. The smallest
    version that runs is a first draft.
-4. Use it for real through its real entry point, the way its user will meet it, following
+4. Use it for real, the way its user will meet it, following
    [references/use-it-for-real.md](references/use-it-for-real.md). Fix what breaks.
 5. Judge with fresh eyes. Fill in [references/judge-brief.md](references/judge-brief.md) and give it
-   to a new subagent spawned with `fork_turns` set to `"none"`. If no subagent can be started, do the
-   same review yourself from the same inputs and call it a self-review in the report.
+   to a new subagent spawned without your conversation history (in Codex, `fork_turns` set to
+   `"none"`). If no subagent can be started, do the same review yourself from the same inputs and
+   call it a self-review in the report. This first judgment is round 0.
 6. Check the findings, then fix. The judge's findings are claims. Mark each one above minor as
    confirmed, not confirmed or can't verify, using your own evidence, and fix the confirmed ones in
-   rank order. Minor gaps do not start a round. A line the judge could not check because a tool was
-   missing is yours to check, and the report says it had no fresh review. Leave the bar, tests and
+   rank order. Minor gaps alone never start a round, and inside a round fix a minor one only in code
+   you are already changing. A line the judge could not check for lack of a tool is yours to check,
+   and the report says it had no fresh review. Leave the bar, tests and
    measurements as they are when fixing for the judge, and keep the user's constraints over the
    judge's advice. Write the fixes back into the brief, use it for real again, and judge again with a
-   new subagent. Fixes plus a new judgment make one round.
+   new subagent, giving it the previous blockers. Each fix-then-judge is one round, so three rounds
+   means at most four judgments.
 7. Stop at the first of these.
    - The judge says READY, or finds no gap above minor.
-   - Plateau. A round moved no bar line toward PASS and closed no gap above minor. New gaps no worse
-     than the ones just closed count as drift.
+   - Plateau. A round moved no bar line toward PASS and closed no gap above minor. A round that
+     closes gaps while the judge finds new ones of the same level is drift, and also a plateau.
    - Regression. A bar line fell back and nothing ranked above it improved. Go back to the best
      version.
    - The same gap above minor survived two rounds of fixes.
    - Three rounds are done, or the number the user gave. "Keep going until it's great" means eight.
 
-   Hand back the best version, the one whose most important bar lines score highest, which is not
-   always the last. Before each round, save a copy of the files the work changed or created under
-   the system temp folder, leaving the user's branches, commits and stash alone. Keep a round log,
-   one line per round, with what changed, what the judge found and what is still open. After the
-   stop, skip further polish and checks.
+   Hand back the best version, whose most important bar lines score highest, which is not always
+   the last. Before each round, save a copy of the files the work changed or created outside the
+   user's repo, such as in the system temp folder, leaving the user's branches, commits and stash
+   alone. Keep a round log, one line per round, with what changed, what the judge found and what is
+   still open. After the stop, skip further polish and checks.
 8. Report as [references/final-report.md](references/final-report.md) describes, keeping this
    skill's wording out of the work itself.
 
@@ -79,7 +83,8 @@ or how question asks for an explanation even when the answer is a bug, and so do
 how things stand. Answer with the evidence, name the fix in one line, and change nothing. This
 overrides the QA rule above. A message that also asks for a change gets the change, and so does a
 question that points at a gap in work you did for the user. When nothing should change, leave the
-files as you found them, and delete by path only what your own commands created.
+files as you found them, and delete by path only what your own commands created, such as a
+`__pycache__` folder.
 
 If your closing message would be a plan, a next step, a routine question or an offer, and the task
 still needs that work, do it instead. Bugs in or caused by the code you touch are in scope.
