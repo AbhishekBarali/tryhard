@@ -6,11 +6,11 @@
   <img alt="Tryhard" src="docs/assets/banner-light.svg">
 </picture>
 
-<p><b>Tryhard mode for GPT-6.2.</b> A Codex plugin that stops the model from coasting.</p>
+<p><b>GPT-6.2 coasts. Tryhard makes it finish.</b><br>
+A Codex plugin that makes it do the whole job, check it, and say plainly what happened.</p>
 
 <p>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-2f6feb"></a>
-  <a href="#quick-start"><img alt="Codex plugin" src="https://img.shields.io/badge/Codex-plugin-1f2328"></a>
   <a href="plugins/tryhard/.codex-plugin/plugin.json"><img alt="Version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-C2410C"></a>
   <a href="docs/why.md"><img alt="For GPT-6.2 Astra and Sol" src="https://img.shields.io/badge/GPT--6.2-Astra%20%26%20Sol-5b6170"></a>
 </p>
@@ -24,13 +24,13 @@ reporting the same habits: the model lists bugs instead of fixing them, ends a t
 "Shall I...?", asks you about files it wrote itself, and explains the result in a wall of code
 names.
 
-Tryhard flips it into tryhard mode. Five skills and a small Stop hook push it to agree what "done"
-means, do the whole task, check it, and tell you plainly what happened.
+Tryhard flips it into tryhard mode. Five skills and a small Stop hook get it to agree what "done"
+means before it starts, then hold it to that.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/before-after-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="docs/assets/before-after-light.svg">
-  <img alt="The same task in Codex without Tryhard and with it" src="docs/assets/before-after-light.svg">
+  <img alt="Three habits, each shown as the model's message without Tryhard and with it: stops at a list, asks about its own files, explains in riddles" src="docs/assets/before-after-light.svg">
 </picture>
 
 What it targets:
@@ -55,31 +55,32 @@ Then start Codex, open `/hooks` and trust the Tryhard Stop hook. Codex skips plu
 you trust them, so without this step the hook never runs. In the desktop app the same list is
 under Settings > Hooks.
 
+Installed the earlier version under its old name? Remove it, then install and trust the hook as above:
+
+```bash
+codex plugin remove follow-through@follow-through
+codex plugin marketplace remove follow-through
+```
+
 A higher-effort profile and an always-on block for `AGENTS.md` are optional. Both are under
 [More details](#more-details).
 
 ## What's inside
 
-| Name | How it runs | What it does |
-|---|---|---|
-| `finish-the-job` | Automatic | Agrees what done means, does the whole job, checks it. |
-| `fresh-ideas` | Automatic | Sets the obvious answer aside when a real choice is open. |
-| `explain-plainly` | Automatic | Leads with the answer or the main cause, in plain words. |
-| `raise-the-bar` | By name | Builds a first version, then improves it in expert reviews. |
-| `set-a-goal` | By name | Sets up a long-running `/goal` with a measured baseline. |
-| Stop hook | Once trusted | Catches hand-backs, needless questions and dense reports. |
+**Automatic.** These trigger from what you ask, so there is nothing to type.
+
+- `finish-the-job` agrees what done means, does the whole job and checks it. It runs for multi-step coding, debugging, QA, build or investigation work.
+- `fresh-ideas` sets the obvious answer aside and picks on fit. It runs when a task leaves open a choice you will see, such as a name, a theme, a level concept or a visual direction.
+- `explain-plainly` leads with the answer or the main cause, in plain words. It runs when you ask why something happens, ask for a summary, or say you are confused.
+
+**By name.** These run only when you call them.
+
+- `raise-the-bar` builds a first version, then improves it in expert review rounds.
+- `set-a-goal` sets up a long-running `/goal` with a measured baseline.
+
+**Stop hook.** Once you trust it, it catches hand-backs, needless questions and dense reports.
 
 ## Usage
-
-### Automatic skills
-
-These trigger from what you ask, so there is nothing to type:
-
-- `finish-the-job` for multi-step coding, debugging, QA, build or investigation work.
-- `fresh-ideas` when a task leaves open a choice you will see, such as a name, a theme, a level concept or a visual direction.
-- `explain-plainly` when you ask why something happens, ask for a summary, or say you are confused.
-
-The other two run only when you name them.
 
 ### Raise the bar
 
@@ -122,7 +123,9 @@ the first run.
   folders, build output, large data files and anything that looks like a secret go in the same
   exclude file if git doesn't already ignore them.
 - If the project folder is not a git repository yet, it runs `git init` there and commits the
-  current files. It won't do this in your home folder or in a folder that holds other repositories.
+  current files. It never does this in your home folder or in a folder that holds other
+  repositories. Started from one of those, it sets up in the project folder your request is about,
+  and asks which one if the request doesn't say.
 - It works on a new branch named `goal/` plus a short name and leaves your own branch where it was.
   Any uncommitted changes you had become the first commit on that branch. To get them back on your
   branch, `git switch` to it and run `git cherry-pick --no-commit` on that first commit. The final
@@ -156,17 +159,17 @@ codex --profile tryhard
 It sets these:
 
 ```toml
-model_reasoning_effort = "high"        # "xhigh" for hard investigations, "ultra" for parallel work
+model_reasoning_effort = "high"
 plan_mode_reasoning_effort = "high"
-# Codex defaults to low verbosity, and the launch reviews found 6.2 answers over-compressed.
 model_verbosity = "medium"
 
 [agents]
 default_subagent_reasoning_effort = "high"
 ```
 
-So reasoning effort is high, including in Plan mode and for subagents, and verbosity is medium.
-The comments in the file say when to switch to xhigh or ultra. Codex layers the profile on top of
+So reasoning effort is high, including in Plan mode and for subagents, and verbosity is medium
+instead of Codex's low default, which leaves room in the final message for how the work was checked
+and what is still open. The comments in the file say when to switch to xhigh or ultra. Codex layers the profile on top of
 your `~/.codex/config.toml`, so nothing else changes.
 
 </details>
@@ -202,18 +205,22 @@ once with a short note. It checks three things:
 
 1. The message ends by offering to do work that belongs to the task ("Shall I...?", "Want me to...?"). The model is told to do it if it is in scope and reversible, or to list it as an open item with a default if it truly needs you.
 2. The message ends with a question about files, IDs or paths you never mentioned. The model is told to inspect its own work, decide and continue.
-3. A long final message opens with a wall of code names or stacked semicolons. The model is told to rewrite it in plain words.
+3. A long final message is hard to read: its opening is packed with code names or runs very long, or a paragraph strings clauses together with semicolons. The model is told to rewrite the message in plain words without redoing the work.
 
-It sends the model back at most once per turn, goes quiet for the session after the same check
-fires 3 times in a row, and does nothing if anything goes wrong. A plain question or a plan you
-asked for is left alone.
+It sends the model back at most once per turn, turns a check off for the rest of the session after
+it fires 3 turns in a row, and does nothing if anything goes wrong. It stays out of Plan mode, and
+an offer at the end of an answer to a question, a review or a plan you asked for doesn't count as a
+hand-back.
 
 To turn it off, untrust or disable it in `/hooks`. The hook also reads two environment variables,
 which have to be set in the environment Codex starts with:
 
 ```bash
-TRYHARD_HOOK=off codex                       # hook off for this session
-TRYHARD_CHECKS=handback,own-work codex       # run only these checks
+# Hook off for this session
+TRYHARD_HOOK=off codex
+
+# Run only some of the checks
+TRYHARD_CHECKS=handback,own-work codex
 ```
 
 `TRYHARD_CHECKS` takes a comma-separated list of `handback`, `own-work` and `readability`, or
@@ -222,9 +229,17 @@ TRYHARD_CHECKS=handback,own-work codex       # run only these checks
 </details>
 
 <details>
-<summary><b>Updating, and installing from a local clone</b></summary>
+<summary><b>Updating and installing from a local clone</b></summary>
 
 <br>
+
+Codex copies the plugin when you install it, so an update takes two commands. If you installed
+from GitHub, the first refreshes Codex's copy of the repo and the second reinstalls the plugin:
+
+```bash
+codex plugin marketplace upgrade tryhard
+codex plugin add tryhard@tryhard
+```
 
 From a local clone you can pass the folder instead of the GitHub name:
 
@@ -232,10 +247,10 @@ From a local clone you can pass the folder instead of the GitHub name:
 codex plugin marketplace add /path/to/tryhard
 ```
 
-Codex copies the plugin when you install it, so after pulling changes run these again:
+`marketplace upgrade` works only for GitHub and other Git installs. To update a local-clone
+install, run `git pull` in the clone, then:
 
 ```bash
-codex plugin marketplace upgrade tryhard
 codex plugin add tryhard@tryhard
 ```
 
@@ -260,7 +275,9 @@ codex plugin marketplace remove tryhard
 
 To forget the hook approval too, delete the
 `[hooks.state."tryhard@tryhard:hooks/hooks.json:stop:0:0"]` table from `~/.codex/config.toml`.
-If you copied the profile, delete `~/.codex/tryhard.config.toml`.
+If you copied the profile, delete `~/.codex/tryhard.config.toml`. The Stop hook keeps small
+per-session files under `~/.codex/plugins/data/`. Delete the Tryhard folder there to remove
+everything.
 
 </details>
 
