@@ -40,14 +40,14 @@ Ask for real work the way you normally would. Tryhard turns that one prompt into
 5. **Fixes what the judge found and judges again.** It confirms each finding before acting on it. It stops at READY, when a round stops helping, or after 3 rounds unless you ask for more, and hands back the best version.
 6. **Reports plainly.** What it made, how it was checked, what each round improved, and anything still weak.
 
-The loop fits the task. Quick edits, questions, explanations and reviews stay quick, with no brief and no judge. A small fix gets a three-line brief and one judge pass. In Plan mode the brief goes into the plan, and the building waits until you leave Plan mode. The full rules are under [More details](#more-details).
+The loop fits the task. Quick edits, questions, explanations and reviews get no brief and no judge. A small fix gets a three-line brief and one judge pass. In Plan mode the brief goes into the plan, and the building waits until you leave Plan mode. The full rules are under [More details](#more-details).
 
 There are two levels:
 
 | Level | What you do | What you get |
 |---|---|---|
-| **Just ask** | Type your request as usual | The loop above, up to 3 improvement rounds |
-| **Push further** | Start with `$tryhard:raise-the-bar`, ideally at ultra effort | A stricter bar and up to 8 rounds, run as a Codex `/goal` so Codex keeps going until the judge says READY |
+| **Just ask** | Type your request as usual | The loop above, up to 3 rounds |
+| **Push further** | Start with `$tryhard:raise-the-bar`, ideally at ultra | A stricter bar and up to 8 rounds, run as a Codex `/goal` until the judge says READY |
 
 The loop costs more time and usage than a single pass. That is the trade: the model does the extra rounds, so you don't have to push it again yourself. Quick edits and questions skip the loop and stay quick.
 
@@ -129,7 +129,7 @@ codex --profile tryhard -c model_reasoning_effort=ultra
 $tryhard:raise-the-bar Build a landing page for a small bakery in Lisbon.
 ```
 
-`raise-the-bar` uses the same brief and fresh judge with a stricter bar: what a top expert would be proud to put their name to. It runs the whole loop even for a small change, and it keeps going through a round that didn't help by going back to the best version and trying a different approach. It runs as a Codex `/goal`, so Codex keeps starting new turns until the judge says READY or 8 rounds are done, unless you give another number. Its notes live in a `.tryhard/` folder that stays out of your commits. When it can't start a goal, it runs the rounds in the same turn and tells you what to type. Use it for the asks where you want the best result you can get. It costs the most.
+`raise-the-bar` uses the same brief and fresh judge with a stricter bar: what a top expert would be proud to put their name to. It runs as a Codex `/goal`, so Codex keeps starting new turns until the judge says READY or 8 rounds are done, unless you give another number. Its notes go in a `.tryhard/` folder that stays out of your commits. When it can't start a goal, it runs the rounds in the same turn and gives you the `/goal` line to paste. It costs the most, so save it for the asks where you want the best result you can get.
 
 Ultra is limited to some accounts. Without it, raise-the-bar still works at xhigh, the profile's default. How it starts the goal and what it keeps on disk are under [More details](#more-details).
 
