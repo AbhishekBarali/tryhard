@@ -82,8 +82,8 @@ Codex's goal instructions already ask whether each turn made progress. This rule
 ## Done
 
 Before claiming the goal is complete, have a fresh evaluator check the work using
-`references/evaluator-brief.md`. Give it to a subagent started without your conversation history
-(with `fork_turns` set to `none` where the spawn tool has that option). If subagents are
+`references/evaluator-brief.md`. Give it to a subagent spawned with `fork_turns` set to `"none"`,
+so it starts without your conversation history. If subagents are
 unavailable, do the same check yourself, starting from only the contract, the diff and the commands.
 
 When the evaluator fails an item, fix it or revert, then run the evaluator again. If the same item

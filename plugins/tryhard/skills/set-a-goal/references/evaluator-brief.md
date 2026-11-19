@@ -1,8 +1,8 @@
 # Evaluator brief
 
-Fill in the parts in braces and send everything below the line as the task of a subagent started
-without your conversation history (with `fork_turns` set to `none` where the spawn tool has that
-option). Give it the contract, the diff, the commands and the ledger. Leave out your own summary of
+Fill in the parts in braces and send everything below the line as the task of a subagent spawned
+with `fork_turns` set to `"none"` (or `fork_context` set to false in tools that use that name), so
+it starts without your conversation history. Give it the contract, the diff, the commands and the ledger. Leave out your own summary of
 the run, because an evaluator who reads the worker's account tends to accept it.
 
 ---
