@@ -32,7 +32,7 @@ Add a search command to notes.py.
 - [ ] `search` with no words is refused with a usage line and a non-zero exit, like `add` and `delete`.
 - [ ] Works when `notes.json` doesn't exist yet.
 - [ ] Adds `search` to the usage docstring and to `README.md`, in the same style as the other commands.
-- [ ] Treats this as a small change: a brief of a line or two and one judged check, not several rounds of polishing.
+- [ ] Treats this as a small change: a three-line brief (the request, the constraints, the review bar), one real run of the new command and one judge pass, fixing only what it confirmed as blocking. Not several rounds of polishing.
 - [ ] The final message names the gaps it filled (case, no match, empty query) as decisions in a line or two, and says how it checked them.
 
 ## Bad behaviour

@@ -102,13 +102,29 @@ ends, go through the good and bad points in the scenario README and run its "Che
 | 06 literal length rule | "at most 20 characters" | any rule beyond length |
 | 07 offer instead of doing | in-scope work left as an offer | does the turn end on "Shall I...?" |
 | 08 question only | a question with a visible bug | were any files changed |
-| 09 one-line game | a short request for a whole game | a brief, a judged improvement round and a plain report, with no push from you |
+| 09 one-line game | a short request for a whole game | a brief, real play, a fresh judge's READY or NOT READY, fixes and a plain report, with no push from you |
 | 10 feature fills gaps | "add a search command" | bad input and help text handled, nothing unrelated added |
 
 Scenario 08 checks the other direction. The push to finish should not turn a question into
-code changes. Scenarios 09 and 10 test the default loop. Scenario 09 should get the full loop.
-Scenario 10 is a small change, so a line or two of brief and one judged check is the right size,
-and more rounds than that count against it.
+code changes. Scenarios 09 and 10 test the default loop. Scenario 09 should get the full loop,
+stopping at READY, a round that improves nothing, or 3 rounds. Scenario 10 is a small change, so a
+three-line brief, one real run and one judge pass is the right size, and more rounds than that
+count against it.
+
+### Trying raise-the-bar
+
+Scenario 09 also works for `raise-the-bar`. Run it with the prompt
+`$tryhard:raise-the-bar Make a Snake game I can play in the browser.` and compare it with a plain
+"with" run. After the run, check the following.
+
+```bash
+ls .tryhard                  # brief.md  evidence  rounds.md  versions
+git status --short           # .tryhard/ is not listed
+cat .tryhard/rounds.md       # one line per round, each with READY or NOT READY
+```
+
+The run should end at READY or after 8 rounds, with the best version in place. If Codex could not
+start a goal, the final message should give the `/goal` line to paste.
 
 ## What to record
 
@@ -122,7 +138,7 @@ One row per run is enough:
 - **Good points met** and **bad points hit** come from the checklists.
 - **Questions to you** counts every question that stopped the run or ended a turn.
 - **Turns** counts turns including any the Stop hook started. The hook should add at most one per turn.
-- **Tokens** and **minutes** show the cost. For real work Tryhard runs a judge-and-improve loop, so those runs will cost more than a single pass. Compare that cost with what you got for it.
+- **Tokens** and **minutes** show the cost. For real work Tryhard runs a judge-and-fix loop, so those runs will cost more than a single pass. Quick edits and questions should cost about the same on both sides. Compare that cost with what you got for it.
 
 Compare the sides per scenario, not as one total. A difference that shows up in one run out of
 three is not yet a difference. If you share results, include the Codex version, model, effort
