@@ -19,12 +19,15 @@ person can act on.
 For a "why" question, name the one cause that explains most of the effect and give the evidence for
 it, such as a measurement, a number or a command result. Put smaller causes in one line or leave
 them out. Go into internals only when the user asked for them or the fix depends on them. Once you
-have evidence for a cause that explains most of the effect, stop digging and write. If there is an
-obvious fix, name it in one line after the cause.
+have evidence for a cause that explains most of the effect, stop digging and write. If three likely
+causes are ruled out and none explains most of it, stop there and say what you ruled out, your best
+remaining guess, and the one check that would settle it. If there is an obvious fix, name it in one
+line after the cause.
 
-A question leaves the working tree as you found it, even when the answer is a bug, unless the user
-also asked for a change. Remove caches and other files your commands created that were not there
-before.
+A question leaves the files as you found them, even when the answer is a bug, unless the user also
+asked for a change or the question points at a gap in work you did for them. Delete by path only
+the caches and files your own commands created, and never tidy up with `git clean`, `reset`,
+`checkout`, `restore` or `stash`, because they can also wipe the user's uncommitted work.
 
 ## Write it so it reads in one pass
 
