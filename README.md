@@ -92,8 +92,8 @@ $tryhard:raise-the-bar Build a landing page for a small bakery in Lisbon.
 `raise-the-bar` writes down what a demanding expert would check, builds a complete first version,
 looks at it for real, then reviews and improves it in rounds. It stops when a round finds only
 minor issues or makes no visible difference, after at most 5 rounds unless you give another
-number. It costs more than a single pass. It keeps each version recoverable, for example as a
-local commit on a work branch.
+number. It costs more than a single pass. It keeps a copy of each version in a temp folder, so a
+round that makes things worse can be undone without touching your branches or commits.
 
 ### Set a goal
 
