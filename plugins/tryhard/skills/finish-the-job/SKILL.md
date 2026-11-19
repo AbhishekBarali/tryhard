@@ -14,54 +14,59 @@ The user's own instructions win over anything here.
 
 - A one-line edit, rename or version bump gets no brief and no judge. Make it, check it the
   quickest real way, and report in a sentence or two.
-- A small but real change, such as a fix in one place, gets a three-line brief (the request, the
-  fixed constraints, the review bar), one real run of the changed path and one judge pass. Fix what
-  you confirm as blocking, and stop.
+- A small but real change, such as a fix in one place or a new option on an existing command, gets
+  a three-line brief (the request, the fixed constraints, the review bar), a real run of the changed
+  path plus one case off the happy path, and one judge pass. Fix what you confirm as blocking or
+  visibly weaker, check each fix the quickest real way, and stop.
 - A new feature, command, page, game, design, document or a QA pass over a flow gets the whole loop.
 - Questions, explanations and reviews get only an answer, as "Do the whole job" says. In Plan mode,
-  put the brief in the plan and leave building and judging for after Plan mode ends.
+  put the brief in the plan and leave building and judging for after Plan mode ends. Once building
+  starts, that plan is the brief.
 
 ## The judged loop
 
-1. **Write the brief.** Read [references/brief.md](references/brief.md) unless the change is small,
+1. Write the brief. Read [references/brief.md](references/brief.md) unless the change is small,
    write the brief, and share it in a progress update, leaving out the request and the must-not-be
    list. Treat the prompt as the minimum, fill gaps as a thoughtful expert would, and record each as
    an assumption. Exact things the user stated, such as numbers, names, limits, a style to match or
    "don't touch X", stay exact. "Passwords of 12 or more characters" means a length check of at
    least 12. If an exact rule causes a real problem, build it as asked and say so at the end.
-2. **Settle open choices** the user will see, such as a theme, level idea, name or layout, inside the
+2. Settle open choices the user will see, such as a theme, level idea, name or layout, inside the
    brief with [../fresh-ideas/SKILL.md](../fresh-ideas/SKILL.md).
-3. **Build the whole thing**, every part of the brief, working and with nothing stubbed. The
-   smallest version that runs is a first draft.
-4. **Use it for real** through its real entry point, the way its user will meet it, following
+3. Build the whole thing, every part of the brief, working and with nothing stubbed. The smallest
+   version that runs is a first draft.
+4. Use it for real through its real entry point, the way its user will meet it, following
    [references/use-it-for-real.md](references/use-it-for-real.md). Fix what breaks.
-5. **Judge with fresh eyes.** Fill in [references/judge-brief.md](references/judge-brief.md) and give
-   it to a new subagent spawned with `fork_turns` set to `"none"`. If no subagent can be started, do
-   the same review yourself from the same inputs and call it a self-review in the report.
-6. **Check the findings, then fix.** The judge's findings are claims. Mark each one above minor as
+5. Judge with fresh eyes. Fill in [references/judge-brief.md](references/judge-brief.md) and give it
+   to a new subagent spawned with `fork_turns` set to `"none"`. If no subagent can be started, do the
+   same review yourself from the same inputs and call it a self-review in the report.
+6. Check the findings, then fix. The judge's findings are claims. Mark each one above minor as
    confirmed, not confirmed or can't verify, using your own evidence, and fix the confirmed ones in
-   rank order. Minor gaps do not start a round. Leave the bar, tests and measurements as they are
-   when fixing for the judge, and keep the user's constraints over the judge's advice. Write the
-   fixes back into the brief, use it for real again, and judge again with a new subagent. Fixes plus
-   a new judgment make one round.
-7. **Stop at the first of these.**
+   rank order. Minor gaps do not start a round. A line the judge could not check because a tool was
+   missing is yours to check, and the report says it had no fresh review. Leave the bar, tests and
+   measurements as they are when fixing for the judge, and keep the user's constraints over the
+   judge's advice. Write the fixes back into the brief, use it for real again, and judge again with a
+   new subagent. Fixes plus a new judgment make one round.
+7. Stop at the first of these.
    - The judge says READY, or finds no gap above minor.
    - Plateau. A round moved no bar line toward PASS and closed no gap above minor. New gaps no worse
      than the ones just closed count as drift.
-   - Regression. A higher-ranked line got worse. Go back to the best version.
-   - The same big gap survived two rounds of fixes.
+   - Regression. A bar line fell back and nothing ranked above it improved. Go back to the best
+     version.
+   - The same gap above minor survived two rounds of fixes.
    - Three rounds are done, or the number the user gave. "Keep going until it's great" means eight.
 
-   Hand back the best version, which is not always the last. Before each round, save the current
-   version as a patch or a copy under the system temp folder, leaving the user's branches, commits
-   and stash alone. Keep a round log, one line per round, with what changed, what the judge found and
-   what is still open. After the stop, skip further polish and checks.
-8. **Report** as [references/final-report.md](references/final-report.md) describes, keeping this
+   Hand back the best version, the one whose most important bar lines score highest, which is not
+   always the last. Before each round, save a copy of the files the work changed or created under
+   the system temp folder, leaving the user's branches, commits and stash alone. Keep a round log,
+   one line per round, with what changed, what the judge found and what is still open. After the
+   stop, skip further polish and checks.
+8. Report as [references/final-report.md](references/final-report.md) describes, keeping this
    skill's wording out of the work itself.
 
-When raise-the-bar or set-a-goal is in use, follow that skill. Under another Codex goal the same
-loop and cap apply across its turns, and the goal's completion audit decides whether its objective
-is met.
+When raise-the-bar or set-a-goal is in use, follow that skill. Under a Codex goal the user set, run
+this loop inside it. The goal's completion audit, not the round cap, decides when the work ends, so
+at the cap keep working toward the objective on the gaps the last judge named.
 
 ## Do the whole job
 
@@ -90,7 +95,7 @@ stop for the user only in these cases, after the work that does not depend on th
 [references/ask-or-decide.md](references/ask-or-decide.md) first.
 
 - The step deletes something you did not make, or cannot be undone.
-- It reaches outside this machine or touches something shared, such as a deploy, a message to
+- It changes something outside this machine or something shared, such as a deploy, a message to
   people, a push to a shared branch or production data.
 - It spends money, or needs a secret or account access that is not already set up.
 - It changes the goal, the scope or an exact constraint the user stated.
