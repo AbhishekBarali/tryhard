@@ -22,12 +22,13 @@ short lines.
    game needs a way to start, lose and restart, controls the player can discover, a goal or score,
    and feedback when something happens. A form needs clear errors, an empty state and a saving
    state. A new command needs help text and a clear error for bad input. A scene of the Red Sea
-   parting has people hurrying through. Say where you will be exhaustive. Leave out what would
-   serve a different request.
-6. Open choices, settled with the fresh-ideas skill, giving the obvious default, the chosen
-   direction and one line on why.
+   parting has people hurrying through. For a QA pass, this is the list of paths and cases you will
+   try. Say where you will be exhaustive. Leave out what would serve a different request.
+6. Open choices, settled with the fresh-ideas skill, giving the chosen direction and one line on why
+   it fits. The obvious default it replaced goes in your notes with part 9.
 7. Assumptions, one line for each gap you filled, giving what you assumed, why, and whether it is
-   reversible. They bind the build and the judge, and the final report lists them.
+   reversible. They bind the build, the judge gets them with the fixed constraints, and the final
+   report lists them.
 8. Review bar, three to eight lines saying what the user will look for when they review the result,
    each with how it is checked (run it, a screenshot at real size, a measurement, a click-through, a
    check that failed before the change). Name one primary measure, and turn side aims into "does not
@@ -39,8 +40,8 @@ short lines.
    generic default. This list stays in your notes, and the judge gets it rewritten as positive
    checks.
 
-Decide all of this yourself. Ask only in the cases listed in SKILL.md under "When to stop for the
-user".
+Decide all of this yourself. Stop for the user only in the cases listed in SKILL.md under "When to
+stop for the user".
 
 ## Sharing it
 

@@ -30,8 +30,8 @@ In those cases a better answer means a cleaner solution inside the rules.
 
 Do the planning steps in your own reasoning. The candidates and their estimates are scaffolding, so
 they stay out of the deliverable, and the final message names only the winner and the runner-up.
-When the work has a brief (finish-the-job or raise-the-bar), record the obvious default, the winner
-and why in its open-choices part.
+When the work has a brief (finish-the-job or raise-the-bar), record the winner and why in its
+open-choices part, and the obvious default in your notes.
 
 1. Lock what is fixed. Note what the user's words, the existing code or style, and hard constraints
    already decide. The brief wins every time, and only the open parts get explored.
