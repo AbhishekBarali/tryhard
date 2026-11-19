@@ -44,7 +44,8 @@ What it targets:
 
 ## Quick start
 
-You need the Codex CLI or the Codex desktop app.
+You need the Codex CLI or the Codex desktop app. The Stop hook also needs Python 3.8 or newer as
+`python3` (macOS, Linux) or `python` (Windows) on your PATH. The skills work without it.
 
 ```bash
 codex plugin marketplace add AbhishekBarali/tryhard
