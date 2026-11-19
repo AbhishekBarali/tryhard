@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Follow Through installer.
+# Done Done installer.
 #
-# Adds the optional always-on Follow Through block to the Codex user
+# Adds the optional always-on Done Done block to the Codex user
 # instructions file (${CODEX_HOME:-~/.codex}/AGENTS.md) between marker lines,
 # after saving a backup, and prints the Codex commands that install the plugin.
 # Running it again updates the block in place. It changes nothing else.
@@ -12,9 +12,9 @@
 
 set -euo pipefail
 
-START_MARKER='<!-- follow-through:start -->'
-END_MARKER='<!-- follow-through:end -->'
-REPO='AbhishekBarali/follow-through'
+START_MARKER='<!-- donedone:start -->'
+END_MARKER='<!-- donedone:end -->'
+REPO='AbhishekBarali/donedone'
 
 usage() {
   sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
@@ -46,7 +46,7 @@ trap 'rm -rf "$work"' EXIT
 
 backup() {
   local target
-  target="$agents.bak-follow-through-$(date +%Y%m%d-%H%M%S)"
+  target="$agents.bak-donedone-$(date +%Y%m%d-%H%M%S)"
   if [ -e "$target" ]; then
     target="$target-$$"
   fi
@@ -82,7 +82,7 @@ rewrite() {
 apply() {
   local new="$1" what="$2"
   if [ -f "$agents" ] && cmp -s "$new" "$agents"; then
-    echo "$agents already has the current Follow Through block. Nothing changed."
+    echo "$agents already has the current Done Done block. Nothing changed."
     return
   fi
   if [ -f "$agents" ]; then
@@ -94,8 +94,8 @@ apply() {
 
 check_markers() {
   if has_start && ! has_end; then
-    echo "$agents has the Follow Through start marker but no end marker, so the block can't be" >&2
-    echo "updated safely. Fix or remove the lines starting with '<!-- follow-through:' and run this again." >&2
+    echo "$agents has the Done Done start marker but no end marker, so the block can't be" >&2
+    echo "updated safely. Fix or remove the lines starting with '<!-- donedone:' and run this again." >&2
     exit 1
   fi
 }
@@ -119,7 +119,7 @@ install_block() {
 
   if has_start; then
     rewrite "$block" >"$new"
-    apply "$new" "Updated the Follow Through block in"
+    apply "$new" "Updated the Done Done block in"
   else
     if [ -s "$agents" ]; then
       cat "$agents" >"$new"
@@ -132,7 +132,7 @@ install_block() {
       : >"$new"
     fi
     cat "$block" >>"$new"
-    apply "$new" "Added the Follow Through block to"
+    apply "$new" "Added the Done Done block to"
   fi
 
   local size
@@ -143,19 +143,19 @@ install_block() {
   fi
   if [ -s "$codex_dir/AGENTS.override.md" ]; then
     echo "Note: $codex_dir/AGENTS.override.md exists and is not empty. Codex reads it instead of" >&2
-    echo "AGENTS.md, so the Follow Through block won't load until you move it there or empty that file." >&2
+    echo "AGENTS.md, so the Done Done block won't load until you move it there or empty that file." >&2
   fi
 }
 
 remove_block() {
   if ! has_start; then
-    echo "$agents has no Follow Through block. Nothing changed."
+    echo "$agents has no Done Done block. Nothing changed."
     return
   fi
   check_markers
   local new="$work/AGENTS.md"
   rewrite "" >"$new"
-  apply "$new" "Removed the Follow Through block from"
+  apply "$new" "Removed the Done Done block from"
 }
 
 print_steps() {
@@ -166,23 +166,23 @@ Next steps for Codex:
   1. Add the marketplace and install the plugin:
 
        codex plugin marketplace add $REPO
-       codex plugin add follow-through@follow-through
+       codex plugin add donedone@donedone
 
      From a local copy you can use the folder instead of the GitHub name:
 
        codex plugin marketplace add "$script_dir"
 
-  2. Start Codex, type /hooks and trust the Follow Through Stop hook. Codex skips
+  2. Start Codex, type /hooks and trust the Done Done Stop hook. Codex skips
      plugin hooks until you trust them. The approval covers every file in the plugin,
      so Codex asks again after each plugin update.
 
   3. Optional: use the higher-effort profile.
 
-       cp "$script_dir/profiles/follow-through.config.toml" "$codex_dir/follow-through.config.toml"
-       codex --profile follow-through
+       cp "$script_dir/profiles/donedone.config.toml" "$codex_dir/donedone.config.toml"
+       codex --profile donedone
 
-To turn the Stop hook off, start Codex with FOLLOW_THROUGH_HOOK=off. To run only some of
-its checks, set FOLLOW_THROUGH_CHECKS to a list such as handback,own-work,readability.
+To turn the Stop hook off, start Codex with DONEDONE_HOOK=off. To run only some of
+its checks, set DONEDONE_CHECKS to a list such as handback,own-work,readability.
 EOF
 }
 
@@ -191,8 +191,8 @@ print_remove_steps() {
 
 To remove the plugin as well:
 
-  codex plugin remove follow-through@follow-through
-  codex plugin marketplace remove follow-through
+  codex plugin remove donedone@donedone
+  codex plugin marketplace remove donedone
 EOF
 }
 

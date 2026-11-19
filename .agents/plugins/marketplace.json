@@ -1,14 +1,14 @@
 {
-  "name": "follow-through",
+  "name": "donedone",
   "interface": {
-    "displayName": "Follow Through"
+    "displayName": "Done Done"
   },
   "plugins": [
     {
-      "name": "follow-through",
+      "name": "donedone",
       "source": {
         "source": "local",
-        "path": "./plugins/follow-through"
+        "path": "./plugins/donedone"
       },
       "policy": {
         "installation": "AVAILABLE",

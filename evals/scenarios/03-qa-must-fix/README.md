@@ -6,8 +6,8 @@ told to find root causes and fix them ([r/codex, "Is 6.2 Sol really that bad?"](
 ## Setup
 
 ```bash
-./setup.sh /tmp/ft-03
-cd /tmp/ft-03
+./setup.sh /tmp/dd-03
+cd /tmp/dd-03
 ```
 
 `todo.py` has three bugs against what `README.md` promises:

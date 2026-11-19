@@ -1,4 +1,4 @@
-# Follow Through
+# Done Done
 
 A Codex plugin for GPT-6.2 Astra and Sol. It helps the models carry a job to the end: agree what
 "done" means, do the whole task, check it, and explain the result in plain words.
@@ -19,16 +19,16 @@ A Codex plugin for GPT-6.2 Astra and Sol. It helps the models carry a job to the
 You need the Codex CLI or the Codex desktop app.
 
 ```bash
-codex plugin marketplace add AbhishekBarali/follow-through
-codex plugin add follow-through@follow-through
+codex plugin marketplace add AbhishekBarali/donedone
+codex plugin add donedone@donedone
 ```
 
 From a local clone you can pass the folder instead: `codex plugin marketplace add
-/path/to/follow-through`. Codex copies the plugin when you install it, so after pulling changes run
-`codex plugin marketplace upgrade follow-through` and then `codex plugin add
-follow-through@follow-through` again.
+/path/to/donedone`. Codex copies the plugin when you install it, so after pulling changes run
+`codex plugin marketplace upgrade donedone` and then `codex plugin add
+donedone@donedone` again.
 
-Then start Codex, open `/hooks` and trust the Follow Through Stop hook. Codex skips plugin hooks
+Then start Codex, open `/hooks` and trust the Done Done Stop hook. Codex skips plugin hooks
 until you trust them, so without this step the hook never runs. In the desktop app the same list
 is under Settings > Hooks. Codex asks again after any update to the plugin, because the approval
 covers every file in it, not only the hook. Editing a skill is enough to trigger it.
@@ -39,8 +39,8 @@ Skills only apply on the turns where they trigger. A short block in `~/.codex/AG
 core habits on every turn. To add it, clone the repo and run the installer:
 
 ```bash
-git clone https://github.com/AbhishekBarali/follow-through.git
-cd follow-through
+git clone https://github.com/AbhishekBarali/donedone.git
+cd donedone
 ./install.sh
 ```
 
@@ -54,8 +54,8 @@ the plugin steps above. It changes nothing else. The block itself is in
 See [Reasoning effort](#reasoning-effort) for why. From the clone:
 
 ```bash
-cp profiles/follow-through.config.toml ~/.codex/follow-through.config.toml
-codex --profile follow-through
+cp profiles/donedone.config.toml ~/.codex/donedone.config.toml
+codex --profile donedone
 ```
 
 The profile sets reasoning effort to high, including in Plan mode and for subagents, and
@@ -73,7 +73,7 @@ Most of it works on its own. Three skills trigger from what you ask:
 Two skills run only when you name them:
 
 ```text
-$follow-through:raise-the-bar Build a landing page for a small bakery in Lisbon.
+$donedone:raise-the-bar Build a landing page for a small bakery in Lisbon.
 ```
 
 `raise-the-bar` writes down what a demanding expert would check, builds a complete first version,
@@ -83,7 +83,7 @@ number. It costs more than a single pass. It keeps each version recoverable, for
 local commit on a work branch.
 
 ```text
-$follow-through:set-a-goal Make the test suite run under 2 minutes without dropping tests.
+$donedone:set-a-goal Make the test suite run under 2 minutes without dropping tests.
 ```
 
 `set-a-goal` turns a request into a Codex `/goal` for a long run. It measures the starting value
@@ -120,7 +120,7 @@ checks. So use more for real work:
 - **ultra** for work that splits into parallel parts. Codex then decides on its own when to use subagents.
 - **medium** is fine for quick look-ups and small edits.
 
-Set it with `/model` in the CLI, or in a profile. The one in `profiles/follow-through.config.toml`
+Set it with `/model` in the CLI, or in a profile. The one in `profiles/donedone.config.toml`
 sets these:
 
 ```toml
@@ -150,27 +150,27 @@ To turn it off, untrust or disable it in `/hooks`. The hook also reads two envir
 which have to be set in the environment Codex starts with:
 
 ```bash
-FOLLOW_THROUGH_HOOK=off codex                       # hook off for this session
-FOLLOW_THROUGH_CHECKS=handback,own-work codex       # run only these checks
+DONEDONE_HOOK=off codex                       # hook off for this session
+DONEDONE_CHECKS=handback,own-work codex       # run only these checks
 ```
 
-`FOLLOW_THROUGH_CHECKS` takes a comma-separated list of `handback`, `own-work` and `readability`,
+`DONEDONE_CHECKS` takes a comma-separated list of `handback`, `own-work` and `readability`,
 or `all` or `none`.
 
 ## Uninstall
 
 If you added the always-on block, run `./install.sh --remove` from the clone. You can also delete
-the two Follow Through marker lines and everything between them in `~/.codex/AGENTS.md` (the
+the two Done Done marker lines and everything between them in `~/.codex/AGENTS.md` (the
 installer left a backup next to it). Then remove the plugin:
 
 ```bash
-codex plugin remove follow-through@follow-through
-codex plugin marketplace remove follow-through
+codex plugin remove donedone@donedone
+codex plugin marketplace remove donedone
 ```
 
 To forget the hook approval too, delete the
-`[hooks.state."follow-through@follow-through:hooks/hooks.json:stop:0:0"]` table from
-`~/.codex/config.toml`. If you copied the profile, delete `~/.codex/follow-through.config.toml`.
+`[hooks.state."donedone@donedone:hooks/hooks.json:stop:0:0"]` table from
+`~/.codex/config.toml`. If you copied the profile, delete `~/.codex/donedone.config.toml`.
 
 ## Evals
 

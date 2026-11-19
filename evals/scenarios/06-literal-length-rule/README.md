@@ -8,8 +8,8 @@ literally, not whether it remembers one example.
 ## Setup
 
 ```bash
-./setup.sh /tmp/ft-06
-cd /tmp/ft-06
+./setup.sh /tmp/dd-06
+cd /tmp/dd-06
 python3 -m unittest
 ```
 

@@ -1,8 +1,8 @@
-# Follow Through profile for Codex (optional).
+# Done Done profile for Codex (optional).
 #
-# Copy this file to ~/.codex/follow-through.config.toml and start Codex with
+# Copy this file to ~/.codex/donedone.config.toml and start Codex with
 #
-#   codex --profile follow-through
+#   codex --profile donedone
 #
 # Codex layers it on top of ~/.codex/config.toml, so only the settings below
 # change. Remove any line you don't want.

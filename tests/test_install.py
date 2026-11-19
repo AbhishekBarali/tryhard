@@ -8,15 +8,15 @@ import tempfile
 import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-START = "<!-- follow-through:start -->"
-END = "<!-- follow-through:end -->"
-SNIPPET = "## Follow Through\n\nDefine what done means before you start.\n"
+START = "<!-- donedone:start -->"
+END = "<!-- donedone:end -->"
+SNIPPET = "## Done Done\n\nDefine what done means before you start.\n"
 
 
 @unittest.skipIf(shutil.which("bash") is None, "needs bash")
 class InstallTests(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.mkdtemp(prefix="ft-install-")
+        self.tmp = tempfile.mkdtemp(prefix="dd-install-")
         self.repo = os.path.join(self.tmp, "repo")
         os.makedirs(os.path.join(self.repo, "agents-md"))
         shutil.copy(os.path.join(ROOT, "install.sh"), self.repo)
@@ -48,17 +48,17 @@ class InstallTests(unittest.TestCase):
         )
 
     def backups(self):
-        return glob.glob(self.agents + ".bak-follow-through-*")
+        return glob.glob(self.agents + ".bak-donedone-*")
 
     def test_creates_the_file_and_prints_the_steps(self):
         result = self.run_install()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.read(self.agents), START + "\n" + SNIPPET + END + "\n")
         self.assertEqual(self.backups(), [])
-        self.assertIn("codex plugin marketplace add AbhishekBarali/follow-through", result.stdout)
-        self.assertIn("codex plugin add follow-through@follow-through", result.stdout)
+        self.assertIn("codex plugin marketplace add AbhishekBarali/donedone", result.stdout)
+        self.assertIn("codex plugin add donedone@donedone", result.stdout)
         self.assertIn("/hooks", result.stdout)
-        self.assertIn("FOLLOW_THROUGH_HOOK=off", result.stdout)
+        self.assertIn("DONEDONE_HOOK=off", result.stdout)
         # Nothing else is created in CODEX_HOME.
         self.assertEqual(os.listdir(self.home), ["AGENTS.md"])
 
@@ -103,7 +103,7 @@ class InstallTests(unittest.TestCase):
         result = self.run_install("--remove")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.read(self.agents), "Before.\n")
-        self.assertIn("codex plugin remove follow-through@follow-through", result.stdout)
+        self.assertIn("codex plugin remove donedone@donedone", result.stdout)
         again = self.run_install("--remove")
         self.assertIn("Nothing changed", again.stdout)
 
@@ -128,7 +128,7 @@ class InstallTests(unittest.TestCase):
         result = self.run_install()
         self.assertEqual(result.returncode, 1)
         self.assertIn("AGENTS.snippet.md is missing", result.stderr)
-        self.assertIn("codex plugin add follow-through@follow-through", result.stdout)
+        self.assertIn("codex plugin add donedone@donedone", result.stdout)
         self.assertFalse(os.path.exists(self.home))
 
     def test_broken_markers_stop_the_script(self):

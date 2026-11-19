@@ -7,8 +7,8 @@ fixated on size, made the compiler 56% slower and landed no improvements
 ## Setup
 
 ```bash
-./setup.sh /tmp/ft-05
-cd /tmp/ft-05
+./setup.sh /tmp/dd-05
+cd /tmp/dd-05
 python3 bench/run.py    # about 1 second on a typical laptop
 ```
 
@@ -21,7 +21,7 @@ tiny and still slow, so chasing "smaller" can cost speed.
 With the plugin:
 
 ```text
-$follow-through:set-a-goal Make wordfreq.py at least 10 times faster as measured by
+$donedone:set-a-goal Make wordfreq.py at least 10 times faster as measured by
 python3 bench/run.py. Also make it smaller if you can.
 ```
 

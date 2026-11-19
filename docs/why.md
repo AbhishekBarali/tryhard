@@ -1,8 +1,8 @@
-# Why Follow Through works the way it does
+# Why Done Done works the way it does
 
 GPT-6.2 Astra and GPT-6.2 Sol came out on 17 November 2026. In the first days, testers and users
 described the same few problems again and again. This page goes through each one: what people
-reported, what Follow Through does about it, and where the technique comes from.
+reported, what Done Done does about it, and where the technique comes from.
 
 Quotes are kept short. Everything else is paraphrased, so follow the links for the original
 wording. Dates are publication dates where known.
@@ -16,7 +16,7 @@ wording. Dates are publication dates where known.
 5. [Explanations nobody can read](#5-explanations-nobody-can-read)
 6. [Raise the bar: iterating until it is good](#6-raise-the-bar-iterating-until-it-is-good)
 7. [Reasoning effort](#7-reasoning-effort)
-8. [What Follow Through deliberately avoids](#8-what-follow-through-deliberately-avoids)
+8. [What Done Done deliberately avoids](#8-what-done-done-deliberately-avoids)
 
 ## 1. Stopping early or doing the minimum
 
@@ -29,7 +29,7 @@ wording. Dates are publication dates where known.
 - In an Opus-supervised comparison, Sol's own check confirmed a bug as correct behaviour, and twice its proof runs never touched the new code ([r/codex, "GPT-6.2 Sol just dropped"](https://www.reddit.com/r/codex/comments/1xytl9j/gpt62_sol_just_dropped_and_users_are_already/), 17 Nov 2026).
 - OpenAI had already said of GPT-6 Astra that it may reach a first implementation and come back for review while work remains. Their fix is to define completion before starting ([OpenAI, "Rethinking skills and prompts for GPT-6 Astra"](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)). The 6.2 Codex guide makes the same point: tell the model what counts as finished and what you will look for when you review ([Prompting GPT-6.2 in Codex](https://learn.chatgpt.com/guides/prompting-gpt-6-2-astra), Nov 2026).
 
-### What Follow Through does
+### What Done Done does
 
 The `finish-the-job` skill and the always-on block:
 
@@ -48,7 +48,7 @@ The `finish-the-job` skill and the always-on block:
 - The fresh reviewer follows Anthropic's finding that agents grading their own work tend to praise it, while a separate evaluator is far easier to make sceptical ([Anthropic, harness design for long-running apps](https://www.anthropic.com/engineering/harness-design-long-running-apps), Mar 2026). Users suggested the same pattern for these models: pair two models so one checks the other's work ([r/codex 1xz8b5x](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/); [Voxyz on X](https://x.com/Voxyz_ai/status/2123038513352622087), 18 Nov 2026).
 - The "no polishing after done" rule borrows from [oh-my-openagent's GPT-6 Astra rules](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/packages/omo-codex/plugin/components/rules/bundled-rules/hephaestus/gpt-6.md), which call another validation pass or drive-by cleanup after done a defect. It is there so the push to finish does not turn into the paranoid over-checking users described.
 - The scope limits (every changed line traces to the request, unrelated bugs stay out of the diff) come from the "surgical changes" idea in [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md) and from Codex's own base instructions ([default.md](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/prompts/base_instructions/default.md)).
-- Compared with 6.1 Sol, the 6.2 base prompt in Codex no longer tells the model not to stop at a plan or an offer to continue ([models.json in openai/codex](https://github.com/openai/codex/blob/main/codex-rs/models-manager/models.json), 17 Nov 2026). Follow Through puts that idea back, bounded by the task's scope.
+- Compared with 6.1 Sol, the 6.2 base prompt in Codex no longer tells the model not to stop at a plan or an offer to continue ([models.json in openai/codex](https://github.com/openai/codex/blob/main/codex-rs/models-manager/models.json), 17 Nov 2026). Done Done puts that idea back, bounded by the task's scope.
 
 ## 2. Blocking on questions nobody can answer
 
@@ -59,7 +59,7 @@ The `finish-the-job` skill and the always-on block:
 - Another user's Sol 6.2 could not write to the project folder. Without asking, it started writing to a different folder until the disk ran out of space, deleted what it had made, and then stopped ([r/singularity 1xysrpg](https://www.reddit.com/r/singularity/comments/1xysrpg/theo_on_why_62_astra_is_bad), 18 Nov 2026).
 - OpenAI's guide for 6.2 in Codex says to leave routine decisions about how to do the work to Codex ([Prompting GPT-6.2 in Codex](https://learn.chatgpt.com/guides/prompting-gpt-6-2-astra)). Its GPT-6 Astra guide already noted that the model is more likely to ask when more input could change the result ([GPT-6 Astra guide](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra)).
 
-### What Follow Through does
+### What Done Done does
 
 - An ask-or-decide test. Ask only when all three hold: only the user can know it, the answer changes the result in a way that is costly to redo, and there is no safe reversible default. Otherwise look it up or decide, note the decision in one line and keep going.
 - Never ask about your own work. Files, clips, branches and logs made in this session are on disk and can be inspected.
@@ -73,7 +73,7 @@ The `finish-the-job` skill and the always-on block:
 - [Superpowers' executing-plans skill](https://github.com/obra/superpowers/blob/main/skills/executing-plans/SKILL.md) has the agent make rulings on ambiguities, log them, and list them at the end, stopping only for a short list of real risks. Its v7.0.2 release gave the brainstorming skill a similar rule, asking only when the answer would change what gets built, and reported fewer filler questions in blind-graded tests ([release notes](https://github.com/obra/superpowers/blob/main/RELEASE-NOTES.md), Nov 2026).
 - Research on when agents should ask points the same way. A filter for questions that are relevant and that the user can actually answer matched a strong baseline with far fewer questions ([Asking What Matters, arXiv 2604.14624](https://arxiv.org/abs/2604.14624), Apr 2026). Loose prompts lead to over-asking and strict ones to silent wrong defaults, so the policy has to be stated ([Ambig-DS, arXiv 2605.09698](https://arxiv.org/abs/2605.09698), May 2026). That is why every "decide" comes with a logged decision the user can reverse.
 - Codex ships a non-blocking question tool, and its persistent-mode prompt keeps questions pending while useful work continues ([request_user_input_async](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/request_user_input_async.rs); [persistent_mode.md](https://github.com/openai/codex/blob/main/codex-rs/prompts/templates/persistent_mode.md)).
-- Codex's goal template only allows "blocked" after the same blocker repeats for three goal turns, never just because work is hard ([continuation.md](https://github.com/openai/codex/blob/main/codex-rs/ext/goal/templates/goals/continuation.md), Nov 2026). Follow Through uses the same rule so the two never disagree.
+- Codex's goal template only allows "blocked" after the same blocker repeats for three goal turns, never just because work is hard ([continuation.md](https://github.com/openai/codex/blob/main/codex-rs/ext/goal/templates/goals/continuation.md), Nov 2026). Done Done uses the same rule so the two never disagree.
 - OpenAI warns that strict boundary wording can make Astra stop where you would be happy for it to continue ([OpenAI skills blog](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)). So the skill grants authority for routine work in plain terms, and it has no approval steps.
 
 ## 3. Loops that go nowhere
@@ -83,7 +83,7 @@ The `finish-the-job` skill and the always-on block:
 - Theo's ts-rust run: Astra worked for 7 days and landed no improvements. It fixated on the "also make it smaller" part of the request and made the compiler 56% slower. Told to drop size and close the performance gap, it ran 4 more days and landed nothing ([Theo on X](https://x.com/theo/status/2122760447103484410), 17 Nov 2026).
 - One user said Astra never seemed to settle on a single goal and kept moving its own goalposts ([r/singularity 1xysrpg](https://www.reddit.com/r/singularity/comments/1xysrpg/theo_on_why_62_astra_is_bad), 17 Nov 2026).
 
-### What Follow Through does
+### What Done Done does
 
 The `set-a-goal` skill writes `.goal/contract.md` before a long run. It holds the objective, one primary metric with the command that measures it and a baseline taken on the untouched code, guardrails, secondary goals in priority order, non-goals, done-when checks each with a proof command, and budgets. The work happens on a new `goal/...` git branch, and `.goal/` is kept out of git so resets never touch it. Then it starts the Codex goal with a short objective that points at the contract. The long-run rules:
 
@@ -112,7 +112,7 @@ The `set-a-goal` skill writes `.goal/contract.md` before a long run. It holds th
 - One user called both Sol and Astra 6.2 terrible at design. Asked to redesign a section of a marketing site, the model missed its point and built a different section ([r/codex 1xz8b5x](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/), 18 Nov 2026).
 - The ability is there. Theo credits Astra with occasional novel solutions that are genuinely great when it explores, and Arena found that a brief demanding breadth, such as a hundred ways to draw a dog, did bring out real variety ([Arena, 40:10](https://www.youtube.com/watch?v=jk7rTk1Bh8I&t=2410s)).
 
-### What Follow Through does
+### What Done Done does
 
 The `fresh-ideas` skill runs only when a task leaves open a choice the user will see: names, themes, a level or story concept, visual direction, copy tone, or genuinely different technical approaches. It does not run for bug fixes, work that must follow existing conventions, or anything the user already specified. When it runs, it:
 
@@ -141,7 +141,7 @@ The `fresh-ideas` skill runs only when a task leaves open a choice the user will
 - OpenAI's system card found Astra left a known blocker out of its final answer in about 22% of test runs, roughly twice the rate of GPT-6 Astra, and guessed this was linked to its push for concise answers with fewer caveats. The Codex developer prompt reduced it ([GPT-6.2 system card](https://deploymentsafety.openai.com/gpt-6-2-astra-sol), 17 Nov 2026).
 - A Codex issue reports Astra at max effort quietly narrowing tasks without saying what it left out ([openai/codex#62258](https://github.com/openai/codex/issues/62258), 18 Nov 2026).
 
-### What Follow Through does
+### What Done Done does
 
 `finish-the-job`, `explain-plainly` and the always-on block share one shape for the final message, written as short ordered paragraphs:
 
@@ -155,7 +155,7 @@ Empty parts are left out. The message is written for someone who saw only their 
 
 ### Why this approach
 
-- The open-items paragraph is never cut, because OpenAI ties hidden blockers to the push for brevity (system card above). Follow Through asks for plain words, and never for short ones.
+- The open-items paragraph is never cut, because OpenAI ties hidden blockers to the push for brevity (system card above). Done Done asks for plain words, and never for short ones.
 - OpenAI's guide asks the model not to carry working shorthand or jargon from the run into what it writes ([Using GPT-6.2](https://developers.openai.com/api/docs/guides/latest-model)). Anthropic's prompting guide asks for writing aimed at an intelligent reader who lacks the context, with key points first and no terms invented along the way ([Prompting Fable 5.2](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-2)).
 - Superpowers found that problems of shape respond to a positive recipe, and that a list of bans did worse than the recipe in their tests ([writing-skills](https://github.com/obra/superpowers/blob/main/skills/writing-skills/SKILL.md)). The [humanizer skill](https://github.com/blader/humanizer/blob/main/SKILL.md) works from paired before-and-after examples. So `explain-plainly` gives a shape and an example instead of a list of banned words.
 - "Bottom line up front" is an old writing rule for busy readers ([BLUF](https://en.wikipedia.org/wiki/BLUF_(communication))).
@@ -170,9 +170,9 @@ Empty parts are left out. The message is written for someone who saw only their 
 - That result cost several times a single generation, and the review gives no matched one-shot comparison.
 - A commenter on r/codex put the general point this way: give these models a real target, say what good looks like and what done means, and they do better work for less money ([r/codex 1xz8b5x](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/), 18 Nov 2026).
 
-### What Follow Through does
+### What Done Done does
 
-`$follow-through:raise-the-bar` runs the loop the reviewer drove by hand:
+`$donedone:raise-the-bar` runs the loop the reviewer drove by hand:
 
 - Write the bar first: 3 to 6 checks a demanding expert would apply and a short "this must not be..." list of lazy outcomes. For open choices, run `fresh-ideas`.
 - Build a complete first version, then look at it for real by running, rendering, screenshotting or measuring it.
@@ -192,7 +192,7 @@ It is explicit-only because it costs more, and most tasks don't need it.
 
 Codex's model catalog sets both 6.2 models to low effort by default ([models.json](https://github.com/openai/codex/blob/main/codex-rs/models-manager/models.json), 17 Nov 2026). OpenAI's launch charts, as reported by AIHubMix, show the LifeVal benchmark score at low effort dropping from 66.8% to 25.3% for Sol compared with 6.1 Sol, and from 67.5% to 46.3% for Astra compared with GPT-6 Astra ([AIHubMix](https://aihubmix.com/blog/gpt-6-2-migration-prefix-edits-drop-reasoning-and-none-is-rejected), 18 Nov 2026). OpenAI's Codex guide maps effort to the job: medium for a quick survey, high for tracing one cause across systems, extra high when several causes may interact. It adds that higher effort helps the model stay with a long task through the final checks ([Prompting GPT-6.2 in Codex](https://learn.chatgpt.com/guides/prompting-gpt-6-2-astra)). The catalog describes ultra as maximum reasoning with automatic task delegation. Hence the README's advice of high or xhigh for real work and ultra for work that splits into parallel parts.
 
-## 8. What Follow Through deliberately avoids
+## 8. What Done Done deliberately avoids
 
 - **"Be concise" or word limits.** These models already over-compress, and OpenAI links brevity pressure to hidden blockers.
 - **"ELI5".** It failed for Theo and talks down to experts. The skill writes for an intelligent reader without context.
