@@ -1,8 +1,12 @@
 """Checks that the marketplace, manifest, hooks file and profile match what Codex reads."""
 
+import glob
 import json
 import os
 import re
+import shutil
+import subprocess
+import tempfile
 import unittest
 import xml.dom.minidom
 
@@ -76,22 +80,115 @@ class ManifestTests(unittest.TestCase):
         self.assertEqual(document.documentElement.tagName, "svg")
 
 
+def stop_handler():
+    hooks = load("plugins", "tryhard", "hooks", "hooks.json")["hooks"]
+    return hooks["Stop"][0]["hooks"][0]
+
+
+class SkillSizeTests(unittest.TestCase):
+    # Codex cuts an explicitly invoked SKILL.md ("$tryhard:finish-the-job ...") at
+    # 8,000 bytes (MAX_SKILL_PROMPT_BYTES in codex-rs/ext/skills/src/render.rs)
+    # and warns that the skill was truncated.
+    # Expected to fail on review2/hook alone: finish-the-job/SKILL.md is
+    # shortened on another branch and this passes once both are merged.
+    MAX_SKILL_PROMPT_BYTES = 8000
+
+    def test_every_skill_fits_the_explicit_invocation_limit(self):
+        paths = sorted(glob.glob(os.path.join(PLUGIN, "skills", "*", "SKILL.md")))
+        self.assertTrue(paths)
+        for path in paths:
+            with self.subTest(os.path.relpath(path, PLUGIN)):
+                self.assertLessEqual(os.path.getsize(path), self.MAX_SKILL_PROMPT_BYTES)
+
+
 class HooksFileTests(unittest.TestCase):
     def test_one_stop_hook_pointing_at_the_script(self):
-        hooks = load("plugins", "tryhard", "hooks", "hooks.json")["hooks"]
+        hooks = load("plugins", "tryhard", "hooks", "hooks.json")
+        self.assertEqual(list(hooks), ["hooks"])  # HooksFile rejects unknown top-level keys
+        hooks = hooks["hooks"]
         self.assertEqual(list(hooks), ["Stop"])
         self.assertEqual(len(hooks["Stop"]), 1)
         handlers = hooks["Stop"][0]["hooks"]
         self.assertEqual(len(handlers), 1)
         handler = handlers[0]
+        self.assertEqual(set(handler), {"type", "command", "commandWindows", "timeout", "statusMessage"})
         self.assertEqual(handler["type"], "command")
         self.assertIsInstance(handler["timeout"], int)
         self.assertFalse(handler.get("async", False))  # async hooks can't block
         match = re.search(r"\$\{PLUGIN_ROOT\}/(\S+?)\"", handler["command"])
         self.assertIsNotNone(match)
         self.assertTrue(os.path.isfile(os.path.join(PLUGIN, match.group(1))))
-        windows = re.search(r"%PLUGIN_ROOT%\\(\S+?)\"", handler["commandWindows"])
+        windows = re.search(r"\$\{PLUGIN_ROOT\}\\(\S+?)\"", handler["commandWindows"])
         self.assertEqual(windows.group(1).replace("\\", "/"), match.group(1))
+
+    def test_commands_work_in_every_shell_codex_uses(self):
+        # Codex replaces ${PLUGIN_ROOT} itself before running the command with
+        # the session's shell: zsh, bash or sh -c on Unix, and on Windows
+        # PowerShell -Command or cmd /c. PowerShell never expands %VAR%.
+        handler = stop_handler()
+        for key in ("command", "commandWindows"):
+            self.assertNotRegex(handler[key], r"%\w+%")
+            self.assertNotRegex(handler[key].replace("${PLUGIN_ROOT}", ""), r"\$")
+            self.assertIn(" -I ", handler[key])  # PYTHONPATH and the cwd can't shadow the stdlib
+
+
+class HookCommandRunTests(unittest.TestCase):
+    """Run the Unix command the way Codex does, from a plugin path with spaces."""
+
+    PAYLOAD = {
+        "session_id": "packaging-test",
+        "turn_id": "turn-1",
+        "transcript_path": None,
+        "cwd": "/tmp",
+        "hook_event_name": "Stop",
+        "model": "gpt-6.2-astra",
+        "permission_mode": "default",
+        "stop_hook_active": False,
+        "last_assistant_message": "Done. Want me to add tests for the parser?",
+    }
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix="tryhard plugin ")
+        self.root = os.path.join(self.tmp, "plugins cache", "tryhard")
+        shutil.copytree(os.path.join(PLUGIN, "hooks"), os.path.join(self.root, "hooks"))
+        # The hand-back check needs the transcript to see that the user asked for a task.
+        self.payload = dict(self.PAYLOAD, transcript_path=os.path.join(self.tmp, "rollout.jsonl"))
+        with open(self.payload["transcript_path"], "w", encoding="utf-8") as handle:
+            record = {"type": "event_msg", "payload": {"type": "user_message", "message": "Fix the parser."}}
+            handle.write(json.dumps(record) + "\n")
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def run_in(self, argv):
+        # A fresh state folder each time: the hook blocks a given turn only once.
+        data = tempfile.mkdtemp(dir=self.tmp)
+        env = dict(os.environ, PLUGIN_ROOT=self.root, PLUGIN_DATA=data)
+        for name in ("TRYHARD_HOOK", "TRYHARD_CHECKS", "PYTHONDONTWRITEBYTECODE"):
+            env.pop(name, None)
+        return subprocess.run(
+            argv,
+            input=json.dumps(self.payload),
+            capture_output=True,
+            text=True,
+            env=env,
+            cwd=self.tmp,
+            timeout=60,
+        )
+
+    @unittest.skipIf(shutil.which("python3") is None, "needs python3 on PATH")
+    def test_unix_command(self):
+        command = stop_handler()["command"].replace("${PLUGIN_ROOT}", self.root)
+        shells = [[shell, "-c"] for shell in ("sh", "bash", "dash", "zsh") if shutil.which(shell)]
+        if shutil.which("pwsh"):
+            shells.append(["pwsh", "-NoProfile", "-Command"])
+        self.assertTrue(shells)
+        for shell in shells:
+            with self.subTest(shell[0]):
+                result = self.run_in(shell + [command])
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads(result.stdout)["decision"], "block")
+                self.assertFalse(os.path.exists(os.path.join(self.root, "hooks", "__pycache__")))
 
 
 class ProfileTests(unittest.TestCase):

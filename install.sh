@@ -35,11 +35,20 @@ case "${1:-}" in
     ;;
 esac
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# CDPATH= keeps cd from printing the folder when CDPATH is exported.
+script_dir="$(CDPATH='' cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 snippet="$script_dir/agents-md/AGENTS.snippet.md"
-codex_dir="${CODEX_HOME:-$HOME/.codex}"
+if [ -n "${CODEX_HOME:-}" ]; then
+  codex_dir="$CODEX_HOME"
+elif [ -n "${HOME:-}" ]; then
+  codex_dir="$HOME/.codex"
+else
+  echo "Neither CODEX_HOME nor HOME is set, so the Codex folder can't be found." >&2
+  exit 1
+fi
 agents="$codex_dir/AGENTS.md"
 status=0
+CR="$(printf '\r')"
 
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
@@ -54,26 +63,32 @@ backup() {
   echo "Saved a backup of $agents to $target"
 }
 
-has_start() { [ -f "$agents" ] && grep -qxF "$START_MARKER" "$agents"; }
-has_end() { [ -f "$agents" ] && grep -qxF "$END_MARKER" "$agents"; }
+# Marker lines also match with a Windows line ending, in case an editor
+# converted the file to CRLF after the block was added.
+has_line() { [ -f "$agents" ] && grep -qxF -e "$1" -e "$1$CR" "$agents"; }
+has_start() { has_line "$START_MARKER"; }
+has_end() { has_line "$END_MARKER"; }
 
 # Print the current file with the marked block replaced by the file in $1
 # (or removed when $1 is empty). Lines outside the block are kept as they are,
 # except that removing the block also drops the one blank line the installer
-# put before it, so install then remove gives back the original file.
+# put before it, so install then remove gives back the original file. The one
+# difference: if the original had no final newline, the installer added one,
+# and it stays after removal.
 rewrite() {
   awk -v start="$START_MARKER" -v end="$END_MARKER" -v block="${1:-}" '
     function flush() { if (held) { print last; held = 0 } }
-    $0 == start {
-      if (block == "" && held && last == "") { held = 0 } else { flush() }
-      if (block != "" && !written) { while ((getline line < block) > 0) print line }
+    { line = $0; sub(/\r$/, "", line) }
+    line == start {
+      if (block == "" && held && bare == "") { held = 0 } else { flush() }
+      if (block != "" && !written) { while ((getline text < block) > 0) print text }
       written = 1
       skipping = 1
       next
     }
-    skipping && $0 == end { skipping = 0; next }
+    skipping && line == end { skipping = 0; next }
     skipping { next }
-    { flush(); last = $0; held = 1 }
+    { flush(); last = $0; bare = line; held = 1 }
     END { flush() }
   ' "$agents"
 }
@@ -113,7 +128,7 @@ install_block() {
   local block="$work/block.md" new="$work/AGENTS.md"
   {
     echo "$START_MARKER"
-    grep -vxF -e "$START_MARKER" -e "$END_MARKER" "$snippet" || true
+    tr -d '\r' <"$snippet" | grep -vxF -e "$START_MARKER" -e "$END_MARKER" || true
     echo "$END_MARKER"
   } >"$block"
 
@@ -155,6 +170,15 @@ remove_block() {
   check_markers
   local new="$work/AGENTS.md"
   rewrite "" >"$new"
+  # The block was all there was (the installer created the file), so take the
+  # file away again instead of leaving it empty. A symlinked file is emptied
+  # instead, so the link stays.
+  if [ ! -s "$new" ] && [ ! -L "$agents" ]; then
+    backup
+    rm -f "$agents"
+    echo "Removed $agents, which held only the Tryhard block"
+    return
+  fi
   apply "$new" "Removed the Tryhard block from"
 }
 

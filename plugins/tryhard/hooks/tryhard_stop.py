@@ -21,8 +21,13 @@ Limits:
     turn.
   * Each check goes quiet for the rest of the session after it has fired on
     3 turns in a row.
-  * Any error, unexpected input or unreadable transcript means no output and
-    exit status 0 (the turn ends as usual).
+  * Offers and questions about deleting, overwriting, publishing or paying
+    are left alone, because those really are the user's call.
+  * Without a readable transcript only the readability check runs, since a
+    miss costs less than pushing back on a plain answer or a plan.
+  * Any error or unexpected input means no output and exit status 0 (the
+    turn ends as usual). Long messages and transcripts are read only up to
+    fixed limits, so a run stays well inside Codex's hook timeout.
 
 Settings (environment variables, read when Codex starts the hook):
   TRYHARD_HOOK=off               turn the whole hook off
@@ -36,6 +41,7 @@ Only the Python 3 standard library is used.
 import json
 import os
 import re
+import stat
 import sys
 import tempfile
 import time
@@ -44,7 +50,15 @@ CHECKS = ("handback", "own-work", "readability")
 STREAK_LIMIT = 3
 MAX_STDIN_BYTES = 8 * 1024 * 1024
 MAX_TRANSCRIPT_BYTES = 256 * 1024 * 1024
+TRANSCRIPT_SECONDS = 4.0  # give up on the transcript after this long
 MAX_STATE_FILES = 200
+STALE_TEMP_SECONDS = 3600
+# The checks look at the start (readability) or the end (the other two) of a
+# message, so only that much of a very long message is examined. Runs of more
+# than LONG_TOKEN_CHARS non-space characters (base64, minified code) are
+# shortened first; real names are shorter, and long runs slow the regexes.
+MAX_ANALYSED_CHARS = 20000
+LONG_TOKEN_CHARS = 200
 
 OFF_VALUES = {"0", "off", "false", "no", "disable", "disabled"}
 CHECK_ALIASES = {
@@ -62,7 +76,10 @@ CHECK_ALIASES = {
     "report": "readability",
 }
 
-FOOTER = "(Automatic check from the Tryhard plugin. Don't mention it in your reply.)"
+FOOTER = (
+    "(Automatic check from the Tryhard plugin. The last message you send is the one the user reads, "
+    "so make it complete on its own. Don't mention this note or apologise.)"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -100,7 +117,15 @@ FENCE_RE = re.compile(r"^[ \t]*(```|~~~).*?^[ \t]*\1[^\n]*$", re.M | re.S)
 CODE_SPAN_RE = re.compile(r"`([^`\n]{1,300})`")
 LIST_ITEM_RE = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
 SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])[\"')\]*_]*\s+")
-TRAILING_DECOR_RE = re.compile(r"[\s*_\"'`)\]]+$")
+# Characters that can follow the last word of a sentence (rstrip, not a regex,
+# so a long run of them cannot slow anything down).
+TRAILING_DECOR = " \t\r\n\f\v*_\"'`)]"
+LONG_TOKEN_RE = re.compile(r"(?<![^\s`])[^\s`]{%d,}" % (LONG_TOKEN_CHARS + 1))
+
+
+def _shorten_token(match):
+    token = match.group(0)
+    return "\u2026" + (token[-1] if token[-1] in ".,;:!?)" else "")
 
 
 def strip_code_blocks(text):
@@ -110,6 +135,23 @@ def strip_code_blocks(text):
     if match:
         text = text[: match.start()]
     return text
+
+
+def prose_of(message, end=False):
+    """The message without code blocks, cut to the part the checks look at.
+
+    end=True keeps the last MAX_ANALYSED_CHARS characters (for checks on how
+    the message ends); otherwise the first ones are kept.
+    """
+    text = LONG_TOKEN_RE.sub(_shorten_token, message.replace("\r\n", "\n"))
+    text = strip_code_blocks(text)
+    if len(text) <= MAX_ANALYSED_CHARS:
+        return text
+    if end:
+        text = text[-MAX_ANALYSED_CHARS:]
+        return text[text.find("\n") + 1 :]
+    text = text[:MAX_ANALYSED_CHARS]
+    return text[: text.rfind("\n") + 1] or text
 
 
 def paragraphs(text):
@@ -122,17 +164,30 @@ def is_list_block(block):
     return bool(lines) and all(LIST_ITEM_RE.match(line) or line.startswith("  ") for line in lines)
 
 
+HEADING_LINE_RE = re.compile(r"#{1,6}(?:\s.*)?|\*\*[^*]{1,80}\*\*:?|__[^_]{1,80}__:?")
+LABEL_LINE_RE = re.compile(r"[A-Z][\w /&-]{0,40}:")
+
+
+def is_heading_line(line, labels=False):
+    line = line.strip()
+    return bool(HEADING_LINE_RE.fullmatch(line) or (labels and LABEL_LINE_RE.fullmatch(line)))
+
+
 def is_heading_block(block):
-    lines = [line.strip() for line in block.splitlines() if line.strip()]
-    if not lines:
-        return True
-    if all(line.startswith("#") for line in lines):
-        return True
-    return len(lines) == 1 and bool(re.fullmatch(r"\*\*[^*]{1,80}\*\*:?", lines[0]))
+    lines = [line for line in block.splitlines() if line.strip()]
+    return all(is_heading_line(line) for line in lines)
+
+
+def without_heading(block):
+    """The block minus heading lines at its top ("**Summary**", "Testing:")."""
+    lines = [line for line in block.splitlines() if line.strip()]
+    while len(lines) > 1 and is_heading_line(lines[0], labels=True):
+        lines = lines[1:]
+    return "\n".join(lines)
 
 
 def ends_with_question(block):
-    return TRAILING_DECOR_RE.sub("", block).endswith("?")
+    return block.rstrip(TRAILING_DECOR).endswith("?")
 
 
 def sentences(block):
@@ -193,19 +248,57 @@ VAGUE_OFFER_RE = re.compile(
     r"(?:any(?:thing)?|something|further|other|more|else)\b"
     r"(?! (?:test|tests|file|files|fix|fixes|check|checks|step|steps|endpoint|page|screen|feature)s?\b)"
 )
+# "Should I use Postgres or SQLite?" or "Do you want me to use your account or
+# the company one?" asks how to do the asked work, which is a choice, not an
+# offer. It is still an offer when it adds work ("Should I also add tests, or
+# docs?") or when the other option is to stop ("..., or leave it here?").
+OFFER_CHOICE_RE = re.compile(r"\b(?:or|either|versus|vs)\b")
+EXTRA_WORK_RE = re.compile(r"\b(?:also|too|as well|next(?! to\b)|additionally|another)\b")
+STOP_OPTION_RE = re.compile(
+    r"\bor (?:not|leave|stop|skip|move on|call it|wrap|is (?:that|this) (?:enough|it|fine|ok|okay|good)|"
+    r"are you good|keep (?:it|things|this) (?:as is|as-is|there|here))\b"
+)
+# Deleting, overwriting, publishing, deploying to production, sending
+# messages and spending money really are the user's call, so neither an
+# offer nor a question about them is pushed back. The word has to be the
+# action ("Should I delete...", "...to be overwritten"), so "add a delete
+# button" is still ordinary work.
+USER_CALL_RE = re.compile(
+    r"\b(?:to|i|we|i'll|we'll|you|be|and|or)\s+(?:(?:can|could|will|should|shall|may|also|just|now|then|"
+    r"permanently|go ahead and)\s+){0,2}"
+    r"(?:delet\w*|drop(?:ped|ping)?|wip(?:e|ed|ing)|purg\w*|eras(?:e|ed|ing)|destroy\w*|overwr\w*|truncat\w*|"
+    r"force[- ]?push\w*|rm -rf|publish\w*|pay|paid|paying|purchas\w*|buy|buying|spend\w*|"
+    r"deploy\w* (?:\S+ ){0,4}(?:to |on |in(?:to)? )?(?:the )?(?:prod|production|live)|"
+    r"send\w* (?:\S+ ){0,4}(?:emails?|messages?|invoices?|newsletters?|notifications?))\b"
+)
+
+
+def handback_sentences(prose):
+    """The last two sentences, plus the lead-in of a list that ends the message."""
+    blocks = paragraphs(prose)
+    if not blocks:
+        return []
+    tail = sentences(blocks[-1])[-2:]
+    if len(blocks) > 1 and is_list_block(blocks[-1]):
+        # "If you'd like, I can also:" followed by a list of extra work.
+        lead = sentences(blocks[-2])[-1:]
+        if lead and lead[0].rstrip(TRAILING_DECOR).endswith(":"):
+            tail = lead + tail
+    return tail
 
 
 def check_handback(message):
     """Return the offering sentence when the message ends on a hand-back."""
-    prose = strip_code_blocks(message)
-    blocks = paragraphs(prose)
-    if not blocks:
-        return None
-    tail = sentences(blocks[-1])[-2:]
-    for sentence in reversed(tail):
+    for sentence in reversed(handback_sentences(prose_of(message, end=True))):
         text = plain(sentence)
-        if re.match(LEAD_IN + r"(?:shall|should|can|may) (?:i|we)\b", text) and CHOICE_RE.search(text):
-            # "Should I use A or B?" is a choice, not an offer; the own-work check covers it.
+        if USER_CALL_RE.search(text):
+            continue
+        if (
+            ends_with_question(text)
+            and OFFER_CHOICE_RE.search(text)
+            and not EXTRA_WORK_RE.search(text)
+            and not STOP_OPTION_RE.search(text)
+        ):
             continue
         hit = any(pattern.search(text) for pattern in OFFER_START_PATTERNS) or any(
             pattern.search(text) for pattern in OFFER_ANYWHERE_PATTERNS
@@ -217,11 +310,12 @@ def check_handback(message):
 
 def handback_reason(sentence):
     return (
-        'Your last message ends by offering more work ("%s"). If that work is part of what was '
-        "asked and can be undone, do it now and then report the result. If it truly needs the user "
-        "(it deletes work you didn't create, leaves this machine, spends money, or changes the "
-        "goal), keep it as one line in your report with the default you applied. If the user only "
-        "asked a question, a review or a plan, end the turn as it was." % shorten(sentence)
+        'Your last message ends by offering more work ("%s"). If that work is part of what the user '
+        "asked for and can be undone, do it now, then write your final report covering all of it. If "
+        "it needs the user (it deletes something you didn't create, leaves this machine, spends money "
+        "or changes the goal), don't do it: state it as one open item with the default you applied. "
+        "If the user only asked a question or asked for a review or a plan, send your answer again "
+        "without the offer." % shorten(sentence)
     )
 
 
@@ -329,7 +423,7 @@ def question_parts(message):
     it, or a list of options right after it. Returns None when the message does
     not end with a question.
     """
-    blocks = paragraphs(strip_code_blocks(message))
+    blocks = paragraphs(prose_of(message, end=True))
     if not blocks:
         return None
     options = ""
@@ -355,13 +449,28 @@ def question_parts(message):
     return question, "\n".join(part for part in (context, options) if part)
 
 
+# "Can you add the key in ~/.ssh/id_ed25519.pub to the server?" asks the user
+# to do something only they can do, which is fine even when it names a file.
+# Asking them to confirm, check or pick something is not.
+USER_ACTION_RE = re.compile(
+    r"^(?:(?:so|and|also|then|ok|okay),?\s+)?(?:please\s+)?(?:can|could|would|will) you\s+(?:please\s+)?"
+    r"(?!(?:confirm|check|tell|clarify|verify|let me know|say|decide|choose|pick|look|see|remind|point)\b)\w"
+)
+# A question about taste or voice ("Does the tone in launch.md fit your
+# customers?") needs the user's judgement even when it names a file.
+TASTE_RE = re.compile(r"\b(?:tone|voice|wording|phrasing|brand|taste|audience|customers?|readers)\b")
+
+
 def own_work_candidates(message):
     parts = question_parts(message)
     if parts is None:
         return []
     question, context = parts
+    text = plain(question)
+    if USER_ACTION_RE.match(text) or USER_CALL_RE.search(text) or TASTE_RE.search(text):
+        return []
     names = extract_identifiers(question)
-    if CHOICE_RE.search(plain(question)):
+    if CHOICE_RE.search(text):
         names += [name for name in extract_identifiers(context) if name not in names]
     return names
 
@@ -380,16 +489,17 @@ def own_work_reason(names):
     return (
         "Your last message asks the user about %s, which never appear in their messages, so they "
         "come from your own work. Look at them yourself (open, list, compare, check timestamps or "
-        "the output that produced them), pick using that evidence, note the choice in one line, "
-        "and carry on. Ask only about what only the user can know, with your default already "
-        "applied." % join_names(names)
+        "the output that produced them), pick using that evidence, say in one line what you picked, "
+        "and carry on. Don't delete or overwrite anything you didn't create to settle it. If the "
+        "answer truly depends on something only the user knows, keep the question as one open item "
+        "with the default you applied." % join_names(names)
     )
 
 
 # ---------------------------------------------------------------------------
 # Check 3: hard-to-read reports
 
-LONG_MESSAGE_CHARS = 800
+LONG_MESSAGE_CHARS = 400
 DENSE_MIN_WORDS = 30
 DENSE_MIN_CODE = 7
 DENSE_RATIO = 0.15
@@ -436,8 +546,13 @@ def word_count(text):
     return len(re.findall(r"\S+", text))
 
 
+# Greek uses ";" as its question mark.
+GREEK_QUESTION_RE = re.compile(r"(?<=[\u0370-\u03ff\u1f00-\u1fff])[\"'\u00bb)]*;")
+
+
 def semicolons(text):
-    return CODE_SPAN_RE.sub(" ", text).count(";")
+    text = CODE_SPAN_RE.sub(" ", text)
+    return text.count(";") - len(GREEK_QUESTION_RE.findall(text))
 
 
 LINE_BREAK_END_RE = re.compile(r"(?:[.!?:)]|  |\\)$")
@@ -457,9 +572,22 @@ def units(block):
     return [block]
 
 
+def opening_unit(blocks):
+    """The first piece of prose, skipping headings and lists.
+
+    A message that opens with "**Summary**" and a list of changes has no
+    opening paragraph to judge, so this returns "" for it.
+    """
+    for block in blocks:
+        block = without_heading(block)
+        if not is_heading_block(block) and not is_list_block(block):
+            return units(block)[0]
+    return ""
+
+
 def check_readability(message):
     """Return a short description of what makes the report hard to read."""
-    prose = strip_code_blocks(message)
+    prose = prose_of(message)
     lines = [line for line in prose.splitlines() if not line.lstrip().startswith("|")]
     prose = "\n".join(lines)
     if len(prose.strip()) < LONG_MESSAGE_CHARS:
@@ -468,7 +596,7 @@ def check_readability(message):
     if not blocks:
         return None
 
-    opening = units(blocks[0])[0]
+    opening = opening_unit(blocks)
     words = word_count(opening)
     code = count_code_names(opening)
     opening_semis = semicolons(opening)
@@ -500,7 +628,7 @@ def readability_reason(detail):
         "Rewrite just the message, without redoing any work, as short plain paragraphs. Start with "
         "the answer or result, then say what changed, how it was checked and what was not, what is "
         "still open, and any decisions you made that they may want to change. Use plain names for "
-        "things and keep a path only where the reader needs it." % detail
+        "things and keep a path only where the reader will want to open the file." % detail
     )
 
 
@@ -519,6 +647,9 @@ HARNESS_PREFIXES = (
     "# agents.md instructions",
     "<skill>",
 )
+
+
+TYPED_MARKERS = ('"UserMessage"', '"user_message"', '"task_started"', '"turn_context"')
 
 
 class Transcript(object):
@@ -559,7 +690,7 @@ def read_transcript(path):
     if not isinstance(path, str) or not path or path.endswith(".zst"):
         return None
     try:
-        if os.path.getsize(path) > MAX_TRANSCRIPT_BYTES:
+        if not os.path.isfile(path) or os.path.getsize(path) > MAX_TRANSCRIPT_BYTES:
             return None
         handle = open(path, "r", encoding="utf-8", errors="replace")
     except (OSError, ValueError):
@@ -567,9 +698,16 @@ def read_transcript(path):
 
     items, legacy, raw, claude = [], [], [], []
     mode = None
+    deadline = time.monotonic() + TRANSCRIPT_SECONDS
     with handle:
-        for line in handle:
-            if "user" not in line and "User" not in line and "mode" not in line:
+        for count, line in enumerate(handle):
+            if count % 512 == 0 and time.monotonic() > deadline:
+                return None
+            # Only these record kinds matter. Raw "user" records are a fallback,
+            # so they are skipped once typed user messages have been seen.
+            if not any(marker in line for marker in TYPED_MARKERS) and (
+                items or legacy or '"user"' not in line
+            ):
                 continue
             try:
                 record = json.loads(line)
@@ -690,6 +828,27 @@ def state_dir(env):
     return os.path.join(tempfile.gettempdir(), "tryhard-%s" % uid, "stop-hook")
 
 
+def private_dir_ok(directory):
+    """Create the fallback state folder under the shared temp folder safely.
+
+    Codex always sets PLUGIN_DATA, so this only matters when the hook runs
+    some other way. Another user could have created the folder (or a symlink
+    to somewhere else) first, so it must be a real folder owned by this user.
+    """
+    getuid = getattr(os, "getuid", None)
+    try:
+        os.makedirs(directory, mode=0o700, exist_ok=True)
+        if getuid is None:
+            return True
+        for path in (os.path.dirname(directory), directory):
+            info = os.lstat(path)
+            if not stat.S_ISDIR(info.st_mode) or info.st_uid != getuid():
+                return False
+    except OSError:
+        return False
+    return True
+
+
 def state_path(directory, session_id):
     safe = re.sub(r"[^A-Za-z0-9_.-]", "_", session_id)[:120] or "session"
     return os.path.join(directory, safe + ".json")
@@ -722,13 +881,26 @@ def save_state(path, state):
 
 
 def _prune(directory):
+    """Keep the newest MAX_STATE_FILES session files and drop leftover temp files."""
     try:
-        names = [name for name in os.listdir(directory) if name.endswith(".json")]
-        if len(names) <= MAX_STATE_FILES:
-            return
-        paths = sorted((os.path.join(directory, name) for name in names), key=os.path.getmtime)
-        for old in paths[: len(paths) - MAX_STATE_FILES]:
-            os.unlink(old)
+        entries = []
+        now = time.time()
+        for name in os.listdir(directory):
+            path = os.path.join(directory, name)
+            try:
+                mtime = os.lstat(path).st_mtime
+                if name.startswith(".state-") and now - mtime > STALE_TEMP_SECONDS:
+                    os.unlink(path)  # left behind by a run that was killed mid-write
+                elif name.endswith(".json"):
+                    entries.append((mtime, path))
+            except OSError:
+                continue
+        entries.sort()
+        for _, old in entries[: max(0, len(entries) - MAX_STATE_FILES)]:
+            try:
+                os.unlink(old)
+            except OSError:
+                pass
     except OSError:
         pass
 
@@ -752,13 +924,18 @@ def evaluate(payload, env, transcript_reader=read_transcript):
         return None
     if not isinstance(session_id, str) or not session_id:
         return None
-    if str(payload.get("permission_mode", "")).lower() == "plan":
+    if str(payload.get("permission_mode", "")).lower() == "plan" or "<proposed_plan>" in message:
+        # Codex sends no plan permission mode today; plan mode is read from
+        # the transcript below. The tag is a cheap extra signal.
         return None
 
     checks = enabled_checks(env)
     if not checks:
         return None
-    path = state_path(state_dir(env), session_id)
+    directory = state_dir(env)
+    if not (env.get("PLUGIN_DATA") or env.get("CLAUDE_PLUGIN_DATA")) and not private_dir_ok(directory):
+        return None
+    path = state_path(directory, session_id)
     state = load_state(path)
     quiet = set(state.get("quiet") or [])
     streak = state.get("streak") if isinstance(state.get("streak"), dict) else {}
@@ -777,9 +954,11 @@ def evaluate(payload, env, transcript_reader=read_transcript):
         transcript = transcript_reader(payload.get("transcript_path"))
         if transcript is not None and transcript.plan_mode:
             return None
+        # Without the transcript there is no telling whether the user only asked
+        # a question or whether plan mode is on, so only readability can fire.
         latest = transcript.user_texts[-1] if transcript is not None else ""
         answer_only = bool(latest) and wants_answer_only(latest)
-        if offer and not answer_only:
+        if offer and transcript is not None and not answer_only:
             fired["handback"] = handback_reason(offer)
         if candidates and transcript is not None and not ASK_ME_RE.search(plain(latest)):
             names = check_own_work(message, transcript.user_texts)
@@ -817,6 +996,17 @@ def evaluate(payload, env, transcript_reader=read_transcript):
     return json.dumps({"decision": "block", "reason": reason})
 
 
+def read_input(stdin):
+    """Read the event as UTF-8 whatever the locale (Windows pipes default to the ANSI code page)."""
+    source = getattr(stdin, "buffer", stdin)
+    data = source.read(MAX_STDIN_BYTES + 1)
+    if len(data) > MAX_STDIN_BYTES:
+        return None
+    if isinstance(data, bytes):
+        data = data.decode("utf-8", errors="replace")
+    return data.lstrip("\ufeff")
+
+
 def main(stdin=None, stdout=None, env=None):
     try:
         stdin = stdin if stdin is not None else sys.stdin
@@ -824,8 +1014,8 @@ def main(stdin=None, stdout=None, env=None):
         env = env if env is not None else os.environ
         if hook_disabled(env):
             return 0
-        data = stdin.read(MAX_STDIN_BYTES + 1)
-        if not data.strip() or len(data) > MAX_STDIN_BYTES:
+        data = read_input(stdin)
+        if not data or not data.strip():
             return 0
         output = evaluate(json.loads(data), env)
         if output:
