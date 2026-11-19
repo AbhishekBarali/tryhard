@@ -2,9 +2,9 @@
 {"id": "ftj-02", "skill": "finish-the-job", "prompt": "The nightly export job fails about one run in five. Find out why and fix it.", "should_trigger": true, "why": "multi-step debugging"}
 {"id": "ftj-03", "skill": "finish-the-job", "prompt": "Add CSV import to the admin page, with validation for the date column and tests that match the existing ones.", "should_trigger": true, "why": "multi-step feature build"}
 {"id": "ftj-04", "skill": "finish-the-job", "prompt": "Our Docker image went from 300 MB to 1.2 GB after last week's changes. Track down what happened and bring it back down.", "should_trigger": true, "why": "investigation plus fix"}
-{"id": "ftj-05", "skill": "finish-the-job", "prompt": "Migrate the settings screen from the old form library to the new one and keep every field working.", "should_trigger": true, "why": "multi-step migration"}
+{"id": "ftj-05", "skill": "finish-the-job", "prompt": "Make a Snake game I can play in the browser.", "should_trigger": true, "why": "one-line request for a whole game gets the full loop"}
 {"id": "ftj-06", "skill": "finish-the-job", "prompt": "Users say search returns nothing for words with accents. Reproduce it and fix it.", "should_trigger": true, "why": "reproduce and fix"}
-{"id": "ftj-07", "skill": "finish-the-job", "prompt": "Get the test suite green again on main. Something broke after the dependency bump.", "should_trigger": true, "why": "debug until checks pass"}
+{"id": "ftj-07", "skill": "finish-the-job", "prompt": "Write a getting-started guide for new contributors to this repo.", "should_trigger": true, "why": "writing a document is real work too"}
 {"id": "ftj-08", "skill": "finish-the-job", "prompt": "Build a small CLI that reads our access logs and prints the 10 slowest endpoints, with a README section on how to run it.", "should_trigger": true, "why": "build task with a clear deliverable"}
 {"id": "ftj-09", "skill": "finish-the-job", "prompt": "Check the mobile layout of every page in the marketing site and fix whatever is broken.", "should_trigger": true, "why": "check means fix too"}
 {"id": "ftj-10", "skill": "finish-the-job", "prompt": "Investigate the memory leak in the worker process and land a fix with a before and after measurement.", "should_trigger": true, "why": "investigation with proof"}
