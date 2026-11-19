@@ -44,7 +44,7 @@ class ManifestTests(unittest.TestCase):
         manifest = self.manifest
         self.assertEqual(manifest["name"], "tryhard")
         self.assertRegex(manifest["name"], r"^[a-z0-9][a-z0-9.-]{0,63}$")
-        self.assertEqual(manifest["version"], "0.2.0")
+        self.assertEqual(manifest["version"], "0.3.0")
         self.assertEqual(manifest["license"], "MIT")
         self.assertEqual(manifest["author"]["name"], "Abhishek Barali")
         self.assertEqual(manifest["skills"], "./skills/")

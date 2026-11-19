@@ -11,7 +11,7 @@ A Codex plugin that makes it work out what you want, build all of it, judge it a
 
 <p>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-2f6feb"></a>
-  <a href="plugins/tryhard/.codex-plugin/plugin.json"><img alt="Version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-C2410C"></a>
+  <a href="plugins/tryhard/.codex-plugin/plugin.json"><img alt="Version 0.3.0" src="https://img.shields.io/badge/version-0.3.0-C2410C"></a>
   <a href="docs/why.md"><img alt="For GPT-6.2 Astra and Sol" src="https://img.shields.io/badge/GPT--6.2-Astra%20%26%20Sol-5b6170"></a>
 </p>
 
