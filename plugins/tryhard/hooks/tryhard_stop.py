@@ -258,10 +258,14 @@ STOP_OPTION_RE = re.compile(
 )
 # Deleting, overwriting, publishing, deploying to production, sending
 # messages and spending money really are the user's call, so neither an
-# offer nor a question about them is pushed back.
+# offer nor a question about them is pushed back. The word has to be the
+# action ("Should I delete...", "...to be overwritten"), so "add a delete
+# button" is still ordinary work.
 USER_CALL_RE = re.compile(
-    r"\b(?:delet\w*|drop(?:ping)?|wip(?:e|ing)|purg\w*|eras(?:e|ing)|destroy\w*|overwrit\w*|truncat\w*|"
-    r"force[- ]?push\w*|rm -rf|publish\w*|pay|paying|purchas\w*|buy|buying|spend\w*|"
+    r"\b(?:to|i|we|i'll|we'll|you|be|and|or)\s+(?:(?:can|could|will|should|shall|may|also|just|now|then|"
+    r"permanently|go ahead and)\s+){0,2}"
+    r"(?:delet\w*|drop(?:ped|ping)?|wip(?:e|ed|ing)|purg\w*|eras(?:e|ed|ing)|destroy\w*|overwr\w*|truncat\w*|"
+    r"force[- ]?push\w*|rm -rf|publish\w*|pay|paid|paying|purchas\w*|buy|buying|spend\w*|"
     r"deploy\w* (?:\S+ ){0,4}(?:to |on |in(?:to)? )?(?:the )?(?:prod|production|live)|"
     r"send\w* (?:\S+ ){0,4}(?:emails?|messages?|invoices?|newsletters?|notifications?))\b"
 )
@@ -493,7 +497,7 @@ def own_work_reason(names):
 # ---------------------------------------------------------------------------
 # Check 3: hard-to-read reports
 
-LONG_MESSAGE_CHARS = 500
+LONG_MESSAGE_CHARS = 400
 DENSE_MIN_WORDS = 30
 DENSE_MIN_CODE = 7
 DENSE_RATIO = 0.15
