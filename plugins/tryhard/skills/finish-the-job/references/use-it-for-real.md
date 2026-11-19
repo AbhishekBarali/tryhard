@@ -5,7 +5,8 @@ is to meet the result the way its user will, through its real entry point, and k
 
 ## What to do for each kind of work
 
-A small change needs one real run of the changed path. A bigger build gets the row that fits.
+A small change needs a real run of the changed path plus one case off the happy path. A bigger
+build gets the row that fits.
 
 | Kind | What to do | Evidence to keep |
 | --- | --- | --- |
@@ -16,7 +17,8 @@ A small change needs one real run of the changed path. A bigger build gets the r
 | Command-line tool | Run the built command as a user would, with `--help`, a real input, a bad input, and an empty or very large input. | The output and exit codes |
 | API or service | Start it and send real requests, including an invalid one. Read back what was stored. | The requests and responses |
 | Library | Write a short caller in a temporary folder that uses the public API the way the docs describe. | The caller and its output |
-| Document or slides | Render to PDF or images and look at every page. | The rendered pages |
+| README, guide or setup doc | Follow it as its reader would, in a fresh copy or a temporary folder. Run each command it gives and open each path and link it names. | The commands and their output, and the rendered page |
+| Slides or a formatted document | Render to PDF or images and look at every page. | The rendered pages |
 
 ## How to do it
 
@@ -33,8 +35,8 @@ A small change needs one real run of the changed path. A bigger build gets the r
   on purpose and restoring it. Exit codes from game engines and test runners need a look at the log
   as well.
 - For web games, a debug-only hook that prints the game state as text and one that advances time by
-  a fixed step make scripted play reliable. Keep them out of the shipped build or behind a flag. Fix
-  the first new console error before anything else.
+  a fixed step make scripted play reliable. Remove them once the work is finished, unless the project
+  already has a debug mode to put them behind. Fix the first new console error before anything else.
 - Use the best tool the environment offers. First its own browser, computer-use or engine
   connection, then a headless browser or a command run from a temporary folder, then software
   rendering under a virtual display, then the closest real check. The final message says what you
