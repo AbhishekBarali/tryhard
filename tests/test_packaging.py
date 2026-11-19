@@ -1,5 +1,6 @@
 """Checks that the marketplace, manifest, hooks file and profile match what Codex reads."""
 
+import glob
 import json
 import os
 import re
@@ -82,6 +83,22 @@ class ManifestTests(unittest.TestCase):
 def stop_handler():
     hooks = load("plugins", "tryhard", "hooks", "hooks.json")["hooks"]
     return hooks["Stop"][0]["hooks"][0]
+
+
+class SkillSizeTests(unittest.TestCase):
+    # Codex cuts an explicitly invoked SKILL.md ("$tryhard:finish-the-job ...") at
+    # 8,000 bytes (MAX_SKILL_PROMPT_BYTES in codex-rs/ext/skills/src/render.rs)
+    # and warns that the skill was truncated.
+    # Expected to fail on review2/hook alone: finish-the-job/SKILL.md is
+    # shortened on another branch and this passes once both are merged.
+    MAX_SKILL_PROMPT_BYTES = 8000
+
+    def test_every_skill_fits_the_explicit_invocation_limit(self):
+        paths = sorted(glob.glob(os.path.join(PLUGIN, "skills", "*", "SKILL.md")))
+        self.assertTrue(paths)
+        for path in paths:
+            with self.subTest(os.path.relpath(path, PLUGIN)):
+                self.assertLessEqual(os.path.getsize(path), self.MAX_SKILL_PROMPT_BYTES)
 
 
 class HooksFileTests(unittest.TestCase):
