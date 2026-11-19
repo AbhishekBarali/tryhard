@@ -21,7 +21,7 @@ A Codex plugin that makes it work out what you want, build all of it, judge it a
 
 GPT-6.2 Astra and Sol can do the work. They just don't do it properly or all the way. Since launch, people using them in Codex keep reporting the same thing: the model lists bugs instead of fixing them, stops halfway with "Shall I continue?", does the smallest version that runs, and hands over its first draft as the finished thing.
 
-Tryhard flips it into tryhard mode. For real work, it works out what you actually want, builds the whole thing, has a fresh judge score it, and keeps improving it until another round stops helping. Five skills and a small Stop hook do the work, and there is nothing new to learn.
+Tryhard flips it into tryhard mode. For real work, it works out what you actually want, builds the whole thing, has a fresh judge check it against a clear bar, and fixes what the judge finds until the bar is met or more rounds stop helping. Five skills and a small Stop hook do the work, and there is nothing new to learn.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/before-after-dark.svg">
@@ -33,29 +33,29 @@ Tryhard flips it into tryhard mode. For real work, it works out what you actuall
 
 Ask for real work the way you normally would. Tryhard turns that one prompt into a loop:
 
-1. **Works out what you really want.** It writes a short brief: who it is for, what good looks like, and the parts a thoughtful expert would include even though you didn't say them. Anything you stated exactly, like a number, a name or "don't touch X", stays exactly as you said it.
+1. **Works out what you really want.** It writes a short brief and shares it before building: the parts a thoughtful expert would include even though you didn't say them, the gaps it filled as assumptions, and a review bar of what you will look for and how each line gets checked. Anything you stated exactly, like a number, a name or "don't touch X", stays exactly as you said it.
 2. **Builds the whole thing**, not a first slice.
 3. **Uses it for real.** It runs it, plays it, opens it and looks at it, and fixes what breaks.
-4. **A fresh judge scores it.** A new subagent that hasn't seen the conversation gets only your request, the brief and the result. It assumes the work isn't good enough yet and names the weakest parts.
-5. **Fixes the weakest parts and repeats.** It stops when the judge finds only small issues or a round stops making a visible difference, after at most 3 rounds unless you ask for more.
-6. **Reports plainly.** What it made, what each round improved, and anything still weak.
+4. **A fresh judge checks it.** A new subagent that hasn't seen the conversation tries the result itself, marks each bar line PASS, WEAK or FAIL, and ends with READY or NOT READY.
+5. **Fixes what the judge found and judges again.** It confirms each finding before acting on it. Each fix-then-judge is one round. It stops at READY, when a round stops helping, or after 3 rounds unless you ask for more, and hands back the best version.
+6. **Reports plainly.** What it made, how it was checked, what each round improved, and anything still weak.
 
-The loop fits the task. A small fix gets a one-line brief and one check. Quick edits, plain questions, explanations, reviews and Plan mode stay quick.
+The loop fits the task. Quick edits, questions, explanations and reviews get no brief and no judge. A small change that fits an existing file and pattern, such as a fix in one place or a new option shaped like its neighbours, gets a short brief and one judge pass. A new feature, page, game, design or document, or QA over a flow, gets the whole loop. In Plan mode the brief goes into the plan, and the building waits until you leave Plan mode. The full rules are under [More details](#more-details).
 
 There are two levels:
 
 | Level | What you do | What you get |
 |---|---|---|
-| **Just ask** | Type your request as usual | The loop above, up to 3 improvement rounds |
-| **Push further** | Turn effort up to ultra and start with `$tryhard:raise-the-bar` | A stricter bar and more rounds, run as a Codex `/goal` so Codex keeps going until the bar is met |
+| **Just ask** | Type your request as usual | The loop above, up to 3 rounds |
+| **Push further** | Start with `$tryhard:raise-the-bar`, ideally at ultra | A stricter bar and up to 8 rounds, run as a Codex `/goal` until the judge says READY |
 
-This costs more time and usage than a single pass. That is the trade: the model does the extra rounds, so you don't have to push it again yourself.
+The loop costs more time and usage than a single pass. That is the trade: the model does the extra rounds, so you don't have to push it again yourself. Quick edits and questions skip the loop and stay quick.
 
 What it targets:
 
 - **Half-done work.** Every part of the request and the cases it implies get built and checked for real. A QA request ends in fixes, not a list of issues.
 - **Doing only what was spelled out.** It reads your request as the minimum and fills the obvious gaps, like bad input and help text for a new command. It doesn't add features you didn't ask for.
-- **First drafts passed off as finished.** A fresh judge scores the result, and it improves the weakest parts until another round stops helping.
+- **First drafts passed off as finished.** A fresh judge checks the result against the bar, and it fixes the gaps the judge found until the judge says READY or another round stops helping.
 - **Stopping halfway.** When the next step is part of the task, it does it instead of asking "Shall I continue?".
 - **The same answer as everyone else.** When a task leaves a real creative choice open, it sets the obvious default aside and picks on fit.
 - **Loops that go nowhere.** Every loop has a clear stop and a round cap. Long measured runs keep only the changes that improve the main number.
@@ -94,7 +94,7 @@ How to switch to ultra, and an optional always-on block for `AGENTS.md`, are und
 
 **Automatic.** These trigger from what you ask, so there is nothing to type.
 
-- `finish-the-job` runs the loop above: a brief, the whole build, real use, a fresh judge and improvement rounds. It runs for builds, features, fixes, QA, games, pages, designs and documents.
+- `finish-the-job` runs the loop above: a brief, the whole build, real use, a fresh judge and up to 3 rounds of fixes. It runs for builds, features, fixes, QA, games, pages, designs and documents.
 - `fresh-ideas` sets the obvious answer aside and picks on fit. It runs inside the brief when a task leaves open a choice you will see, such as a name, a theme, a level concept or a visual direction.
 - `explain-plainly` leads with the answer or the main cause, in plain words. It runs when you ask why something happens, ask for a summary, or say you are confused.
 
@@ -113,13 +113,13 @@ How to switch to ultra, and an optional always-on block for `AGENTS.md`, are und
 Make a small Snake game I can play in the browser.
 ```
 
-No prefix needed. Tryhard writes a short brief first. For this one it might decide the game needs a start screen, a score, game over with a restart, and both keyboard and touch controls. Then it builds the game, plays it, has a fresh judge score it and improves the weakest parts. The final message says what each round improved and what is still weak.
+No prefix needed. Tryhard shares a short brief first. For this one it might decide the game needs a start screen, a score, game over with a restart, and both keyboard and touch controls. Then it builds the game, plays it, has a fresh judge check it against the brief's bar and fixes what the judge confirmed. The final message says how it was checked, what each round improved and what is still weak.
 
-Want more rounds? Say so in the request, for example "keep going until it's great" or "do 5 rounds". If you only want a fast first version, say that instead.
+Want more rounds? Say so in the request, for example "do 5 rounds". "Keep going until it's great" means up to 8. If you only want a fast first version, say that instead.
 
 ### Push further
 
-Start Codex at ultra effort, then call `raise-the-bar`:
+Start Codex at ultra effort if your account offers it, then call `raise-the-bar`:
 
 ```bash
 codex --profile tryhard -c model_reasoning_effort=ultra
@@ -129,9 +129,9 @@ codex --profile tryhard -c model_reasoning_effort=ultra
 $tryhard:raise-the-bar Build a landing page for a small bakery in Lisbon.
 ```
 
-`raise-the-bar` uses the same brief and fresh judge with a stricter bar. It runs as a Codex `/goal`, so Codex keeps starting new turns until the judge says the bar is met, after at most 8 rounds unless you give another number. If goals aren't available in your Codex, it runs the rounds in the same turn and gives you the exact `/goal` line to paste. Use it for the asks where you want the best result you can get. It costs the most.
+`raise-the-bar` uses the same brief and fresh judge with a stricter bar: what a top expert would be proud to put their name to. It runs as a Codex `/goal`, so Codex keeps starting new turns until the judge says READY or 8 rounds are done, unless you give another number. Its notes go in a `.tryhard/` folder that ignores itself, so it stays out of your commits. When it can't start a goal, it runs the rounds in the same turn and gives you the `/goal` line to paste. It costs the most, so save it for the asks where you want the best result you can get.
 
-Ultra is limited to some accounts. Without it, raise-the-bar still works at xhigh, the profile's default.
+Ultra is limited to some accounts. Without it, raise-the-bar still works at xhigh, the profile's default. How it starts the goal and what it keeps on disk are under [More details](#more-details).
 
 ### Set a goal
 
@@ -148,13 +148,67 @@ It changes your workspace and git state. The section below says exactly how, so 
 ## More details
 
 <details>
-<summary><b>What raise-the-bar keeps on disk</b></summary>
+<summary><b>How the default loop decides, judges and stops</b></summary>
 
 <br>
 
-- It writes `.tryhard/brief.md` in the project folder. The file holds the brief, the bar, the "this must not be..." list, how the judge scores the work, the round log and the stop rule. The Codex goal points at this file, so each new turn picks up where the last one stopped.
-- It adds `.tryhard/` to the repo's local exclude file, `.git/info/exclude`, so the file never shows up in commits.
-- It keeps each version recoverable, so a round that makes things worse can be undone without touching your branches or commits.
+**How much loop a task gets.** A one-line edit, rename or version bump gets no brief and no judge, just the change and a quick real check. A small change is one that fits inside an existing file and pattern, such as a fix in one place or a new option or subcommand shaped like its neighbours. It gets a short brief (your request, your exact constraints, the review bar), a real run of the changed path plus one case off the happy path, and one judge pass. Only confirmed blocking or visibly weaker problems get fixed, and then it stops. A new feature, page, game, design or document, or a QA pass over a flow, gets the whole loop. Questions, explanations and reviews get an answer and no changes.
+
+**The brief.** For a bigger build it is about ten to twenty short lines: your request as you wrote it, your exact constraints, what the result is at its best and who it is for, what you meet in the first seconds, the details an expert would include, any open choices (settled with `fresh-ideas`), the assumptions it made, and three to eight review-bar lines, each with how it is checked. It also keeps a short list of lazy versions the result must not be. That list stays in its notes and reaches the judge as positive checks. You see the brief in a progress update before the build starts, so you can steer early.
+
+**The judge.** Each round it starts a new subagent with `fork_turns` set to `"none"`, so the judge doesn't inherit the conversation. The judge gets five things: your request, your exact constraints with the brief's assumptions, the review bar, how to run or see the result with the folder of screenshots and logs from real use, and from the second round on the blockers the last judge found. It never sees the worker's summary or opinion of the work. It uses the result for real, including at least two edge or hostile inputs, marks each bar line PASS, WEAK or FAIL with evidence it saw itself, ranks the gaps, and ends with READY or NOT READY. PASS means the line fully holds, WEAK that it holds only in part or only on easy cases, and FAIL that it doesn't hold. READY means every bar line passes and nothing above minor is left. The judge changes none of the work's files.
+
+**Without subagents.** If no subagent can be started, the model does the same review itself from the same five inputs and says in the report that it was a self-review.
+
+**Acting on findings.** The judge's findings are claims. The model confirms each one above minor with its own evidence before fixing it, fixes the confirmed ones in order of importance, and keeps your constraints over the judge's advice. Minor gaps don't start a round. The bar can get stricter as the work goes, but it never drops so the work passes.
+
+**Counting rounds.** The first build and its judgment are round 0. Each fix-then-judge after that is one round, so 3 rounds means at most four judgments, and the 8 rounds of `raise-the-bar` mean at most nine.
+
+**When it stops.** At the first of these:
+
+- The judge says READY, or finds nothing above minor.
+- A round moved no bar line toward PASS and closed no real gap.
+- A bar line fell back and nothing ranked above it improved. It goes back to the best version.
+- The same gap above minor survived two rounds of fixes.
+- 3 rounds are done, or the number you gave. "Keep going until it's great" means 8.
+
+Before each round it saves a copy of the files the work changed or created under the system temp folder, without touching your branches, commits or stash, so it can hand back the best version (the one whose most important bar lines score highest) rather than the last one. Screenshots and logs from real use go in a temp folder too. After the stop it does no more polishing, and the final message names what still falls short of the bar. Asking for more rounds continues from the best version.
+
+Inside a Codex goal you set yourself, the loop runs within the goal, and the goal's own completion check, not the round cap, decides when the work ends.
+
+</details>
+
+<details>
+<summary><b>How raise-the-bar runs as a goal, and what it keeps on disk</b></summary>
+
+<br>
+
+**What changes from the default loop.** It runs the whole loop whatever the size of the change. If the work already exists, it uses and judges it before changing anything. The bar is five to eight lines of what a top expert would be proud to sign. The run ends only when a fresh judge says READY or 8 rounds are logged (or your number). A round that didn't help, a regression or a stubborn gap sends it back to the best version to try a different approach for the weakest bar line, instead of ending the run. It keeps parallel subagents to about four or five. It works without subagents too, with each review labelled as a self-review.
+
+**Files.** It creates `.tryhard/` in the folder Codex is working in, with a `.gitignore` inside it that holds the single line `*`. Git then ignores the whole folder, so nothing in it enters a commit, and nothing under `.git` changes.
+
+- `.tryhard/brief.md` holds the brief with its review bar, the paths of the skill and the judge's instructions, and a note that checks already run on the current state stand until their inputs change.
+- `.tryhard/rounds.md` is the round log. The first build and its judgment are round 0, then there is one line per round: what changed, the judge's READY or NOT READY and its top gaps, and what is still open. It names the best version.
+- `.tryhard/versions/` holds copies of the files the work changed or created, saved before each round, so a worse round can be undone without touching your branches or commits.
+- `.tryhard/evidence/` holds the screenshots, logs and outputs from real use that the judge works from.
+
+Each goal turn starts by reading `brief.md` and `rounds.md` and checking the current state of the work. Delete the folder whenever you no longer need it.
+
+**Starting the goal.** It calls `get_goal` first, then takes the first case that fits:
+
+- No goal is set, or the goal is complete. It creates one with a short objective that points at `.tryhard/brief.md` and states the 8-round cap, replacing a complete goal. A token budget is added only if you named one.
+- The same objective is already active. It continues it.
+- Any other goal that isn't complete is set, such as a different goal, or this one paused, blocked or out of budget. It leaves that goal alone, runs the rounds in the current turn, and tells you that `/goal clear` followed by the `/goal` line it gives starts this one as a goal.
+- The goal tools are missing. It runs the rounds in the current turn and gives you the `/goal` line in the final message. If goals are turned off in your Codex, add this to `~/.codex/config.toml`:
+
+  ```toml
+  [features]
+  goals = true
+  ```
+
+It marks the goal complete only after a final real use and a fresh judge's READY, or once the last allowed round is logged with the gaps that remain. If the same blocker, such as something only you can supply, holds for three goal turns in a row, it marks the goal blocked, the same rule Codex's own goals use.
+
+**Effort.** It mentions once that it does best at ultra, chosen under `/model` in the CLI or in the app's model picker. It still works at xhigh.
 
 </details>
 
@@ -163,7 +217,7 @@ It changes your workspace and git state. The section below says exactly how, so 
 
 <br>
 
-- It creates a `.goal/` folder (contract, attempt ledger, status and logs) and adds it to the repo's local exclude file, `.git/info/exclude`, so it never shows up in commits. Dependency folders, build output, large data files and anything that looks like a secret go in the same exclude file if git doesn't already ignore them.
+- It creates a `.goal/` folder (contract, attempt ledger, status and logs) and adds it to the repo's local exclude file (usually `.git/info/exclude`), so it never shows up in commits. Dependency folders, build output, large data files and anything that looks like a secret go in the same exclude file if git doesn't already ignore them.
 - If the project folder is not a git repository yet, it runs `git init` there and commits the current files. It never does this in your home folder or in a folder that holds other repositories. Started from one of those, it sets up in the project folder your request is about, and asks which one if the request doesn't say.
 - It works on a new branch named `goal/` plus a short name and leaves your own branch where it was. Any uncommitted changes you had become the first commit on that branch. To get them back on your branch, `git switch` to it and run `git cherry-pick --no-commit` on that first commit. The final message tells you which of these steps it took.
 - Every attempt is a commit. An attempt that doesn't beat the best result so far is dropped with `git reset --keep`, which leaves your other local changes in place.
@@ -209,7 +263,7 @@ Why ultra isn't the default: it is limited to some accounts. Codex accepts the s
 
 <br>
 
-Skills only apply on the turns where they trigger. A short block in `~/.codex/AGENTS.md` keeps the short form of the loop on every turn: read for what you mean and fill the gaps an expert would, build the whole thing, use it for real, judge it with fresh eyes, improve it until a round stops helping, and report plainly. To add it, clone the repo and run the installer:
+Skills only apply on the turns where they trigger. A short block in `~/.codex/AGENTS.md` keeps the short form of the loop on every turn: write a brief with a review bar, build the whole thing, use it for real, have a fresh subagent judge it READY or NOT READY (a labelled self-review when subagents aren't available), fix what is confirmed, stop at READY, a round that doesn't help, the same gap surviving two rounds or 3 rounds, and report plainly. To add it, clone the repo and run the installer:
 
 ```bash
 git clone https://github.com/AbhishekBarali/tryhard.git
