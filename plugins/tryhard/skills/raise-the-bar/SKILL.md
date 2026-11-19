@@ -13,6 +13,8 @@ stopping rule below decides when to finish.
 
 The user's own words win over anything here, including a number of rounds they name.
 
+In Plan mode, put the bar in the plan and leave building and review rounds for after Plan mode ends.
+
 ## Write the bar first
 
 Before building, put the bar in your first update so the user can see it.
@@ -34,8 +36,8 @@ ask for are outside it.
 ## Build a complete first version
 
 Every part of the brief is present and working, and nothing is stubbed. Keep each version
-recoverable, for example as a local commit on a work branch or a copy in a temporary folder outside
-the deliverable, so a round that makes things worse can be undone.
+recoverable without touching the user's branches or commits, for example as a patch or a copy under
+the system temp folder, so a round that makes things worse can be undone.
 
 ## Look at it for real
 

@@ -35,11 +35,12 @@ branch where it is.
 - If the workspace is not a git repository, initialise one. Do this only in a single project folder.
   If the workspace is the home directory or holds other repositories, set up in the project folder
   the request is about, and ask which one only if the request does not say.
-- Create `.goal/` at the workspace root and add `.goal/` to the exclude file that
+- Create `.goal/` at the project root and add `.goal/` to the exclude file that
   `git rev-parse --git-path info/exclude` prints, so resets never touch the contract or the ledger.
   Add dependency folders, build output, large data files and anything that looks like a secret to
   the same file if git does not already ignore them, so they never enter a commit.
-- Create a branch named `goal/` plus a short name from the current commit and switch to it.
+- Create a branch from the current commit, named `goal/` plus a short name that no existing branch
+  uses, and switch to it.
 - If there are uncommitted changes, including new files, or the repository is new, commit the files
   as they are on that branch as the baseline commit. When they are the user's uncommitted work, say
   so in the commit message. A reset to an earlier commit would otherwise undo or delete them.
@@ -77,10 +78,9 @@ plain text under each.
 Then start `.goal/ledger.tsv` with its header row and `.goal/status.md` with the baseline and the
 first step, since every later turn begins by reading them.
 
-For work without a number, such as a game level or a design, leave out the primary metric. The done
-items carry the weight instead, together with a rubric of three to six checks the evaluator scores.
-An attempt then counts as a keep when it turns a failing check into a passing one without breaking a
-passing one.
+For work without a number, such as a game level or a design, leave out the primary metric and write
+a rubric of three to six checks instead. You score the rubric after each attempt, and the fresh
+evaluator scores it again before the goal is marked complete.
 
 ## 4. Start the goal
 
@@ -103,7 +103,7 @@ the exact line to paste, starting with `/goal `.
 
 Once the goal is running, start the first attempt in the same turn, following
 [references/long-run.md](references/long-run.md). Read that file again after the conversation is
-compacted or a new context window starts. Before each evaluation, read
+compacted or a new context window starts. Before each check by a fresh evaluator, read
 [references/evaluator-brief.md](references/evaluator-brief.md).
 
 ## The first turn's final message

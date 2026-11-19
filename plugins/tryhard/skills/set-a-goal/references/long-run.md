@@ -8,12 +8,12 @@ measurement, so that each turn's work is judged by the numbers in `.goal/contrac
 
 Read `.goal/status.md`, the last lines of `.goal/ledger.tsv` and `git log --oneline -10`. The best
 commit is the latest keep in the ledger, or the baseline commit before the first keep. Resets only
-ever move the goal branch. If the checkout is on another branch, the user moved it, so leave it as
-it is and report that. If the checkout holds an attempt that was never measured, measure it and
-keep or discard it as usual. If it is anywhere else on the goal branch, return to the best commit
-the same way as a discard. If the user changed the code or the machine since the last measurement,
-rerun the primary measurement before new work. Finished attempts stay finished, so pick up from the
-next step in the status file.
+ever move the goal branch. If the checkout is on another branch, the user moved it, so make no
+attempts, leave it as it is and report it as a blocker. If the checkout holds an attempt that was
+never measured, measure it and keep or discard it as usual. If it is anywhere else on the goal
+branch, return to the best commit the same way as a discard. If the user changed the code or the
+machine since the last measurement, rerun the primary measurement before new work. Finished
+attempts stay finished, so pick up from the next step in the status file.
 
 ## The primary goal wins
 
@@ -27,9 +27,12 @@ changes that leave the primary metric level or better. Guardrails hold throughou
 2. Make the change and commit it.
 3. Measure with the contract's command. Iterate on a fast sample when the full run is slow, and run
    the full measurement before any keep.
-4. Keep the commit only if it beats the best result so far by more than the noise level and every
-   guardrail holds. Otherwise go back with `git reset --keep` and the best commit, which drops your
-   attempt and leaves any other local changes in place.
+4. Keep the commit only if every guardrail holds and it beats the best result so far by more than
+   the noise level. An attempt at a secondary goal counts as a keep when it moves that goal toward
+   its target and the primary result stays within the noise level of the best. For work without a
+   number, a keep turns a failing rubric check into a passing one without breaking a passing one.
+   Otherwise go back with `git reset --keep` and the best commit, which drops your attempt and
+   leaves any other local changes in place.
 5. Append one row to the ledger.
 
 Stop an attempt that runs past twice its expected time and log it as a crash. Measure each change on
