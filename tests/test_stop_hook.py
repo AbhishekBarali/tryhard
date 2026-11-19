@@ -1,4 +1,4 @@
-"""Tests for plugins/follow-through/hooks/follow_through_stop.py (stdlib unittest only)."""
+"""Tests for plugins/tryhard/hooks/tryhard_stop.py (stdlib unittest only)."""
 
 import importlib.util
 import io
@@ -8,16 +8,17 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-HOOK_PATH = os.path.join(ROOT, "plugins", "follow-through", "hooks", "follow_through_stop.py")
+HOOK_PATH = os.path.join(ROOT, "plugins", "tryhard", "hooks", "tryhard_stop.py")
 FIXTURES = os.path.join(ROOT, "tests", "fixtures")
 
 # Keep __pycache__ out of the plugin folder that gets installed.
 sys.dont_write_bytecode = True
-spec = importlib.util.spec_from_file_location("follow_through_stop", HOOK_PATH)
+spec = importlib.util.spec_from_file_location("tryhard_stop", HOOK_PATH)
 hook = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(hook)
 
@@ -53,7 +54,7 @@ PLAIN_SSD_OPENING = (
 
 class HookTestCase(unittest.TestCase):
     def setUp(self):
-        self.data = tempfile.mkdtemp(prefix="ft-test-")
+        self.data = tempfile.mkdtemp(prefix="tryhard-test-")
         self.env = {"PLUGIN_DATA": self.data}
         self.turn = 0
 
@@ -65,7 +66,8 @@ class HookTestCase(unittest.TestCase):
         data = {
             "session_id": "019a96c1-5a2e-7d31-9f0e-2b8d41c7e5a0",
             "turn_id": "turn-%d" % self.turn,
-            "transcript_path": None,
+            # The latest request in this rollout is a task ("Now make a teaser cut...").
+            "transcript_path": fixture("rollout_paginated.jsonl"),
             "cwd": "/home/dev/projects/landing",
             "hook_event_name": "Stop",
             "model": "gpt-6.2-astra",
@@ -87,23 +89,23 @@ class HookTestCase(unittest.TestCase):
 class SettingsTests(unittest.TestCase):
     def test_off_values_disable_the_hook(self):
         for value in ("0", "off", "OFF", "false", "no", "disabled", " off "):
-            self.assertTrue(hook.hook_disabled({"FOLLOW_THROUGH_HOOK": value}), value)
+            self.assertTrue(hook.hook_disabled({"TRYHARD_HOOK": value}), value)
         for value in ("", "1", "on", "yes"):
-            self.assertFalse(hook.hook_disabled({"FOLLOW_THROUGH_HOOK": value}), value)
+            self.assertFalse(hook.hook_disabled({"TRYHARD_HOOK": value}), value)
         self.assertFalse(hook.hook_disabled({}))
 
     def test_check_selection(self):
         self.assertEqual(hook.enabled_checks({}), list(hook.CHECKS))
-        self.assertEqual(hook.enabled_checks({"FOLLOW_THROUGH_CHECKS": ""}), list(hook.CHECKS))
-        self.assertEqual(hook.enabled_checks({"FOLLOW_THROUGH_CHECKS": "all"}), list(hook.CHECKS))
-        self.assertEqual(hook.enabled_checks({"FOLLOW_THROUGH_CHECKS": "none"}), [])
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": ""}), list(hook.CHECKS))
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": "all"}), list(hook.CHECKS))
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": "none"}), [])
         self.assertEqual(
-            hook.enabled_checks({"FOLLOW_THROUGH_CHECKS": "readability, handback"}),
+            hook.enabled_checks({"TRYHARD_CHECKS": "readability, handback"}),
             ["handback", "readability"],
         )
-        self.assertEqual(hook.enabled_checks({"FOLLOW_THROUGH_CHECKS": "own_work"}), ["own-work"])
-        self.assertEqual(hook.enabled_checks({"FOLLOW_THROUGH_CHECKS": "hand-back own-files"}), ["handback", "own-work"])
-        self.assertEqual(hook.enabled_checks({"FOLLOW_THROUGH_CHECKS": "typo"}), [])
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": "own_work"}), ["own-work"])
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": "hand-back own-files"}), ["handback", "own-work"])
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": "typo"}), [])
 
 
 # ---------------------------------------------------------------------------
@@ -122,6 +124,13 @@ class HandbackTests(unittest.TestCase):
         "The fix is in. **Want me to add a test for the empty-input case?**",
         "Report is ready. Happy to add charts for the weekly numbers if you want.",
         "So, should we also cover the Windows paths?",
+        "Tests pass. Should I also look at the two slow tests, or leave it here?",
+        "Retries are in. Want me to tackle the docs or the dashboard next?",
+        "Rate limits are live.\n\nIf you'd like, I can also:\n\n- add per-route limits\n- document the headers",
+        "Want me to:\n\n- add tests\n- update the docs?",
+        # Destructive words used as names, not as the action.
+        "The list works. Want me to add a delete button to each row?",
+        "If you'd like, I can add a purge command for the cache.",
     ]
     NEGATIVE = [
         "Fixed the parser and added a regression test. All 42 tests pass.",
@@ -136,6 +145,14 @@ class HandbackTests(unittest.TestCase):
         "Everything is merged into the work branch. Let me know if anything looks off.",
         "The next step would be moving the cron job, which is outside this task.",
         "",
+        # A choice about how to do the asked work.
+        "Do you want me to use your personal account or the company one for the release?",
+        "The teaser is ready. Should I put it in public/video/intro.mp4 or next to it?",
+        # Really the user's call.
+        "Should I delete the backups in /var/backups/app that are older than 90 days?",
+        "The hotfix is ready. Should I deploy it to production?",
+        "Want me to send the invoice emails to the 40 customers now?",
+        "Shall I publish the package?",
     ]
 
     def test_offers_at_the_end_are_found(self):
@@ -235,6 +252,26 @@ class OwnWorkTests(unittest.TestCase):
         message = "Which one: a1.mp4, b1.mp4, c1.mp4 or d1.mp4?"
         self.assertEqual(len(hook.check_own_work(message, self.USER)), 3)
 
+    def test_asking_the_user_to_act_is_fine(self):
+        for message in (
+            "The deploy is blocked. Can you add the key in ~/.ssh/id_ed25519.pub to the server?",
+            "Could you add your Stripe key as STRIPE_SECRET_KEY in config/.env.local?",
+            "Would you run scripts/rotate.sh from a machine with production access?",
+        ):
+            self.assertEqual(hook.check_own_work(message, self.USER), [], message)
+
+    def test_asking_the_user_to_confirm_own_files_still_counts(self):
+        message = "Can you confirm whether teaser_a.mp4 is the final cut?"
+        self.assertEqual(hook.check_own_work(message, self.USER), ["teaser_a.mp4"])
+
+    def test_destructive_and_taste_questions_are_fine(self):
+        for message in (
+            "Two old archives are left. Should I delete backup_2023.tar.gz or keep both?",
+            "Should I overwrite out/teaser_final.mp4 with the new cut?",
+            "Does the tone in docs/launch-email.md fit how you talk to your customers?",
+        ):
+            self.assertEqual(hook.check_own_work(message, self.USER), [], message)
+
 
 # ---------------------------------------------------------------------------
 
@@ -304,6 +341,30 @@ class ReadabilityTests(unittest.TestCase):
         self.assertIsNotNone(detail)
         self.assertIn("words", detail)
 
+    def test_medium_length_dense_message(self):
+        message = DENSE_SSD_OPENING + "\n\nI moved the store onto the same disk, so installs take 14 seconds now."
+        self.assertLess(len(message), 800)
+        self.assertIn("semicolons", hook.check_readability(message))
+
+    def test_summary_heading_and_file_list_is_not_an_opening_paragraph(self):
+        message = (
+            "**Summary**\n"
+            "- Renamed `Workspace` to `Project` in `api/models.py`, `api/serializers.py`, `api/views.py` "
+            "and `api/urls.py`.\n"
+            "- Old `/workspaces/` routes redirect to `/projects/`, so existing clients keep working.\n"
+            "- Added `api/migrations/0042_rename_workspace.py`, which renames the table in place.\n\n"
+            "**Testing**\n"
+            "- `pytest api` passes (318 tests).\n"
+            "- Ran the migration on a copy of the dev database and compared row counts."
+        )
+        self.assertGreater(len(message), hook.LONG_MESSAGE_CHARS)
+        self.assertIsNone(hook.check_readability(message))
+        self.assertEqual(hook.opening_unit(hook.paragraphs(message)), "")
+
+    def test_greek_question_marks_are_not_semicolons(self):
+        self.assertEqual(hook.semicolons("Θέλετε κεφαλαία; Και στους τίτλους; Ή μόνο στο μενού;"), 0)
+        self.assertEqual(hook.semicolons("one; two; three"), 2)
+
 
 # ---------------------------------------------------------------------------
 
@@ -364,6 +425,63 @@ class TranscriptTests(unittest.TestCase):
         with mock.patch.object(hook, "MAX_TRANSCRIPT_BYTES", 100):
             self.assertIsNone(hook.read_transcript(fixture("rollout_paginated.jsonl")))
 
+    def test_slow_transcript_is_given_up(self):
+        with mock.patch.object(hook, "TRANSCRIPT_SECONDS", -1):
+            self.assertIsNone(hook.read_transcript(fixture("rollout_paginated.jsonl")))
+
+    @unittest.skipUnless(os.path.exists(os.devnull) and os.name == "posix", "needs /dev")
+    def test_special_files_are_not_read(self):
+        for path in (os.devnull, "/dev/zero", "/dev/stdin"):
+            self.assertIsNone(hook.read_transcript(path), path)
+
+    def test_binary_and_huge_lines_are_tolerated(self):
+        handle = tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False)
+        try:
+            handle.write(os.urandom(4096) + b"\n")
+            handle.write(b'{"type":"user","message":"' + b"x" * 2000000 + b'"}\n')
+            handle.write(b"\xff\xfe user \x00\x00\n")
+            record = {"type": "event_msg", "payload": {"type": "user_message", "message": "Fix café.py — now"}}
+            handle.write(json.dumps(record, ensure_ascii=False).encode("utf-8") + b"\n")
+            handle.close()
+            transcript = hook.read_transcript(handle.name)
+            self.assertEqual(transcript.user_texts, ["Fix café.py — now"])
+        finally:
+            os.unlink(handle.name)
+
+
+class ProseTests(unittest.TestCase):
+    def test_long_tokens_are_shortened_but_keep_the_question_mark(self):
+        blob = "A" * 5000
+        self.assertNotIn(blob, hook.prose_of("Here is the key " + blob))
+        self.assertTrue(hook.prose_of("Is this the key " + blob + "?").endswith("?"))
+        self.assertEqual(hook.check_handback("Encoded: " + blob + "\n\nWant me to decode it too?"), "Want me to decode it too?")
+
+    def test_only_the_relevant_end_of_a_huge_message_is_examined(self):
+        filler = "This line is filler for the long report.\n" * 5000
+        tail = hook.prose_of(filler + "Want me to add tests?", end=True)
+        self.assertLessEqual(len(tail), hook.MAX_ANALYSED_CHARS)
+        self.assertTrue(tail.endswith("Want me to add tests?"))
+        head = hook.prose_of("Opening line.\n" + filler)
+        self.assertLessEqual(len(head), hook.MAX_ANALYSED_CHARS)
+        self.assertTrue(head.startswith("Opening line."))
+
+    def test_hostile_messages_finish_quickly(self):
+        messages = [
+            ("+a" * 100 + " ") * 5000 + "?",
+            ("a." * 99 + "py ") * 5000 + "?",
+            ("x" * 200 + " ") * 20000 + "?",
+            "`" + "a/" * 140 + "` " * 30000 + "?",
+            "\n" * 2000000 + "Want me to?",
+            "a.a.a." * 50000 + "py ?",
+        ]
+        started = time.time()
+        for message in messages:
+            hook.check_handback(message)
+            hook.own_work_candidates(message)
+            hook.check_readability(message)
+        # The old code needed over a minute for these; the hook timeout is 15 s.
+        self.assertLess(time.time() - started, 6)
+
 
 # ---------------------------------------------------------------------------
 
@@ -405,6 +523,8 @@ class EvaluateTests(HookTestCase):
     def test_plan_mode_is_left_alone(self):
         self.assertIsNone(self.run_hook(self.OFFER, permission_mode="plan"))
         self.assertIsNone(self.run_hook(self.OFFER, transcript_path=fixture("rollout_plan_mode.jsonl")))
+        plan = "<proposed_plan>\n1. Add the table.\n</proposed_plan>\n\n" + self.OFFER
+        self.assertIsNone(self.run_hook(plan))
 
     def test_handback_skipped_when_user_only_asked(self):
         transcript = hook.Transcript()
@@ -412,8 +532,17 @@ class EvaluateTests(HookTestCase):
         output = hook.evaluate(self.payload(self.OFFER), self.env, transcript_reader=lambda path: transcript)
         self.assertIsNone(output)
 
+    def test_only_readability_runs_without_a_transcript(self):
+        # Without it there is no telling a plain answer or a plan from a task.
+        for path in (None, "/no/such/rollout.jsonl", fixture("rollout_paginated.jsonl") + ".zst"):
+            self.assertIsNone(self.run_hook(self.OFFER, transcript_path=path), path)
+            self.assertIsNone(self.run_hook(self.OWN, transcript_path=path), path)
+            result = self.run_hook(DENSE_SSD_OPENING + REPORT_TAIL + "\n\n" + self.OFFER, transcript_path=path)
+            self.assertIn("hard to follow", result["reason"])
+            self.assertNotIn("offering more work", result["reason"])
+
     def test_own_work_needs_the_transcript(self):
-        self.assertIsNone(self.run_hook(self.OWN))
+        self.assertIsNone(self.run_hook(self.OWN, transcript_path=None))
         result = self.run_hook(self.OWN, transcript_path=fixture("rollout_paginated.jsonl"))
         self.assertIn("`24_g521.mp4` and `24_p11.mp4`", result["reason"])
         self.assertIn("never appear in their messages", result["reason"])
@@ -434,10 +563,10 @@ class EvaluateTests(HookTestCase):
         self.assertLess(reason.index("offering more work"), reason.index("hard to follow"))
 
     def test_env_switches(self):
-        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, FOLLOW_THROUGH_HOOK="off")))
-        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, FOLLOW_THROUGH_CHECKS="readability")))
-        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, FOLLOW_THROUGH_CHECKS="none")))
-        self.assertIsNotNone(self.run_hook(self.OFFER, env=dict(self.env, FOLLOW_THROUGH_CHECKS="handback")))
+        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, TRYHARD_HOOK="off")))
+        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, TRYHARD_CHECKS="readability")))
+        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, TRYHARD_CHECKS="none")))
+        self.assertIsNotNone(self.run_hook(self.OFFER, env=dict(self.env, TRYHARD_CHECKS="handback")))
 
     def test_check_goes_quiet_after_three_in_a_row(self):
         for _ in range(3):
@@ -473,7 +602,7 @@ class EvaluateTests(HookTestCase):
         self.assertEqual(hook.state_dir({"CLAUDE_PLUGIN_DATA": "/x"}), os.path.join("/x", "stop-hook"))
         self.assertEqual(hook.state_dir({"PLUGIN_DATA": "/a", "CLAUDE_PLUGIN_DATA": "/b"}), os.path.join("/a", "stop-hook"))
         with mock.patch.object(hook.tempfile, "gettempdir", return_value=self.data):
-            self.assertTrue(hook.state_dir({}).startswith(os.path.join(self.data, "follow-through-")))
+            self.assertTrue(hook.state_dir({}).startswith(os.path.join(self.data, "tryhard-")))
         self.assertNotIn("/", os.path.basename(hook.state_path("/d", "../../etc/passwd")))
 
     def test_corrupt_state_is_ignored(self):
@@ -503,6 +632,44 @@ class EvaluateTests(HookTestCase):
                 self.run_hook(self.OFFER, session_id="s%d" % index)
         self.assertEqual(len(os.listdir(os.path.join(self.data, "stop-hook"))), 3)
 
+    def test_leftover_temp_files_are_removed(self):
+        directory = os.path.join(self.data, "stop-hook")
+        os.makedirs(directory)
+        stale = os.path.join(directory, ".state-killed")
+        fresh = os.path.join(directory, ".state-running")
+        for path in (stale, fresh):
+            with open(path, "w") as handle:
+                handle.write("{")
+        old = time.time() - 2 * hook.STALE_TEMP_SECONDS
+        os.utime(stale, (old, old))
+        self.run_hook(self.OFFER)
+        self.assertFalse(os.path.exists(stale))
+        self.assertTrue(os.path.exists(fresh))
+
+    def test_state_holds_no_message_text(self):
+        self.run_hook(self.OFFER + " The API key is sk-test-123.")
+        directory = os.path.join(self.data, "stop-hook")
+        with open(os.path.join(directory, os.listdir(directory)[0]), encoding="utf-8") as handle:
+            state = json.load(handle)
+        self.assertEqual(set(state), {"session_id", "streak", "quiet", "last_block_turn", "updated"})
+        self.assertNotIn("sk-test", json.dumps(state))
+
+    @unittest.skipUnless(hasattr(os, "getuid") and hasattr(os, "symlink"), "POSIX only")
+    def test_fallback_state_folder_must_be_private(self):
+        good = os.path.join(self.data, "tryhard-me", "stop-hook")
+        self.assertTrue(hook.private_dir_ok(good))
+        elsewhere = os.path.join(self.data, "elsewhere")
+        os.makedirs(elsewhere)
+        link = os.path.join(self.data, "tryhard-link")
+        os.symlink(elsewhere, link)
+        self.assertFalse(hook.private_dir_ok(os.path.join(link, "stop-hook")))
+        with mock.patch.object(hook.tempfile, "gettempdir", return_value=self.data), mock.patch.object(
+            hook, "private_dir_ok", return_value=False
+        ):
+            self.assertIsNone(hook.evaluate(self.payload(self.OFFER), {}))
+        with mock.patch.object(hook.tempfile, "gettempdir", return_value=self.data):
+            self.assertIsNotNone(hook.evaluate(self.payload(self.OFFER), {}))
+
 
 # ---------------------------------------------------------------------------
 
@@ -525,6 +692,14 @@ class MainTests(HookTestCase):
         with mock.patch.object(hook, "evaluate", side_effect=RuntimeError("boom")):
             self.assertEqual(self.call(json.dumps(self.payload("Want me to add tests?"))), (0, ""))
 
+    def test_input_is_read_as_utf8_whatever_the_locale(self):
+        # Windows pipes decode stdin with the ANSI code page unless told otherwise.
+        payload = json.dumps(self.payload("Done — café page fixed. If you’d like, I can add retries."), ensure_ascii=False)
+        stdin = io.TextIOWrapper(io.BytesIO(b"\xef\xbb\xbf" + payload.encode("utf-8")), encoding="cp1252")
+        out = io.StringIO()
+        self.assertEqual(hook.main(stdin, out, self.env), 0)
+        self.assertEqual(json.loads(out.getvalue())["decision"], "block")
+
     def test_block_output_is_one_json_object(self):
         code, output = self.call(json.dumps(self.payload("Done. Want me to add tests for the parser?")))
         self.assertEqual(code, 0)
@@ -533,8 +708,8 @@ class MainTests(HookTestCase):
 
     def test_runs_as_a_script(self):
         env = dict(os.environ, PLUGIN_DATA=self.data)
-        env.pop("FOLLOW_THROUGH_HOOK", None)
-        env.pop("FOLLOW_THROUGH_CHECKS", None)
+        env.pop("TRYHARD_HOOK", None)
+        env.pop("TRYHARD_CHECKS", None)
         block = subprocess.run(
             [sys.executable, HOOK_PATH],
             input=json.dumps(self.payload("Done. Want me to add tests for the parser?")),
@@ -550,6 +725,23 @@ class MainTests(HookTestCase):
             [sys.executable, HOOK_PATH], input="garbage", capture_output=True, text=True, env=env, timeout=30
         )
         self.assertEqual((quiet.returncode, quiet.stdout, quiet.stderr), (0, "", ""))
+
+    def test_script_reads_utf8_with_a_legacy_locale(self):
+        env = dict(os.environ, PLUGIN_DATA=self.data, PYTHONIOENCODING="cp1252", LC_ALL="C")
+        env.pop("TRYHARD_HOOK", None)
+        env.pop("TRYHARD_CHECKS", None)
+        message = "Le cache est corrigé — tout passe. If you’d like, I can add a purge command."
+        result = subprocess.run(
+            [sys.executable, HOOK_PATH],
+            input=json.dumps(self.payload(message), ensure_ascii=False).encode("utf-8"),
+            capture_output=True,
+            env=env,
+            timeout=30,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stderr, b"")
+        reason = json.loads(result.stdout.decode("ascii"))["reason"]
+        self.assertIn("If you’d like, I can add a purge command.", reason)
 
 
 if __name__ == "__main__":

@@ -1,14 +1,14 @@
 {
-  "name": "follow-through",
+  "name": "tryhard",
   "interface": {
-    "displayName": "Follow Through"
+    "displayName": "Tryhard"
   },
   "plugins": [
     {
-      "name": "follow-through",
+      "name": "tryhard",
       "source": {
         "source": "local",
-        "path": "./plugins/follow-through"
+        "path": "./plugins/tryhard"
       },
       "policy": {
         "installation": "AVAILABLE",

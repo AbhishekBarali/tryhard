@@ -1,0 +1,1050 @@
+# Final messages for measuring the Stop hook.
+#
+# Each case starts with a "=== <id>" line, then header lines:
+#   expect: none | handback | own-work | readability (comma-separated)
+#   user:   one of the user's messages (repeat the line for several, oldest first)
+# then a line with "---", then the final assistant message up to the next "===".
+# Lines starting with "#" before the first case are comments.
+#
+# "good" cases are messages the hook must leave alone. "bad" cases are the
+# patterns it exists to catch. test_corpus.py runs every case through
+# evaluate() and reports how often each check fires on each group.
+# Cases with "holdout" in the id were written after the thresholds had been
+# tuned on the others, to estimate how the hook does on messages it has not
+# been fitted to.
+
+=== good-answer-why-ci-slow
+expect: none
+user: Why is npm install so slow in CI? It takes 4 minutes every run.
+---
+Most of the install time goes to downloading packages, because the CI cache never hits.
+
+The cache key in `.github/workflows/ci.yml` is built from the commit SHA, so every new commit misses the cache and downloads all 1,400 packages again. That download is about 3 of the 4 minutes. With a warm cache the same install took 41 seconds on my machine.
+
+Keying the cache on `package-lock.json` instead would let most runs reuse it. I haven't changed the workflow because you only asked why.
+
+=== good-report-login-timeout
+expect: none
+user: Fix the login timeout bug. People get logged out after a few seconds of idle time.
+---
+The login timeout is fixed. Sessions were ending early because `refreshToken()` compared seconds with milliseconds, so a one hour session expired after about four seconds of idle time.
+
+What changed:
+
+- `src/auth/session.ts` now converts both values to milliseconds before comparing.
+- `src/auth/session.test.ts` has a new test that idles for five seconds and stays logged in.
+- `docs/auth.md` says which unit the setting uses.
+
+I ran the whole test suite, which passes, and logged in on the local server and waited ten minutes without being logged out. I did not test the mobile app because it uses a separate login service that this change does not touch.
+
+Nothing is left open. I kept the setting name the same so existing config files still work.
+
+=== good-codex-style-summary-bullets
+expect: none
+user: The last page of the product list repeats the final item. Fix it.
+---
+**Summary**
+- Fixed the off-by-one in `src/pagination.ts:58`, so the last page no longer repeats the final item.
+- Added `tests/pagination.test.ts` with cases for 0, 1, 20 and 101 items.
+- Kept the page size at 20; only the offset maths changed.
+
+**Testing**
+- `npm test` passes (214 tests).
+- Loaded `/products?page=6` on the dev server and checked the last item appears once.
+
+=== good-codex-style-many-files
+expect: none
+user: Rename the "workspace" concept to "project" everywhere in the API layer.
+---
+**Summary**
+- Renamed `Workspace` to `Project` in `api/models.py`, `api/serializers.py`, `api/views.py` and `api/urls.py`.
+- Old `/workspaces/` routes now redirect to `/projects/` with a 308, so existing clients keep working.
+- Added migration `api/migrations/0042_rename_workspace.py`, which renames the table without copying rows.
+
+**Testing**
+- `pytest api` passes (318 tests).
+- Ran the migration on a copy of the dev database and checked row counts match before and after.
+
+**Not done**
+- The web client still says "workspace" in its labels; that is outside the API layer you asked about.
+
+=== good-plan-user-asked
+expect: none
+user: Make a plan for moving the auth service from MySQL to Postgres. Don't change any code yet.
+---
+Here is the plan. It moves the data first and switches reads last, so we can roll back at every step.
+
+1. Add a Postgres schema that mirrors the three auth tables, using the same column names.
+2. Write a copy job that moves users, sessions and tokens in batches of 5,000 and checks row counts.
+3. Dual-write new sessions to both databases for a week.
+4. Switch reads to Postgres behind a feature flag, starting with 5% of logins.
+5. Remove the MySQL code once the flag has been at 100% for a week with no errors.
+
+The riskiest step is the token table, because it has 40 million rows and a unique index that MySQL treats case-insensitively. I'd start with step 1. Shall I start with step 1?
+
+=== good-review-findings-then-offer
+expect: none
+user: Review this PR and tell me what you think before I merge it.
+---
+The PR is close, but two things should change before it merges.
+
+1. The retry loop in the upload client never gives up. A server that always returns 503 keeps the worker busy forever. Capping it at five attempts would match the rest of the code.
+2. The new setting is read once at import time, so changing it needs a restart. That is fine if it is documented, but the README says it applies immediately.
+
+The rest looks good: the tests cover the new path, and the naming matches the existing code.
+
+Want me to fix these two?
+
+=== good-explain-question-then-offer
+expect: none
+user: How does the job scheduler decide which worker gets a job?
+---
+Each job goes to the worker with the fewest jobs in flight, and ties go to the worker that has been idle longest.
+
+The scheduler keeps a count per worker that goes up when it hands out a job and down when the worker reports back. When a new job arrives it picks the lowest count. If a worker misses three heartbeats in a row, its count is treated as infinite, so it gets nothing until it reports in again.
+
+Jobs with a "region" label skip this and go only to workers in that region, picked the same way.
+
+If you want, I can walk through the code that does the picking.
+
+=== good-user-only-question-account
+expect: none
+user: Set up the release workflow so tags publish the package.
+---
+The release workflow is in place. Pushing a tag like v1.4.0 now builds the package, runs the tests and publishes it.
+
+I tested the build and test steps on a throwaway tag in a fork, and both pass. I could not test the publish step itself because it needs the registry token, which only you have.
+
+Do you want me to use your personal registry account or the company one for publishing?
+
+=== good-user-only-question-domain
+expect: none
+user: Deploy setup for the docs site, please.
+---
+The docs site now builds and deploys from the main branch. Every push rebuilds it in about a minute.
+
+I set it up for docs.acme.dev, since that matches the other subdomains. Changing it is one line in the deploy settings.
+
+Which domain do you want the docs on: docs.acme.dev or acme.dev/docs?
+
+=== good-user-action-ssh-key
+expect: none
+user: Deploy the API to the staging server.
+---
+I could not finish the deploy: the staging server rejects this machine's SSH key, so the copy step fails with "Permission denied (publickey)".
+
+Everything before that step works. The build passes and the release archive is ready in the dist folder.
+
+Can you add the public key in ~/.ssh/id_ed25519.pub to the staging server's authorized keys?
+
+=== good-user-action-secret
+expect: none
+user: Wire up Stripe payments on the checkout page.
+---
+Checkout now creates a Stripe payment session and shows the Stripe card form. Successful payments mark the order as paid, and failed ones keep the cart.
+
+I tested it with Stripe's mock server and the test cards for success, decline and 3-D Secure, and all three behave correctly. I could not run it against your real test account because the key isn't in the repo.
+
+Could you add your Stripe test secret key as STRIPE_SECRET_KEY in the .env file?
+
+=== good-delete-permission
+expect: none
+user: Free up disk space on the build box, it's at 98%.
+---
+The disk is at 71% now. I removed the Docker build cache and old CI workspaces, which freed 46 GB, and all of that is rebuilt on demand.
+
+The biggest thing left is 31 GB of database backups in /var/backups/app, the oldest from 2023. I didn't touch them because I can't tell whether you still need them.
+
+Should I delete the backups in /var/backups/app that are older than 90 days?
+
+=== good-delete-choice-own-files
+expect: none
+user: Free up disk space on the build box, it's at 98%.
+---
+The disk is at 71% now. I removed the Docker build cache and old CI workspaces, which freed 46 GB.
+
+Two large files are left that I didn't create: backup_2023_full.tar.gz and backup_2024_full.tar.gz, 14 GB each. Should I delete backup_2023_full.tar.gz or keep both?
+
+=== good-deploy-choice
+expect: none
+user: Get the hotfix for the checkout crash ready.
+---
+The hotfix is ready on the hotfix/checkout-crash branch. The crash came from a missing null check when a coupon has no expiry date, and the fix adds that check plus a test for it.
+
+All tests pass, and I reproduced the crash on the old code and confirmed it is gone with the fix.
+
+Should I deploy it to production now, or wait for the Monday release window?
+
+=== good-code-block-answer
+expect: none
+user: How do I run a single test with pytest?
+---
+Give pytest the file and the test name, or use -k with part of the name:
+
+```bash
+pytest tests/test_api.py::test_login -q
+pytest -k login
+```
+
+The first form runs exactly one test. The second runs every test whose name contains "login", which is handy when you don't remember the file.
+
+=== good-code-block-with-offer-inside
+expect: none
+user: Add a --dry-run flag to the cleanup script.
+---
+The cleanup script now has a --dry-run flag that lists what it would delete without deleting anything.
+
+```python
+if args.dry_run:
+    # Want me to delete these? Run again without --dry-run.
+    for path in targets:
+        print("would delete", path)
+    return
+```
+
+I ran it with and without the flag on a copy of the temp folder, and the dry run left all 212 files in place while the real run removed them. The help text mentions the new flag.
+
+=== good-table-report
+expect: none
+user: Update the pricing page to the new tiers.
+---
+The pricing page now shows the three new tiers.
+
+| Plan | Price | Seats | Support |
+|---|---|---|---|
+| Starter | $9 | 1 | Email |
+| Team | $29 | 10 | Email and chat |
+| Business | $99 | 50 | Phone |
+
+I checked the page at phone, tablet and desktop widths, and the table scrolls sideways on phones instead of squashing the columns. The old "Pro" tier is gone from the page but its checkout link still works for existing customers.
+
+=== good-long-conceptual-answer
+expect: none
+user: Explain why our Postgres queries got slower after the upgrade.
+---
+The queries got slower because the upgrade reset the planner statistics, so Postgres is guessing table sizes and picking poor plans. After a major upgrade the statistics are not carried over, and until the next ANALYZE the planner assumes every table is small. For small tables a sequential scan is the cheapest plan, so it scans the 30-million-row orders table from start to end instead of using the index on customer_id. That is why the order history page went from about 40 ms to over 6 seconds, while queries on small tables did not change at all.
+
+You can see this in the query plan: it estimates 1,000 rows for the orders table and finds 30 million. Running ANALYZE on the database fixes it, and it takes about two minutes here. I ran it on the staging copy and the order history query went back to 38 ms.
+
+I have not run it on production, because it adds load while it runs and you may want to pick the time.
+
+=== good-medium-first-sentence
+expect: none
+user: Why does the nightly export fail on the first of the month?
+---
+The nightly export fails on the first of the month because the job asks for "yesterday's" partition by subtracting one from the day number, which gives day zero on the first, and the database rejects a date with day zero.
+
+The fix is to subtract one day from the full date instead, which correctly rolls back to the last day of the previous month. I changed that in the export job and added a test that runs it with the date set to March 1st and January 1st.
+
+All export tests pass. I also ran the job by hand for 1 March on the staging data, and it exported the 28 February partition as expected.
+
+=== good-semicolons-two
+expect: none
+user: Summarise what you changed in the build.
+---
+The build is about 40% faster now. Three changes did most of it: the test step runs in four parallel shards; the Docker layers are cached between runs; and the lint step only looks at changed files.
+
+A full build took 11 minutes before and takes 6 minutes 40 seconds now, measured over the last ten runs on the main branch. Nothing changed in what the build checks, so a failing test still fails the build the same way.
+
+The one thing to watch is the shard count. If the test suite grows a lot, four shards may stop being enough, and the setting is at the top of the workflow file.
+
+=== good-vague-closer
+expect: none
+user: Add dark mode to the settings page.
+---
+The settings page now has a dark mode toggle. It follows the system setting by default and remembers the choice once the user changes it.
+
+I checked it in Chrome and Safari with the system set to light and to dark, and every control stays readable in both. The charts on the page already used theme colours, so they switch too.
+
+Let me know if you'd like any other changes.
+
+=== good-anything-off
+expect: none
+user: Merge the two config loaders into one.
+---
+There is one config loader now. The old YAML loader is gone and its two callers use the shared one, which already handled YAML.
+
+All tests pass, and I started the app with the dev and the prod config files to check that both load. The environment variable overrides work the same as before.
+
+Let me know if anything looks off.
+
+=== good-done-with-path-answer
+expect: none
+user: Where is the rate limit configured?
+---
+The rate limit is set in config/limits.yaml, under "api", and it is 100 requests per minute per API key. The middleware in src/middleware/rate_limit.py reads that file once at startup, so a change needs a restart.
+
+=== good-confirm-backup
+expect: none
+user: Drop the legacy_events table, we don't use it anymore.
+---
+I checked that nothing reads or writes legacy_events: no code references it, and the database shows no queries against it in the last 30 days.
+
+I haven't dropped it yet, because dropping a table can't be undone and the last backup I can see is from Sunday. Can you confirm the backup from last night finished before I drop it?
+
+=== good-user-named-files
+expect: none
+user: Raise the API timeout to 30 seconds in config/staging.yaml. We'll do config/prod.yaml next week.
+---
+The API timeout in config/staging.yaml is now 30 seconds, and the staging deploy picked it up. A request that sleeps for 25 seconds now completes instead of failing at 10.
+
+You mentioned config/prod.yaml for next week. Should the new timeout go there now as well, or only in config/staging.yaml for now?
+
+=== good-options-list-plain
+expect: none
+user: Redesign the dashboard home page.
+---
+Both layouts are live on the preview link. They use the same data and the same charts; only the arrangement differs.
+
+Which layout do you prefer?
+
+- Cards with a chart in each, two per row
+- One compact table with sparklines
+
+=== good-subjective-tone
+expect: none
+user: Write the launch email for the new export feature.
+---
+The launch email is drafted in docs/launch-email.md. It opens with what users can now do, shows one example, and ends with a link to the help article.
+
+It is 140 words, and I kept the same greeting and sign-off as your last three product emails.
+
+Does the tone in docs/launch-email.md fit how you usually talk to your customers?
+
+=== good-german-report
+expect: none
+user: Füge dem CSV-Export eine Spalte für das Land hinzu.
+---
+Der Export enthält jetzt eine Spalte „Land“, die aus der Rechnungsadresse gefüllt wird.
+
+Die Änderung steckt in app/export.py. Kunden ohne Rechnungsadresse bekommen eine leere Zelle.
+
+Ich habe die 40 Beispielkunden exportiert und die Datei in LibreOffice geöffnet; alle Spalten passen. Die bestehenden Tests laufen durch. Excel konnte ich nicht testen, weil es hier nicht installiert ist.
+
+=== good-spanish-answer
+expect: none
+user: ¿Por qué falla el build en Windows?
+---
+El build falla en Windows porque el script de copia usa rutas con barras normales y `cp`, que no existe en cmd.
+
+El paso concreto es `npm run copy-assets`, definido en package.json. En Linux y macOS funciona; en Windows termina con "cp no se reconoce como un comando interno".
+
+Cambiarlo por el paquete cpy-cli lo arreglaría en los tres sistemas. No he cambiado nada porque solo preguntaste por qué falla.
+
+=== good-french-real-question
+expect: none
+user: Configure les paiements récurrents pour l'abonnement mensuel.
+---
+Les paiements récurrents sont en place : l'abonnement mensuel crée maintenant un prélèvement automatique chaque mois, et un échec de paiement envoie un e-mail au client.
+
+J'ai testé le cycle complet avec l'horloge de test de Stripe, sur trois mois simulés, et les trois prélèvements passent.
+
+Quel compte Stripe dois-je utiliser pour la production ?
+
+=== good-japanese-report
+expect: none
+user: ログイン画面のエラーメッセージを日本語にしてください。
+---
+ログイン画面のエラーメッセージをすべて日本語にしました。
+
+変更したのは locales/ja.json の12件で、英語の文言はそのまま残しています。ブラウザの言語設定が日本語のときだけ日本語が表示されます。
+
+パスワード間違い、アカウントロック、ネットワークエラーの3つを実際に発生させて、表示を確認しました。iOSアプリは別のファイルを使っているため、今回は変更していません。
+
+=== good-chinese-answer
+expect: none
+user: 为什么首页加载这么慢？
+---
+首页慢主要是因为首屏一次加载了 3.2 MB 的图片，而且都没有压缩。
+
+最大的三张轮播图每张约 900 KB，占了加载时间的大部分。在模拟 4G 网络下，首页完全加载需要 7.8 秒，去掉这三张图后只需要 2.1 秒。
+
+把图片转换成 WebP 并按屏幕尺寸加载，可以把这部分降到 300 KB 左右。我还没有改代码，因为你只问了原因。
+
+=== good-russian-report
+expect: none
+user: Исправь сортировку по дате в таблице заказов.
+---
+Сортировка по дате в таблице заказов исправлена. Раньше даты сравнивались как строки, поэтому 10 марта оказывалось раньше 2 марта.
+
+Теперь таблица сравнивает настоящие даты. Я добавил тест с датами из разных месяцев и годов, и все тесты проходят.
+
+Я проверил сортировку в браузере в обе стороны на 500 тестовых заказах. Экспорт в CSV использует другой код, и его я не трогал.
+
+=== good-greek-report
+expect: none
+user: Διόρθωσε τη μετάφραση στη σελίδα ρυθμίσεων.
+---
+Η σελίδα ρυθμίσεων είναι πλέον πλήρως μεταφρασμένη. Έλειπαν 14 κείμενα από το αρχείο ελληνικών, οπότε εμφανίζονταν στα αγγλικά.
+
+Πρόσθεσα τα κείμενα που έλειπαν και έλεγξα τη σελίδα με τη γλώσσα του προγράμματος περιήγησης ρυθμισμένη στα ελληνικά. Όλα τα κουμπιά χωράνε στο πλάτος τους, ακόμα και στο κινητό.
+
+Θέλετε η λέξη «Ρυθμίσεις» να γράφεται με κεφαλαία στο μενού; Θέλετε το ίδιο και στους τίτλους; Ή μόνο στο μενού; Προς το παρόν την άφησα όπως στα υπόλοιπα μενού, γιατί έτσι είναι πιο συνεπές με την υπόλοιπη εφαρμογή και με τις οδηγίες που ήδη ακολουθεί η ομάδα.
+
+=== good-hindi-report
+expect: none
+user: चेकआउट पेज पर कूपन कोड का बग ठीक करो।
+---
+कूपन कोड का बग ठीक हो गया है। पहले छोटे अक्षरों में लिखा कोड स्वीकार नहीं होता था, अब बड़े और छोटे दोनों अक्षर चलते हैं।
+
+मैंने तीन कूपन कोड से चेकआउट करके देखा और सभी टेस्ट पास हो रहे हैं। मोबाइल ऐप का कोड अलग है, उसे मैंने नहीं बदला।
+
+=== good-portuguese-question
+expect: none
+user: Configure o envio de notificações por e-mail para novos pedidos.
+---
+As notificações por e-mail para novos pedidos estão funcionando. Cada pedido novo envia um e-mail para a loja com os itens, o total e o endereço de entrega.
+
+Testei com cinco pedidos no ambiente de testes e todos os e-mails chegaram em menos de um minuto.
+
+Para qual endereço de e-mail da loja as notificações devem ir?
+
+=== good-korean-report
+expect: none
+user: 회원가입 폼에 이메일 형식 검사를 추가해 주세요.
+---
+회원가입 폼에 이메일 형식 검사를 추가했습니다. 잘못된 형식이면 입력란 아래에 안내 문구가 바로 나타납니다.
+
+빈 값, 골뱅이가 없는 주소, 도메인이 없는 주소, 정상 주소 네 가지로 확인했고 모두 예상대로 동작합니다. 서버 쪽 검사는 원래 있던 그대로 두었습니다.
+
+=== good-emoji-status
+expect: none
+user: Are all the services back up after the outage?
+---
+Yes, all three services are back up ✅
+
+- API: healthy since 14:02, error rate back under 0.1%
+- Worker queue: drained the 12,000 jobs that piled up during the outage
+- Web app: serving normally, no errors in the last 30 minutes
+
+The outage started when the database ran out of connections, and it ended once the stuck migration was killed.
+
+=== good-markdown-links
+expect: none
+user: Make CSV exports include each customer's country, and make sure older exports still open.
+---
+Exports now include a Country column, filled from the customer's billing address.
+
+The change is in [export.py](/repo/app/export.py), which adds the column after City. Customers with no billing address get an empty cell.
+
+I exported the 40 sample customers and opened the file in LibreOffice, and every column lined up. The existing export tests pass. I could not try the Excel import because Excel is not installed here.
+
+I used the billing address because the shipping address is missing for about a third of customers. Switching to the shipping address is a one-line change in the same file.
+
+=== good-commit-hash-in-prose
+expect: none
+user: When did the search results start showing duplicates?
+---
+The duplicates started with commit 4be91c0d on 3 November, which changed the search query to join the tags table. A product with two tags now matches twice.
+
+Before that commit the same search returns each product once, and right after it the duplicates appear, so it is that change and not the data. Adding DISTINCT to the query, or grouping by product, would fix it.
+
+=== good-rhetorical-question-inside
+expect: none
+user: Why does the cron job only fail on Mondays?
+---
+So why only Mondays? Because the job runs at midnight UTC, which is Sunday evening in your timezone, and the weekly report table is locked by the Sunday backup until about 00:20 UTC.
+
+On the other days the backup is not running, so the job gets the lock straight away. Moving the job to 01:00 UTC, or making the backup finish earlier, would stop the failures.
+
+=== good-not-done-items
+expect: none
+user: Upgrade the app to Django 5 and make sure everything still works.
+---
+The app now runs on Django 5.1 and all 1,204 tests pass.
+
+Most of the work was replacing three removed APIs: the old timezone helper, the URL include syntax, and a form widget that was renamed. I also bumped two packages that had no Django 5 support yet.
+
+I clicked through the admin, the signup flow and the checkout on the dev server, and all of them work. I couldn't test the PDF invoices, because the PDF service only runs in production.
+
+One thing is not done: the deprecation warnings from the payments package are still there, because its maintainers haven't released a Django 5 version yet. They don't break anything today.
+
+=== good-long-run-report
+expect: none
+user: Get the import job under 10 minutes for the full dataset. It takes 47 minutes now.
+---
+The full import now takes 8 minutes 20 seconds, down from 47 minutes.
+
+Almost all of the time was spent inserting rows one at a time. The job now inserts them in batches of 2,000 and builds the search index once at the end instead of after every row. Those two changes account for 37 of the 39 minutes saved. The rest came from reading the input file in larger chunks.
+
+I measured each change on the full 6.2-million-row file, three runs each, and kept only changes that made it faster. The imported data matches the old job exactly: same row count and the same checksum per table.
+
+Two things are open. The job now needs about 1.5 GB of memory at its peak, up from 400 MB, which fits the current server but is worth knowing. And I left the old row-by-row code path behind a flag for one release, in case something unexpected shows up; it can be deleted after that.
+
+=== good-question-only-user-ask
+expect: none
+user: Before you start, ask me anything you need to know about the export format.
+---
+I have three questions before I start on the export.
+
+1. Should dates be in ISO format (2026-11-19) or in the format your accountants use?
+2. Do you want one file per month or one file for the whole year?
+3. Should cancelled orders be left out, or included with a status column?
+
+Is it okay if I also include refunds as negative rows?
+
+=== good-short-answer
+expect: none
+user: Is the staging deploy green?
+---
+Yes. The last staging deploy finished at 09:14 and all health checks pass.
+
+=== good-numbers-and-versions
+expect: none
+user: Which Node version should we standardise on?
+---
+Node 22 is the best fit: it is the current long-term support release until April 2027, and every package in the repo already supports it.
+
+Node 20 would also work, but its support ends in April 2026, so you would be upgrading again soon. Node 24 is newer, but two of the build tools don't support it yet.
+
+=== good-headline-question-with-default
+expect: none
+user: Build the onboarding checklist for new users.
+---
+The onboarding checklist is live on the dashboard. It shows four steps (verify email, create a project, invite a teammate, connect a data source) and remembers which ones are done.
+
+I tested it with a new account from start to finish, and with an old account that had already done everything, which correctly sees no checklist.
+
+I used "Get started" as the heading because it matches the button on the welcome screen. Would "Set up your workspace" work better for your users?
+
+=== bad-handback-cli-flag
+expect: handback
+user: The parser drops the last field when a line ends with a comma. Fix it.
+---
+Fixed the parser so a trailing comma keeps an empty last field, and added a regression test. All 42 tests pass.
+
+Want me to also add a CLI flag for verbose output?
+
+=== bad-handback-run-to-confirm
+expect: handback
+user: The --limit flag in report.py is ignored. Fix it so the report shows at most N rows, and make sure the usage text in README.md matches.
+---
+The --limit flag is now applied after sorting, so the report shows at most N rows. I updated the usage text in README.md to match.
+
+Shall I run it on the sample data to confirm?
+
+=== bad-handback-update-readme
+expect: handback
+user: Add a --since option to the log viewer.
+---
+The log viewer now takes a --since option with values like 2h or 3d, and filters entries older than that.
+
+Would you like me to update the README to document it?
+
+=== bad-handback-if-youd-like
+expect: handback
+user: Make the upload step more reliable, it fails on flaky networks.
+---
+Uploads now resume from the last completed chunk instead of starting over, and a failed chunk is retried up to three times. I tested it by cutting the network halfway through a 2 GB upload, and it finished once the network came back.
+
+I can also add a progress bar for the upload step if you'd like.
+
+=== bad-handback-let-me-know
+expect: handback
+user: Write a script that converts the image folder to WebP.
+---
+The script is in scripts/to_webp.py. It converts every PNG and JPEG in a folder to WebP at quality 82 and keeps the originals.
+
+I ran it on the sample folder of 20 images, and the output is 64% smaller with no visible difference.
+
+Let me know if you want me to run it on the full image set.
+
+=== bad-handback-if-you-want-pr
+expect: handback
+user: Fix the flaky upload test.
+---
+The upload test was flaky because it waited a fixed 100 ms for the file to appear. It now waits until the file exists, up to five seconds. I ran it 200 times in a row and it passed every time.
+
+If you want, I can open a pull request with this change.
+
+=== bad-handback-go-ahead
+expect: handback
+user: Clean up the lint errors in the payments module.
+---
+The payments module has no lint errors now. I fixed 23 of them, mostly unused imports and missing type hints, and the tests still pass.
+
+There are two lint warnings left in the shared utils file. Should I go ahead and fix those as well?
+
+=== bad-handback-bold
+expect: handback
+user: Handle empty input in the summariser.
+---
+The summariser now returns an empty summary for empty or whitespace-only input instead of crashing.
+
+**Want me to add a test for the empty-input case?**
+
+=== bad-handback-do-you-want
+expect: handback
+user: Add the new /reports endpoint.
+---
+The /reports endpoint is written and returns the weekly totals as JSON. Its tests pass.
+
+Do you want me to wire it into the router so it is reachable?
+
+=== bad-handback-happy-to
+expect: handback
+user: Build the weekly sales report.
+---
+The weekly sales report is ready in reports/weekly.md. It covers the last 12 weeks with totals, the top ten products and the week-over-week change.
+
+Happy to add charts for the weekly numbers if you want.
+
+=== bad-handback-lead-in-list
+expect: handback
+user: Add rate limiting to the public API.
+---
+Public API routes are now limited to 100 requests per minute per key, and over-limit requests get a 429 with a Retry-After header. The tests cover both the limit and the reset.
+
+If you'd like, I can also:
+
+- add per-route limits for the search endpoint
+- show the remaining quota in a response header
+- write a short section in the API docs
+
+=== bad-handback-leave-it-choice
+expect: handback
+user: Speed up the test suite.
+---
+The test suite runs in 3 minutes 10 seconds now, down from 9 minutes, mostly by running tests in parallel and reusing one database per worker.
+
+Should I also look at the two slowest integration tests, or leave it here?
+
+=== bad-handback-just-say
+expect: handback
+user: Get the new search page working.
+---
+The new search page works: results update as you type, and filters for price and brand narrow them down. I tested it with the full product catalogue.
+
+The page isn't linked from the menu yet. Just say the word and I'll add it.
+
+=== bad-handback-next-should
+expect: handback
+user: Move the user endpoints to the new auth middleware.
+---
+All seven user endpoints now go through the new auth middleware, and their tests pass with both old and new tokens.
+
+Next, should I migrate the remaining admin endpoints too?
+
+=== bad-own-work-reviewer-files
+expect: own-work
+user: Run the three reviewer scripts in tools/, then write REVIEW.md listing every finding, most severe first, and fix the high and medium findings in app/form.html.
+---
+I ran the three reviewer scripts. Reviewers a and c each wrote one note, but reviewer b wrote two files and I can't tell which one is its final note.
+
+Which one should I use, out/b_8f3k_p.txt or out/b_8f3k_g.txt?
+
+=== bad-own-work-clips
+expect: own-work
+user: Make a 6 second teaser cut of the intro and put it next to public/video/intro.mp4.
+---
+I exported two teaser cuts from the intro, both 6 seconds long. Should I use 24_g521.mp4 or 24_p11.mp4?
+
+=== bad-own-work-runs
+expect: own-work
+user: Train the small model on the cleaned data and keep the best checkpoint.
+---
+Both training runs finished without errors and their loss curves look similar. Which should I keep, run-3 or run-7?
+
+=== bad-own-work-options-after
+expect: own-work
+user: Make a 6 second teaser cut of the intro and put it next to public/video/intro.mp4.
+---
+Both teaser cuts are ready. Which should go on the page?
+
+- `out/teaser_fast.mp4`
+- `out/teaser_slow.mp4`
+
+=== bad-own-work-commits
+expect: own-work
+user: Rebase the feature branch so it applies cleanly on top of the latest changes.
+---
+The feature branch has conflicts with two recent commits, and it applies cleanly on top of either one. Should I rebase onto 4be91c0d or onto 9f2e7a1b?
+
+=== bad-own-work-confirm-file
+expect: own-work
+user: Export the trained model so the app can load it.
+---
+Training finished and I have several checkpoints saved. Is checkpoints/ckpt-1200.pt the right one to export?
+
+=== bad-readability-dense-opening
+expect: readability
+user: Why are new worktrees so slow to set up on this machine?
+---
+Root cause is store-side, not git: `worktree add` is ~0.4 s; the tail is pnpm's per-tree link phase, with `node-linker=isolated` and the CAS under `~/.local/share/pnpm/store/v10`, the ~212k-inode hardlink fan-out falls back to copy since wt-3 is on a different mount (EXDEV), so reflink is ineligible; compounded by side-effects-cache misses from the postinstall hash drift seen in r7.
+
+I changed the store location so it sits on the same disk as the worktrees, which lets pnpm hard-link files instead of copying them. A new worktree now installs in 14 seconds instead of 3 minutes.
+
+I checked it by creating three fresh worktrees and timing each install. I did not change anything in the git setup, because git itself was already fast.
+
+=== bad-readability-code-names
+expect: readability
+user: People get logged out early since the clock change. Fix it.
+---
+Updated `src/auth/session.ts`, `src/auth/token.ts`, `refreshToken()`, `SESSION_TTL_MS`, `lib/clock.ts`, `tests/session.test.ts` and `scripts/seed_users.py` so that the session refresh path uses one clock source everywhere in the app, which stops the early logouts people saw after the clocks changed last week.
+
+I changed the cache key so it includes the locale, which stops French pages from being served to English visitors. The fix is in the page cache module and nowhere else.
+
+I checked it by running the full test suite, which passes, and by loading the home page in both languages on the local server. I did not test the CDN layer because it is not running here.
+
+=== bad-readability-semicolons-later
+expect: readability
+user: Why were French pages showing up for English visitors?
+---
+French pages were served to English visitors because the page cache ignored the visitor's language.
+
+The cache was stale; the key ignored the locale; the purge job was off; nobody noticed because the monitoring only checks the home page.
+
+I changed the cache key so it includes the locale, which stops French pages from being served to English visitors. The fix is in the page cache module and nowhere else.
+
+I checked it by running the full test suite, which passes, and by loading the home page in both languages on the local server. I did not test the CDN layer because it is not running here.
+
+=== bad-readability-wall-opening
+expect: readability
+user: Make the build pass on every platform.
+---
+The build now passes on Linux, macOS and Windows, and getting there took changes in several places that all interacted with each other in ways that were not obvious at first, starting with the path handling in the asset copy step, which assumed forward slashes and broke on Windows, then the shell scripts that the test step called, which used GNU-only flags for sed and date and failed on macOS, then the line-ending settings in the repository, which made the snapshot tests fail on Windows because the stored snapshots had LF endings and the generated output had CRLF endings, and finally the native module build, which needed a newer compiler on the macOS runner than the default one, so I pinned the runner image and added a step that selects the right compiler version before the native build runs, and after all of that the whole matrix passes on three consecutive runs.
+
+I checked it by running the full matrix three times on the main branch. I did not test on ARM Windows, because the CI provider doesn't offer it.
+
+=== bad-readability-long-first-sentence
+expect: readability
+user: Why does the nightly sync miss some records?
+---
+The nightly sync misses records that are updated while it is running, because it reads the change log in pages ordered by update time and a record that is updated after its page was read but before the sync finishes moves to a later page that the sync has already decided not to read since it computed the total page count at the start, so those records wait for the next night and sometimes get skipped again if they keep changing.
+
+Reading the change log by a fixed snapshot time instead of live update times would fix it. I tested that approach on a copy of last night's data and it picked up all 312 records that the current sync missed.
+
+I haven't changed the production job yet because it runs in an hour and I didn't want to change it mid-cycle.
+
+=== bad-handback-and-readability
+expect: handback, readability
+user: Why are new worktrees so slow to set up on this machine? Fix it if you can.
+---
+Root cause is store-side, not git: `worktree add` is ~0.4 s; the tail is pnpm's per-tree link phase, with `node-linker=isolated` and the CAS under `~/.local/share/pnpm/store/v10`, the ~212k-inode hardlink fan-out falls back to copy since wt-3 is on a different mount (EXDEV), so reflink is ineligible; compounded by side-effects-cache misses from the postinstall hash drift seen in r7.
+
+I moved the store onto the same disk as the worktrees, so a new worktree installs in 14 seconds instead of 3 minutes. I checked it by creating three fresh worktrees and timing each install.
+
+Want me to add a check to the setup script that warns when the store is on a different disk?
+
+=== good-holdout-plain-headings
+expect: none
+user: Add CSV import to the contacts page.
+---
+Contacts can now be imported from a CSV file on the contacts page.
+
+Changes
+- New "Import" button opens a file picker and a preview of the first 10 rows.
+- Columns are matched by header name, so "Email", "email" and "E-mail" all work.
+- Rows with an invalid email are skipped and listed after the import.
+
+Tests
+- Imported a 2,000-row file from the sample data; all rows arrived.
+- Imported a file with 12 bad emails; those 12 were listed and skipped.
+
+=== good-holdout-paths-in-prose
+expect: none
+user: Only admins should be able to open the admin pages.
+---
+Admin pages now require the admin role. I added the check in src/app/guards/auth.ts and applied it to the routes in src/app/routes/admin.ts, so a signed-in user without the role is sent back to the dashboard with a short message.
+
+I tested it with an admin account, a normal account and a signed-out browser. Only the admin account can open the admin pages, and the other two land where they should. The API already checked the role on its side, so nothing changed there.
+
+=== good-holdout-cli-flags-answer
+expect: none
+user: What flags does the cleanup script take?
+---
+The cleanup script takes four flags. Use --dry-run to list what would be deleted, --older-than with a number of days to set the cutoff (30 by default), --force to skip the confirmation prompt, and --verbose to print each file as it goes.
+
+A safe first run is --dry-run with your cutoff, then the same command without --dry-run once the list looks right.
+
+=== good-holdout-env-choice
+expect: none
+user: Run a load test on the new checkout service.
+---
+The checkout service handles 1,200 requests per second at a median of 85 ms before errors start, and it fails at about 1,450 because the database connection pool runs out.
+
+I ran the test from this machine against the local copy, which is smaller than production, so the real numbers should be higher. Raising the pool from 20 to 50 connections pushed the failure point to 2,100 requests per second locally.
+
+Which environment should I use for the full load test: staging or the perf cluster?
+
+=== good-holdout-one-line-done
+expect: none
+user: Bump the version to 2.3.1.
+---
+The version is now 2.3.1 in package.json and in the changelog header.
+
+=== good-holdout-why-with-numbers
+expect: none
+user: Why did the AWS bill jump last month?
+---
+The bill went up by $1,840, and $1,610 of that is data transfer out of the image bucket.
+
+On 4 October the CDN in front of the bucket was removed when the old load balancer was deleted, so every image request since then has been served straight from the bucket at full transfer price. The daily transfer cost went from about $6 to about $58 that same day, and nothing else in the bill moved by more than $40.
+
+Putting the CDN back in front of the bucket should bring it back down. I haven't changed anything in the account.
+
+=== good-holdout-multi-question-intake
+expect: none
+user: I want a script to back up the Postgres database every night. Ask me what you need first.
+---
+Before I write it, three things only you can tell me:
+
+1. Where should the backups go: this server's disk, an S3 bucket, or both?
+2. How many nightly backups should be kept before old ones are removed?
+3. Should it email someone when a backup fails, and if so who?
+
+If you don't mind either way, I'll use an S3 bucket, keep 14 backups and email the address in the server's admin config.
+
+=== good-holdout-semicolon-inline-code
+expect: none
+user: Why does the config parser choke on the new line?
+---
+The parser splits each line on semicolons, and the new line has a semicolon inside a quoted value: `TITLE="Q4; final"`. The parser treats it as two settings and fails on the second half.
+
+The fix is to split only on semicolons outside quotes. I made that change and added a test with the exact line from your config, and it now loads as one setting. The other 140 lines in the file load the same as before.
+
+=== good-holdout-yaml-block-answer
+expect: none
+user: How do I make the CI job run only on the main branch?
+---
+Add a branch filter to the trigger at the top of the workflow file:
+
+```yaml
+on:
+  push:
+    branches: [main]
+```
+
+Pull requests will then stop running it. If you still want it on pull requests that target main, add `pull_request: { branches: [main] }` next to the push trigger.
+
+=== good-holdout-long-list-of-fixes
+expect: none
+user: Fix all the issues from the accessibility audit.
+---
+All 11 issues from the accessibility audit are fixed.
+
+1. Every form field now has a visible label, including the search box.
+2. The colour contrast of grey text on white was raised to 4.6:1.
+3. The modal traps focus and returns it to the button that opened it.
+4. Images that carry meaning have alt text; decorative ones are marked as such.
+5. The menu can be opened and used with the keyboard alone.
+6. Error messages are announced to screen readers when they appear.
+7. The skip-to-content link works on every page.
+8. Headings follow a proper order on the account pages.
+9. Buttons that only had icons now have names.
+10. The carousel pauses on hover and has a pause button.
+11. The page language is set, so screen readers pronounce it correctly.
+
+I checked each one with the browser's accessibility checker and went through signup and checkout with VoiceOver. The checker reports no issues on the six pages in the audit.
+
+=== good-holdout-blocked-on-access
+expect: none
+user: Rotate the database password on production.
+---
+I couldn't rotate the production password, because this machine has no access to the production secrets manager: every request returns "access denied" for the role it runs as.
+
+Everything else is ready. The script that sets the new password and restarts the app servers one at a time is in scripts/rotate_db_password.sh, and I ran it end to end against staging, where it worked without dropping requests.
+
+Could you run it from a machine that has production access, or give this role read and write access to the database secret?
+
+=== good-holdout-explain-tradeoff
+expect: none
+user: Should we use server-side rendering for the marketing site?
+---
+Yes, for the marketing site server-side rendering is the better choice, mainly because search engines and link previews see the full page straight away.
+
+The pages change rarely and have no logged-in state, so they can be rendered once at build time and served as plain files. That gives the speed of a static site with full HTML for crawlers. The cost is a rebuild when content changes, which takes about a minute with the current page count.
+
+Client-side rendering would only win if the pages became highly personalised, which is not the case today.
+
+=== good-holdout-python-traceback-explain
+expect: none
+user: What does this error mean? KeyError: 'region' in loader.py
+---
+It means the config file being loaded has no "region" setting, and the loader reads it without a fallback.
+
+The loader looks it up directly in load_settings(), so a missing key stops everything with that error. The sample config in the repo has the setting, but the one in your home folder was created before it was added last month.
+
+Adding a "region" line to your config fixes it. A fallback to the default region in the loader would also stop the error for anyone else with an old config.
+
+=== good-holdout-confirm-intent
+expect: none
+user: Remove the legacy billing module.
+---
+The legacy billing module is gone: 41 files, its database migrations folder, and the two settings it used. Nothing else imported it, and all tests pass.
+
+The old billing tables are still in the database. I left them because dropping tables can't be undone, and the finance team's monthly export still reads from one of them.
+
+=== good-holdout-camelcase-names
+expect: none
+user: Why is the profile page re-rendering on every keystroke?
+---
+The profile page re-renders on every keystroke because the form state lives at the top of the page, so each change re-renders every section, including the heavy activity chart.
+
+Moving the form state into the form component and wrapping the chart in a memo stops that. After the change, typing in the name field re-renders only the form, and the chart renders once on load. I measured it with the React profiler: a keystroke went from 38 ms to 3 ms.
+
+All component tests pass, and the profile still saves the same way.
+
+=== good-holdout-non-english-question-es
+expect: none
+user: Añade un modo oscuro a la aplicación.
+---
+La aplicación ya tiene modo oscuro. Sigue la configuración del sistema por defecto y recuerda la elección del usuario si la cambia.
+
+Lo probé en Chrome, Firefox y Safari, con el sistema en claro y en oscuro, y todos los textos se leen bien en los dos modos.
+
+¿Prefieres que el interruptor esté en el menú de usuario o en la página de ajustes?
+
+=== good-holdout-arabic-report
+expect: none
+user: أصلح زر الإرسال في نموذج الاتصال.
+---
+تم إصلاح زر الإرسال في نموذج الاتصال. كان الزر يبقى معطلاً بعد خطأ في التحقق، والآن يعود للعمل بمجرد تصحيح الحقول.
+
+جربت النموذج بإرسال صحيح وبإرسال فيه بريد إلكتروني خاطئ، وفي الحالتين يعمل الزر كما يجب. كل الاختبارات تنجح.
+
+=== good-holdout-turkish-report
+expect: none
+user: Sipariş listesine tarih filtresi ekle.
+---
+Sipariş listesine tarih filtresi eklendi. Başlangıç ve bitiş tarihi seçilebiliyor ve liste hemen güncelleniyor.
+
+Filtreyi farklı aralıklarla 3.000 test siparişi üzerinde denedim; sonuçlar veritabanı sorgusuyla birebir aynı. Dışa aktarma butonu da artık seçili aralığı kullanıyor.
+
+=== good-holdout-version-pin-question
+expect: none
+user: Upgrade the charting library.
+---
+The charting library is upgraded from 3.9 to 4.2, and all 63 charts render the same as before in a side-by-side screenshot comparison.
+
+Version 4 changed how tooltips are configured, so I updated the shared tooltip settings in one place and every chart picked it up. The bundle is 18 KB smaller.
+
+Version 4.3 came out yesterday with a fix for a rare crash on Safari. Do you want it pinned at 4.2 or allowed to update to 4.3?
+
+=== good-holdout-sql-explain
+expect: none
+user: Why is the monthly report query slow?
+---
+The monthly report query is slow because it filters on the created date with a function, so Postgres can't use the index on that column and scans all 18 million orders.
+
+The filter wraps the date in date_trunc, which hides the column from the index. Comparing the raw column with the first and last day of the month instead gives the same rows and lets the index work. On the staging copy that brought the query from 14 seconds to 120 ms, with identical results.
+
+I haven't changed the report yet because you only asked why.
+
+=== good-holdout-mixed-list-and-prose
+expect: none
+user: Migrate the project from npm to pnpm.
+---
+The project now uses pnpm. Installs take 22 seconds instead of 70, and the lock file is about a third of the size.
+
+Three things needed changes beyond swapping the lock file:
+
+- Two packages relied on undeclared dependencies, which pnpm doesn't allow, so I added those dependencies explicitly.
+- The CI workflow caches the pnpm store instead of node_modules.
+- The Docker build installs pnpm through corepack.
+
+The full test suite passes locally and in CI, and the Docker image builds and starts. Anyone with an old node_modules folder should delete it once before the first pnpm install.
+
+=== good-holdout-question-about-user-file
+expect: none
+user: Clean up the downloads folder, sort files into subfolders by type.
+---
+The downloads folder is sorted: 1,240 files went into Images, Documents, Archives, Installers and Other, and nothing was deleted.
+
+Fourteen files had no extension, so I put them in Other. One file, taxes-2025-final.pdf, was also in your Documents folder with a different size, so I left both copies where they are.
+
+Do you want the copy in Downloads moved into Documents next to the other one?
+
+=== good-holdout-status-with-warning
+expect: none
+user: Is the nightly backup working?
+---
+Yes, the nightly backup ran at 02:00 every night this week, and last night's backup restored cleanly into a scratch database with matching row counts.
+
+One warning: the backup disk is 81% full, and at the current growth it will be full in about five weeks. Older backups are not being removed because the retention setting is empty.
+
+=== good-holdout-recommendation
+expect: none
+user: Pick an email provider for the transactional emails.
+---
+I'd use Postmark for the transactional emails, and I've set the app up with it.
+
+It had the best delivery in the tests I could run here: all 50 test emails reached the inbox in under 10 seconds, against 47 for SES and 49 for SendGrid. It's also the simplest to set up for this kind of email only, and at your volume of about 20,000 emails a month it costs $15.
+
+Switching later is a settings change, because the app sends through a small wrapper and not the provider's library directly. You'll need to verify the sending domain in Postmark before it works in production.
+
+=== good-holdout-long-german-answer
+expect: none
+user: Warum ist der Build so langsam geworden?
+---
+Der Build ist langsamer geworden, weil seit dem letzten Update alle Bilder bei jedem Build neu komprimiert werden.
+
+Früher lag ein Cache für die komprimierten Bilder im Build-Ordner. Das neue Update löscht diesen Ordner vor jedem Build, also werden alle 2.300 Bilder jedes Mal neu verarbeitet. Das allein dauert etwa sechs der acht Minuten.
+
+Wenn der Cache in einen eigenen Ordner außerhalb des Build-Ordners verschoben wird, bleibt er erhalten. Ich habe das lokal ausprobiert: Der Build dauert damit wieder knapp zwei Minuten. Geändert habe ich noch nichts, weil du nur nach dem Grund gefragt hast.
+
+=== bad-holdout-offer-pr
+expect: handback
+user: Add pagination to the orders API.
+---
+The orders API now pages results with a cursor, 50 orders per page by default and up to 200. The response includes the cursor for the next page, and the tests cover the first, middle and last pages.
+
+Would you like me to open a pull request for this?
+
+=== bad-holdout-offer-docs-next
+expect: handback
+user: Add the webhook retry logic.
+---
+Webhooks are now retried up to five times with growing delays, and a webhook that still fails is marked as failed with the last error. I tested it against an endpoint that fails three times and then succeeds.
+
+Want me to tackle the docs or the dashboard view next?
+
+=== bad-holdout-can-i-proceed
+expect: handback
+user: Refactor the email sender so all emails go through one function.
+---
+I found all nine places that send email, and they can all go through one function with the same options. I've written the new function and moved the first two callers over, and their tests pass.
+
+Can I proceed with moving the other seven?
+
+=== bad-holdout-i-could-also
+expect: handback
+user: Make the search results load faster.
+---
+Search results now load in about 180 ms instead of 1.4 seconds, because the query uses the full-text index and the results are cached for a minute.
+
+I could also add result highlighting to the search page if you want.
+
+=== bad-holdout-own-work-logs
+expect: own-work
+user: Figure out why the worker crashed last night.
+---
+There are two crash logs from last night, and they show different errors. Should I look at worker-2.log or worker-5.log first?
+
+=== bad-holdout-own-work-variant
+expect: own-work
+user: Generate a hero image for the landing page.
+---
+I generated three versions of the hero image at the size the landing page uses. Which should go on the page: hero_v1.png, hero_v2.png or hero_v3.png?
+
+=== bad-holdout-readability-jargon
+expect: readability
+user: Why does the app freeze when uploading big files?
+---
+Main-thread stall: `FileReader.readAsArrayBuffer()` on the 1.2 GB blob materialises it in the JS heap; `crypto.subtle.digest()` then hashes it synchronously w.r.t. the event loop's microtask drain; meanwhile `UploadQueue.flush()` holds the IDB txn open, so `onprogress` never fires and the UI looks frozen.
+
+I changed the upload to read and hash the file in 8 MB pieces and to report progress after each piece. A 1.2 GB upload now shows steady progress and the page stays responsive the whole time.
+
+I tested it with files of 100 MB, 1.2 GB and 4 GB in Chrome and Firefox. Safari still freezes briefly at the start of very large uploads, which I couldn't fix from the app side.
+
+=== bad-holdout-readability-semicolon-bullets
+expect: readability
+user: What did you change in the deploy script?
+---
+The deploy script is faster and safer now.
+
+- Builds: cached per commit; skipped when nothing changed; pruned after a week; logged to the deploy channel.
+- Rollback: one command now; it restores the previous release and the previous config.
+- Health checks: run after each server instead of at the end.
+
+I ran a deploy and a rollback on staging and both worked. A deploy with no changes now takes 40 seconds instead of 6 minutes.
