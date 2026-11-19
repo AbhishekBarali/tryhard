@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="400" viewBox="0 0 1280 400" role="img" aria-labelledby="title desc">
+  <title id="title">Done Done</title>
+  <desc id="desc">Done Done wordmark with a double blue tick. Tagline: Is it done, or done done? Two chat bubbles: "Want me to fix these?" with one grey tick, and "Fixed all 3. Tests pass." with two blue ticks.</desc>
+  <style>
+    .sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace; }
+    .card { fill: #f6f8fa; stroke: #d0d7de; stroke-width: 2; }
+    .tile { fill: #0d1117; stroke: #0d1117; stroke-width: 2; }
+    .ink { fill: #1f2328; }
+    .muted { fill: #59636e; }
+    .blue { fill: #0b7bd0; }
+    .tick { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .tick-blue { stroke: #0b7bd0; }
+    .tick-tile { stroke: #53bdeb; }
+    .tick-grey { stroke: #818b98; }
+    .bubble-1 { fill: #ffffff; stroke: #d0d7de; stroke-width: 1.5; }
+    .bubble-2 { fill: #dcf0ff; stroke: #9ccff5; stroke-width: 1.5; }
+  </style>
+
+  <rect class="card" x="1" y="1" width="1278" height="398" rx="24"/>
+
+  <!-- Logo tile: double blue tick (same mark as icon.svg) -->
+  <rect class="tile" x="88" y="96" width="104" height="104" rx="26"/>
+  <g transform="translate(140 148) scale(0.74) translate(-54 -50)">
+    <path class="tick tick-tile" stroke-width="12" d="M6 52 26 72 64 28M54 62 64 72 102 28"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text class="sans ink" x="216" y="181" font-size="92" font-weight="700" letter-spacing="-2">Done Done</text>
+
+  <!-- Tagline -->
+  <text class="sans muted" x="88" y="262" font-size="36" font-weight="500">Is it done, or <tspan class="blue" font-weight="700">done done</tspan>?</text>
+  <text class="mono muted" x="88" y="312" font-size="23">A Codex plugin for GPT-6.2 Astra and Sol</text>
+
+  <!-- Bubble 1: done (one grey tick) -->
+  <rect class="bubble-1" x="800" y="128" width="392" height="64" rx="20"/>
+  <text class="sans muted" x="826" y="169" font-size="26">Want me to fix these?</text>
+  <g transform="translate(1165 160) scale(0.34) translate(-35 -50)">
+    <path class="tick tick-grey" stroke-width="12" d="M6 52 26 72 64 28"/>
+  </g>
+
+  <!-- Bubble 2: done done (two blue ticks), with tail -->
+  <path class="bubble-2" d="M780 210H1172A20 20 0 0 1 1192 230V258L1208 274H780A20 20 0 0 1 760 254V230A20 20 0 0 1 780 210Z"/>
+  <text class="sans ink" x="786" y="251" font-size="26" font-weight="600">Fixed all 3. Tests pass.</text>
+  <g transform="translate(1159 242) scale(0.34) translate(-54 -50)">
+    <path class="tick tick-blue" stroke-width="12" d="M6 52 26 72 64 28M54 62 64 72 102 28"/>
+  </g>
+</svg>
