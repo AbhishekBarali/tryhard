@@ -214,7 +214,7 @@ It marks the goal complete only after a final real use and a fresh judge's READY
 
 <br>
 
-- It creates a `.goal/` folder (contract, attempt ledger, status and logs) and adds it to the repo's local exclude file, `.git/info/exclude`, so it never shows up in commits. Dependency folders, build output, large data files and anything that looks like a secret go in the same exclude file if git doesn't already ignore them.
+- It creates a `.goal/` folder (contract, attempt ledger, status and logs) and adds it to the repo's local exclude file (usually `.git/info/exclude`), so it never shows up in commits. Dependency folders, build output, large data files and anything that looks like a secret go in the same exclude file if git doesn't already ignore them.
 - If the project folder is not a git repository yet, it runs `git init` there and commits the current files. It never does this in your home folder or in a folder that holds other repositories. Started from one of those, it sets up in the project folder your request is about, and asks which one if the request doesn't say.
 - It works on a new branch named `goal/` plus a short name and leaves your own branch where it was. Any uncommitted changes you had become the first commit on that branch. To get them back on your branch, `git switch` to it and run `git cherry-pick --no-commit` on that first commit. The final message tells you which of these steps it took.
 - Every attempt is a commit. An attempt that doesn't beat the best result so far is dropped with `git reset --keep`, which leaves your other local changes in place.
