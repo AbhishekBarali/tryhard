@@ -26,7 +26,7 @@ Tryhard flips it into tryhard mode. For real work, it works out what you actuall
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/before-after-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="docs/assets/before-after-light.svg">
-  <img alt="Three habits, each shown as the model's message without Tryhard and with it: stops at a list, asks about its own files, explains in riddles" src="docs/assets/before-after-light.svg">
+  <img alt="Four habits, each shown as the model's message without Tryhard and with it: stops at a list, stops halfway, does the bare minimum, ships the first draft" src="docs/assets/before-after-light.svg">
 </picture>
 
 ## How it works
