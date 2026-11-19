@@ -19,28 +19,30 @@ A Codex plugin that makes it do the whole job, check it, and say plainly what ha
 
 ## Why
 
-GPT-6.2 Astra and Sol are smart. They also coast. Since launch, people using them in Codex keep
-reporting the same habits: the model lists bugs instead of fixing them, ends a turn with
-"Shall I...?", asks you about files it wrote itself, and explains the result in a wall of code
-names.
+GPT-6.2 Astra and Sol can do the work. They just don't do it properly or all the way. Since
+launch, people using them in Codex keep reporting the same thing: the model lists bugs instead of
+fixing them, stops halfway with "Shall I continue?", does the smallest version that runs, and hands
+over its first draft as the finished thing.
 
-Tryhard flips it into tryhard mode. Five skills and a small Stop hook get it to agree what "done"
-means before it starts, then hold it to that.
+Tryhard flips it into tryhard mode. Five skills and a small Stop hook make it agree what "done
+properly" means before it starts, hold itself to that, check the result, and keep improving it when
+you ask for more.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/before-after-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="docs/assets/before-after-light.svg">
-  <img alt="Three habits, each shown as the model's message without Tryhard and with it: stops at a list, asks about its own files, explains in riddles" src="docs/assets/before-after-light.svg">
+  <img alt="Four habits, each shown as the model's message without Tryhard and with it: stops at a list, stops halfway, does the bare minimum, ships the first draft" src="docs/assets/before-after-light.svg">
 </picture>
 
 What it targets:
 
-- **Stopping early.** It agrees what finished looks like before starting, and a QA request ends in fixes, not a list of issues.
-- **Questions nobody can answer.** It looks things up and decides routine choices itself, and it never asks you about files it made.
-- **Loops that go nowhere.** Long runs get a measured starting point, one main goal, a keep-only-what-improves rule and a clear stop.
-- **The same answer as everyone else.** When a task leaves a real creative choice open, it sets the obvious default aside and picks on fit.
-- **Explanations you can't read.** The final message leads with the answer or the main cause, in plain words, then says what is still open.
+- **Half-done work.** It agrees what "done properly" looks like before starting: every part of the request, the cases it implies, checked for real. A QA request ends in fixes, not a list of issues.
+- **Stopping halfway.** When the next step is part of the task, it does it instead of asking "Shall I continue?".
 - **First drafts passed off as finished.** On request, it reviews its own work like a demanding expert and improves it until another pass stops helping.
+- **The same answer as everyone else.** When a task leaves a real creative choice open, it sets the obvious default aside and picks on fit.
+- **Loops that go nowhere.** Long runs get a measured starting point, one main goal, a keep-only-what-improves rule and a clear stop.
+- **Questions nobody can answer.** It looks things up and decides routine choices itself, and it never asks you about files it made.
+- **Explanations you can't read.** The final message leads with the answer or the main cause, in plain words, then says what is still open.
 
 ## Quick start
 
