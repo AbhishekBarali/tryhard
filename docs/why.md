@@ -34,7 +34,7 @@ wording. Dates are publication dates where known.
 The `finish-the-job` skill and the always-on block:
 
 - State in a line or two what finished looks like and what a reviewer would check, before any work starts.
-- Take requirements literally. "12+ characters" means a length of at least 12. A stronger idea goes in the report, and the criteria don't grow or shrink during the run.
+- Take requirements literally. "12+ characters" means a length of at least 12. If the literal rule causes a real problem, build it as asked and say so in the report. The criteria don't grow or shrink during the run.
 - Do the whole job. With write access, "QA this" means find, reproduce, find the cause, fix, check again and report. Report-only happens when the user asks for it, or asks for a review or a plan. A plain question gets an answer and no code changes.
 - Claim "done", "fixed" or "passes" only with fresh evidence from this session, checked through the real entry point. A subagent's claim is checked against the diff.
 - Review the finished work once, fix the serious issues and mention minor ones only if the user would trip over them. After that, more polishing or extra validation is treated as wasted effort.
@@ -151,7 +151,7 @@ The `fresh-ideas` skill runs only when a task leaves open a choice the user will
 4. Any part of the request that was not done or could not be finished, and why.
 5. Decisions made for the user that they may want to change, each with the default already applied, and anything only they can decide.
 
-Empty parts are left out. The message is written for someone who saw only their own request, so it contains no run numbers, subagent names or labels made up during the work. The `explain-plainly` skill adds a pre-send check and one worked before-and-after example. The Stop hook asks for one rewrite when a long message opens with a wall of code names or stacked semicolons.
+Empty parts are left out. The message is written for someone who saw only their own request, so it contains no run numbers, subagent names or labels made up during the work. The `explain-plainly` skill adds a pre-send check and one worked before-and-after example. The Stop hook asks for one rewrite when a long message opens with a wall of code names or a very long paragraph, or strings clauses together with semicolons.
 
 ### Why this approach
 
