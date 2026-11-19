@@ -1,8 +1,7 @@
 # Final message
 
-The final message is the user's first look at the work. They saw their own messages and they will
-see this message. They did not see your tool calls, your reasoning, your subagents or your earlier
-updates.
+The user saw their own messages and will see this one. They did not see your tool calls, your
+reasoning, your subagents or your earlier updates.
 
 ## Shape
 
@@ -19,9 +18,9 @@ put no labels in front of them.
    Give each with the default you already applied and how to change it. Where no safe default
    existed, give the options with your recommendation first.
 
-A one-line fix may need only the first part and a short note of how it was checked. A long run needs
-all five. When parts 4 and 5 have something in them, they stay in even if everything else is short,
-because a hidden blocker or a silent decision is what the user most needs to hear about.
+A one-line fix may need only the first part and a short note of how it was checked. When parts 4
+and 5 have something in them, they stay in even if everything else is short, because a hidden
+blocker or a silent decision is what the user most needs to hear about.
 
 ## Writing it
 
