@@ -6,7 +6,7 @@ description: Use for real work that should end finished and good, such as buildi
 # Finish the job
 
 This skill gets a result a demanding expert would accept from one normal request, so the user
-never has to spell everything out or push twice. It takes longer than one pass, which is the point.
+never has to spell everything out or push twice. It takes longer than one pass on purpose.
 
 The user's own instructions win over anything here.
 
@@ -36,10 +36,10 @@ The user's own instructions win over anything here.
 3. **Build the whole thing**, every part of the brief, working and with nothing stubbed. The
    smallest version that runs is a first draft.
 4. **Use it for real**, the way the user will meet it. Run it, play it, render it and look at the
-   image, click through it, or measure it. For a command, try the normal case, one bad input and
-   its help. For a web page, use a real browser and watch the console. Read a document as its
-   reader would. Fix what breaks. If you cannot see it this way, use the closest real check and say
-   what you could not see.
+   image, click through it, or measure it. Try a command's normal case, one bad input and its help,
+   open a web page in a real browser with the console visible, and read a document as its reader.
+   Fix what breaks. If you cannot see it this way, use the closest real check and say what you
+   could not see.
 5. **Judge with fresh eyes.** Fill in [references/judge-brief.md](references/judge-brief.md) and
    give it to a new subagent started without your conversation history. It sees only the request,
    the brief and how to see the result, and assumes the work is not good enough yet. Without
@@ -57,11 +57,11 @@ The user's own instructions win over anything here.
    the current version as a patch or a copy under the system temp folder, leaving the user's
    branches, commits and stash alone. Undo a fix that helps a lower-ranked check but hurts a higher
    one, because the main goal comes first. After the stop, skip further polish and checks.
-7. **Report plainly**, as "Final message" below describes.
+7. **Report plainly**, as "Final message" below says.
 
-Under a Codex goal the same loop and cap apply, and the goal's completion audit still decides
-whether the objective is met. In Plan mode, put the brief and the bar in the plan and leave
-building and judging for after Plan mode ends.
+When raise-the-bar or set-a-goal is in use, follow that skill. Under another Codex goal the same
+loop and cap apply, and the goal's completion audit decides whether its objective is met. In Plan
+mode, put the brief and the bar in the plan and leave building and judging for after Plan mode ends.
 
 ## Do the whole job
 
@@ -80,7 +80,8 @@ commands created, since `git clean`, `reset`, `checkout`, `restore` or `stash` c
 uncommitted work.
 
 When the next step is inside the task and reversible, do it and report it. An offer to do it hands
-the work back.
+the work back. Bugs in or caused by the code you touch are in scope. Unrelated bugs, refactors,
+features and docs stay out of the diff, and get one line only when they affect the request.
 
 ## Ask or decide
 
@@ -90,17 +91,12 @@ decision in one line with how to change it, and keep going. What you or your sub
 disk, so inspect it. Before you ask anything, wait for an answer, or delete, publish, send, spend
 or change something shared, read [references/ask-or-decide.md](references/ask-or-decide.md).
 
-## Keep the scope
-
-Bugs in or caused by the code you touch are in scope. Unrelated bugs, refactors, features and docs
-stay out of the diff. Mention an unrelated problem in one line only when it affects the request.
-
 ## Check before claiming
 
 Say something is done, fixed, passing or good only when that is completely true, with evidence from
 this session.
 
-| Claim | Evidence it needs |
+| Claim | Evidence |
 | --- | --- |
 | It works or is fixed | The real entry point or original symptom, run now and behaving right |
 | Tests pass | This session's test output with zero failures |

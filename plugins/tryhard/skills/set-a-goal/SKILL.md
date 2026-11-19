@@ -1,6 +1,6 @@
 ---
 name: set-a-goal
-description: Turn a request into a strong Codex /goal for a long run. Writes a goal contract with a measured baseline, ranked goals and checkable done items, starts the goal, and sets rules for keeping only what improves and for handling stalls. Use when the user invokes it by name.
+description: Turn a request with a measurable target, such as speed, size or a score, into a strong Codex /goal for a long run. Writes a goal contract with a measured baseline, ranked goals and checkable done items, starts the goal, and sets rules for keeping only what improves and for handling stalls. Use when the user invokes it by name.
 ---
 
 # Set a goal
@@ -80,7 +80,8 @@ first step, since every later turn begins by reading them.
 
 For work without a number, such as a game level or a design, leave out the primary metric and write
 a rubric of three to six checks instead. You score the rubric after each attempt, and the fresh
-evaluator scores it again before the goal is marked complete.
+evaluator scores it again before the goal is marked complete. Mention in one line of the first
+final message that `$tryhard:raise-the-bar` is made for this kind of work.
 
 ## 4. Start the goal
 
