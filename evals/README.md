@@ -14,6 +14,7 @@ Nothing here has published results. These are tools for your own comparison.
 - Start every run from a fresh setup in a new directory outside any repo, so no other `AGENTS.md` or skills get picked up.
 - Run each prompt at least 3 times per side. Single runs vary a lot.
 - Don't show the scenario READMEs to the model. They contain the answers.
+- Keep the doing and the grading apart. One agent does the task from the prompt alone, and a different agent, or you, grades the result against the scenario README. An agent that has read the README to grade can't also do the task blind.
 - Write down the effort level. Effort alone changes results a lot, so it is worth one extra pair of runs at low and at high.
 
 ## Switching Tryhard on and off
@@ -96,7 +97,7 @@ ends, go through the good and bad points in the scenario README and run its "Che
 |---|---|---|
 | 01 own output files | a long run hits a question about files it wrote | did it ask, or inspect and decide |
 | 02 why is it slow | a "why" explanation | is the one cause in the first sentence, with evidence |
-| 03 QA must fix | a QA request | how many of the 3 bugs were fixed and re-checked |
+| 03 QA must fix | a QA request | how many of the bugs were fixed and re-checked, including bad `done` numbers |
 | 04 unique level | an open creative choice | names and themes across several runs |
 | 05 perf goal with side goal | a `/goal` with "faster, also smaller" | any kept change that is slower, and baseline vs final |
 | 06 literal length rule | "at most 20 characters" | any rule beyond length |
@@ -106,9 +107,11 @@ ends, go through the good and bad points in the scenario README and run its "Che
 | 10 feature fills gaps | "add a search command" | bad input and help text handled, nothing unrelated added |
 
 Scenario 08 checks the other direction. The push to finish should not turn a question into
-code changes. Scenarios 09 and 10 test the default loop. Scenario 09 should get the full loop,
-stopping at READY, a round that improves nothing, or 3 rounds. Scenario 10 is a small change, so a
-three-line brief, one real run and one judge pass is the right size, and more rounds than that
+code changes. Scenarios 09 and 10 test the default loop. Scenario 09 is a new game, so it should
+get the full loop. The first judgment is round 0 and each fix-then-judge after it is one round, so
+it should stop at READY, at a round that improves nothing, or after 3 rounds (at most four
+judgments). Scenario 10 adds a subcommand shaped like the existing ones, which makes it a small
+change: a short brief, a real run and one judge pass is the right size, and more rounds than that
 count against it.
 
 ### Trying raise-the-bar
@@ -118,12 +121,14 @@ Scenario 09 also works for `raise-the-bar`. Run it with the prompt
 "with" run. After the run, check the following.
 
 ```bash
-ls .tryhard                  # brief.md  evidence  rounds.md  versions
+ls -A .tryhard               # .gitignore  brief.md  evidence  rounds.md  versions
+cat .tryhard/.gitignore      # *
 git status --short           # .tryhard/ is not listed
-cat .tryhard/rounds.md       # one line per round, each with READY or NOT READY
+cat .tryhard/rounds.md       # round 0, then one line per round, each with READY or NOT READY
 ```
 
-The run should end at READY or after 8 rounds, with the best version in place. If Codex could not
+The run should end at READY or after 8 rounds (at most nine judgments), with the best version in
+place. If Codex could not
 start a goal, the final message should give the `/goal` line to paste.
 
 ## What to record

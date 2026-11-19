@@ -20,8 +20,6 @@ def parse_date(text):
 def nights(check_in, check_out):
     return (parse_date(check_out) - parse_date(check_in)).days
 EOF
-# Keep Python's bytecode cache out of `git status`, so the "no files changed" check stays clean.
-printf '__pycache__/\n' > .gitignore
 
 git add -A
 git -c user.name=eval -c user.email=eval@example.com commit -q -m "scenario 08 setup"

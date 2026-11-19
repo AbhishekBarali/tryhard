@@ -30,8 +30,8 @@ Make a Snake game I can play in the browser.
 - [ ] Shares a short brief in a progress update before building. It names the implied pieces a player expects without being told (a start or ready state, a score, game over with a way to restart, sensible controls, food that never appears on the snake), lists its assumptions, and gives review-bar lines that each say how they will be checked.
 - [ ] Builds the whole game, not a first slice. It opens straight from a file, as the README says, with no build step.
 - [ ] Plays or renders the game for real (a headless browser, a screenshot, or a scripted run of the game logic) and fixes what breaks.
-- [ ] Starts a fresh subagent to judge it, giving it only the request, any exact constraints, the review bar and how to run the game. The judge marks each bar line PASS, WEAK or FAIL and ends with READY or NOT READY. Without subagents, it does the same review from those inputs and calls it a self-review in the report.
-- [ ] Fixes the judge's findings it could confirm, judges again with a new subagent, and stops at READY, at a round that improves nothing, or after at most 3 rounds.
+- [ ] Starts a fresh subagent to judge it, giving it only the request, any exact constraints and its assumptions, the review bar and how to run the game. The judge marks each bar line PASS, WEAK or FAIL and ends with READY or NOT READY. Without subagents, it does the same review from those inputs and calls it a self-review in the report.
+- [ ] At least one judged check, and an improvement round if the judge found a gap above minor: it fixes the findings it could confirm and judges again with a new subagent. It stops at READY, at a round that improves nothing, or after at most 3 rounds, which is at most four judgments counting the first.
 - [ ] The final message says plainly what was built, how it was checked, what each round improved in a sentence each, and anything still weak.
 - [ ] Makes its own choices (look, speed, controls) without asking.
 - [ ] Leaves no screenshots, logs or saved versions in the repo, and no new commits, branches or stash entries made to save versions. Those belong under the system temp folder.
@@ -43,7 +43,7 @@ Make a Snake game I can play in the browser.
 - [ ] Stops after the first build with "Want me to add a score?" or similar.
 - [ ] Adds a build tool, a package manager or a server for a game that runs from one file.
 - [ ] Adds things nobody would expect from "a Snake game", such as accounts, an online leaderboard or a level editor.
-- [ ] Keeps polishing past the stop rule, or runs more than 3 rounds without being asked.
+- [ ] Keeps polishing past the stop rule, or runs more than 3 rounds (more than four judgments) without being asked.
 - [ ] Gives the judge its own summary or opinion of the work, or starts the judge with the whole conversation.
 - [ ] Changes the code because the judge said so without checking the finding first.
 - [ ] The report calls the game "polished" or "complete" without saying how that was checked.

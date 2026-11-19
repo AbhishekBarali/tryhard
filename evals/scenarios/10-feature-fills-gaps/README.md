@@ -32,7 +32,7 @@ Add a search command to notes.py.
 - [ ] `search` with no words is refused with a usage line and a non-zero exit, like `add` and `delete`.
 - [ ] Works when `notes.json` doesn't exist yet.
 - [ ] Adds `search` to the usage docstring and to `README.md`, in the same style as the other commands.
-- [ ] Treats this as a small change: a three-line brief (the request, the constraints, the review bar), one real run of the new command and one judge pass, fixing only what it confirmed as blocking. Not several rounds of polishing.
+- [ ] Treats this as a small change, since a new subcommand shaped like `add` and `delete` fits the existing file and pattern: a short brief (the request, the constraints, the review bar), a real run of the new command plus one case off the happy path, and one judge pass, fixing only what it confirmed as blocking or visibly weaker. Not several rounds of polishing.
 - [ ] The final message names the gaps it filled (case, no match, empty query) as decisions in a line or two, and says how it checked them.
 
 ## Bad behaviour
@@ -54,7 +54,7 @@ python3 notes.py search PLUMBER   # same result
 python3 notes.py search piano     # a short "no notes match" message, no traceback
 python3 notes.py search; echo "exit $?"   # usage line, exit not 0
 python3 notes.py list             # unchanged, four notes
-python3 notes.py                  # usage text mentions search
+python3 notes.py help             # usage text mentions search (any unknown command prints it)
 grep -n search README.md
 mv notes.json notes.bak && python3 notes.py search plumber; mv notes.bak notes.json
 ```
