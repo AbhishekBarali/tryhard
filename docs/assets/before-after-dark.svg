@@ -1,22 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
-  <title id="title">Without Done Done and with Done Done</title>
-  <desc id="desc">Two example final messages from a coding agent after the request "QA the todo CLI". Without Done Done, it lists three bugs and asks "Want me to fix these?". With Done Done, it fixes all three, shows the commands it ran to check them and their results, and says what is still open.</desc>
+  <title id="title">Without Tryhard and with Tryhard</title>
+  <desc id="desc">Two example final messages from a coding agent after the request "QA the todo CLI". Without Tryhard, it lists three bugs and asks "Want me to fix these?". With Tryhard, it fixes all three, shows the commands it ran to check them and their results, and says what is still open.</desc>
   <style>
     .sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif; }
     .mono { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace; }
     .page { fill: #0d1117; }
     .panel { fill: #161b22; stroke: #30363d; stroke-width: 2; }
-    .panel-done { fill: #161b22; stroke: #1d4f70; stroke-width: 2; }
+    .panel-done { fill: #161b22; stroke: #8a3a17; stroke-width: 2; }
     .line { fill: none; stroke: #30363d; stroke-width: 2; }
-    .line-done { fill: none; stroke: #1d4f70; stroke-width: 2; }
+    .line-done { fill: none; stroke: #8a3a17; stroke-width: 2; }
     .chip { fill: #262c36; }
     .block { fill: #0d1117; stroke: #30363d; stroke-width: 1.5; }
     .ink { fill: #e6edf3; }
     .muted { fill: #9198a1; }
-    .blue { fill: #53bdeb; }
-    .tick { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-    .tick-blue { stroke: #53bdeb; }
-    .tick-grey { stroke: #6e7681; }
+    .hot { fill: #ff6b2c; }
+    .knob { fill: #ffffff; }
+    .off { fill: #30363d; }
+    .off-knob { fill: #6e7681; }
   </style>
 
   <rect class="page" width="1280" height="720" rx="16"/>
@@ -26,12 +26,12 @@
   <text class="mono ink" x="640" y="47" font-size="27" text-anchor="middle"><tspan class="muted">›</tspan> QA the todo CLI</text>
   <path class="line" d="M640 62V75M324 88V83a8 8 0 0 1 8-8H948a8 8 0 0 1 8 8V88"/>
 
-  <!-- Left: without Done Done -->
+  <!-- Left: without Tryhard -->
   <rect class="panel" x="16" y="88" width="616" height="568" rx="18"/>
-  <text class="sans muted" x="44" y="136" font-size="30" font-weight="700">Without Done Done</text>
-  <g transform="translate(590 125) scale(0.4) translate(-35 -50)">
-    <path class="tick tick-grey" stroke-width="12" d="M6 52 26 72 64 28"/>
-  </g>
+  <text class="sans muted" x="44" y="136" font-size="30" font-weight="700">Without Tryhard</text>
+  <!-- Switch off -->
+  <rect class="off" x="548" y="110" width="56" height="32" rx="16"/>
+  <circle class="off-knob" cx="564" cy="126" r="11"/>
   <path class="line" d="M17 162H631"/>
 
   <text class="sans ink" x="44" y="208" font-size="27">Found 3 bugs in the todo CLI:</text>
@@ -53,12 +53,12 @@
 
   <text class="sans ink" x="44" y="380" font-size="27" font-weight="600">Want me to fix these?</text>
 
-  <!-- Right: with Done Done -->
+  <!-- Right: with Tryhard -->
   <rect class="panel-done" x="648" y="88" width="616" height="568" rx="18"/>
-  <text class="sans ink" x="676" y="136" font-size="30" font-weight="700">With Done Done</text>
-  <g transform="translate(1214 125) scale(0.4) translate(-54 -50)">
-    <path class="tick tick-blue" stroke-width="12" d="M6 52 26 72 64 28M54 62 64 72 102 28"/>
-  </g>
+  <text class="sans ink" x="676" y="136" font-size="30" font-weight="700">With Tryhard</text>
+  <!-- Switch on -->
+  <rect class="hot" x="1180" y="110" width="56" height="32" rx="16"/>
+  <circle class="knob" cx="1220" cy="126" r="11"/>
   <path class="line-done" d="M649 162H1263"/>
 
   <text class="sans ink" x="676" y="208" font-size="27" font-weight="700">Fixed all 3 bugs.</text>
@@ -81,13 +81,13 @@
   <text class="sans muted" x="676" y="380" font-size="27" font-weight="600">How I checked</text>
   <rect class="block" x="676" y="396" width="560" height="162" rx="10"/>
   <text class="mono ink" x="696" y="428" font-size="27"><tspan class="muted">$</tspan> todo --help</text>
-  <text class="sans blue" x="1008" y="428" font-size="27" font-weight="600">exit 0</text>
+  <text class="sans ink" x="1008" y="428" font-size="27" font-weight="600">exit 0</text>
   <text class="mono ink" x="696" y="466" font-size="27"><tspan class="muted">$</tspan> todo add ""</text>
-  <text class="sans blue" x="1008" y="466" font-size="27" font-weight="600">refused</text>
+  <text class="sans ink" x="1008" y="466" font-size="27" font-weight="600">refused</text>
   <text class="mono ink" x="696" y="504" font-size="27"><tspan class="muted">$</tspan> todo list --done</text>
-  <text class="sans blue" x="1008" y="504" font-size="27" font-weight="600">no open tasks</text>
+  <text class="sans ink" x="1008" y="504" font-size="27" font-weight="600">no open tasks</text>
   <text class="mono ink" x="696" y="542" font-size="27"><tspan class="muted">$</tspan> pytest</text>
-  <text class="sans blue" x="1008" y="542" font-size="27" font-weight="600">24 passed</text>
+  <text class="sans ink" x="1008" y="542" font-size="27" font-weight="600">24 passed</text>
 
   <text class="sans ink" x="676" y="604" font-size="27"><tspan class="muted" font-weight="600">Still open:</tspan> Windows not tested.</text>
 
