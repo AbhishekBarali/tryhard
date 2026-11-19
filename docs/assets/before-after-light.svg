@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="744" viewBox="0 0 1000 744" role="img" aria-labelledby="title desc">
   <title id="title">Without Tryhard and with Tryhard</title>
   <desc id="desc">Two example final messages from a coding agent after the request "QA the todo CLI". Without Tryhard, it lists three bugs and asks "Want me to fix these?". With Tryhard, it fixes all three, shows the commands it ran to check them and their results, and says what is still open.</desc>
   <style>
@@ -19,78 +19,71 @@
     .off-knob { fill: #ffffff; }
   </style>
 
-  <rect class="page" width="1280" height="720" rx="16"/>
+  <rect class="page" width="1000" height="744" rx="16"/>
 
   <!-- Shared request -->
-  <rect class="panel" x="474" y="14" width="332" height="48" rx="24"/>
-  <text class="mono ink" x="640" y="47" font-size="27" text-anchor="middle"><tspan class="muted">›</tspan> QA the todo CLI</text>
-  <path class="line" d="M640 62V75M324 88V83a8 8 0 0 1 8-8H948a8 8 0 0 1 8 8V88"/>
+  <rect class="panel" x="340" y="12" width="320" height="48" rx="24"/>
+  <text class="mono ink" x="500" y="45" font-size="27" text-anchor="middle"><tspan class="muted">›</tspan> QA the todo CLI</text>
+  <path class="line" d="M500 60V74M252 88V82a8 8 0 0 1 8-8H740a8 8 0 0 1 8 8V88"/>
 
   <!-- Left: without Tryhard -->
-  <rect class="panel" x="16" y="88" width="616" height="568" rx="18"/>
-  <text class="sans muted" x="44" y="136" font-size="30" font-weight="700">Without Tryhard</text>
-  <!-- Switch off -->
-  <rect class="off" x="548" y="110" width="56" height="32" rx="16"/>
-  <circle class="off-knob" cx="564" cy="126" r="11"/>
-  <path class="line" d="M17 162H631"/>
+  <rect class="panel" x="12" y="88" width="480" height="592" rx="18"/>
+  <text class="sans muted" x="38" y="140" font-size="32" font-weight="700">Without Tryhard</text>
+  <rect class="off" x="410" y="112" width="58" height="32" rx="16"/>
+  <circle class="off-knob" cx="426" cy="128" r="11"/>
+  <path class="line" d="M13 166H491"/>
 
-  <text class="sans ink" x="44" y="208" font-size="27">Found 3 bugs in the todo CLI:</text>
+  <text class="sans ink" x="38" y="214" font-size="28">Found 3 bugs:</text>
+  <text class="sans muted" x="38" y="260" font-size="28">1.</text>
+  <rect class="chip" x="68" y="232" width="117" height="38" rx="6"/>
+  <text class="mono ink" x="76" y="260" font-size="28">--help</text>
+  <text class="sans ink" x="197" y="260" font-size="28">exits with 1</text>
+  <text class="sans muted" x="38" y="304" font-size="28">2.</text>
+  <rect class="chip" x="68" y="276" width="117" height="38" rx="6"/>
+  <text class="mono ink" x="76" y="304" font-size="28">add ""</text>
+  <text class="sans ink" x="197" y="304" font-size="28">saves empty tasks</text>
+  <text class="sans muted" x="38" y="348" font-size="28">3.</text>
+  <rect class="chip" x="68" y="320" width="83" height="38" rx="6"/>
+  <text class="mono ink" x="76" y="348" font-size="28">rm 2</text>
+  <text class="sans ink" x="163" y="348" font-size="28">deletes task 3</text>
 
-  <text class="sans muted" x="44" y="248" font-size="27">1.</text>
-  <rect class="chip" x="78" y="222" width="114" height="35" rx="6"/>
-  <text class="mono ink" x="86" y="248" font-size="27">--help</text>
-  <text class="sans ink" x="204" y="248" font-size="27">exits with code 1</text>
-
-  <text class="sans muted" x="44" y="288" font-size="27">2.</text>
-  <rect class="chip" x="78" y="262" width="114" height="35" rx="6"/>
-  <text class="mono ink" x="86" y="288" font-size="27">add ""</text>
-  <text class="sans ink" x="204" y="288" font-size="27">saves an empty task</text>
-
-  <text class="sans muted" x="44" y="328" font-size="27">3.</text>
-  <rect class="chip" x="78" y="302" width="195" height="35" rx="6"/>
-  <text class="mono ink" x="86" y="328" font-size="27">list --done</text>
-  <text class="sans ink" x="285" y="328" font-size="27">shows open tasks</text>
-
-  <text class="sans ink" x="44" y="380" font-size="27" font-weight="600">Want me to fix these?</text>
+  <text class="sans ink" x="38" y="410" font-size="32" font-weight="700">Want me to fix these?</text>
+  <text class="sans muted" x="38" y="456" font-size="28">Turn ends. Your move.</text>
 
   <!-- Right: with Tryhard -->
-  <rect class="panel-done" x="648" y="88" width="616" height="568" rx="18"/>
-  <text class="sans ink" x="676" y="136" font-size="30" font-weight="700">With Tryhard</text>
-  <!-- Switch on -->
-  <rect class="hot" x="1180" y="110" width="56" height="32" rx="16"/>
-  <circle class="knob" cx="1220" cy="126" r="11"/>
-  <path class="line-done" d="M649 162H1263"/>
+  <rect class="panel-done" x="508" y="88" width="480" height="592" rx="18"/>
+  <text class="sans ink" x="534" y="140" font-size="32" font-weight="700">With Tryhard</text>
+  <rect class="hot" x="906" y="112" width="58" height="32" rx="16"/>
+  <circle class="knob" cx="948" cy="128" r="11"/>
+  <path class="line-done" d="M509 166H987"/>
 
-  <text class="sans ink" x="676" y="208" font-size="27" font-weight="700">Fixed all 3 bugs.</text>
+  <text class="sans ink" x="534" y="214" font-size="32" font-weight="700">Fixed all 3 bugs.</text>
+  <text class="sans muted" x="534" y="260" font-size="28">•</text>
+  <rect class="chip" x="564" y="232" width="117" height="38" rx="6"/>
+  <text class="mono ink" x="572" y="260" font-size="28">--help</text>
+  <text class="sans ink" x="693" y="260" font-size="28">exits with 0</text>
+  <text class="sans muted" x="534" y="304" font-size="28">•</text>
+  <rect class="chip" x="564" y="276" width="117" height="38" rx="6"/>
+  <text class="mono ink" x="572" y="304" font-size="28">add ""</text>
+  <text class="sans ink" x="693" y="304" font-size="28">shows an error</text>
+  <text class="sans muted" x="534" y="348" font-size="28">•</text>
+  <rect class="chip" x="564" y="320" width="83" height="38" rx="6"/>
+  <text class="mono ink" x="572" y="348" font-size="28">rm 2</text>
+  <text class="sans ink" x="659" y="348" font-size="28">deletes task 2</text>
 
-  <text class="sans muted" x="678" y="248" font-size="27">•</text>
-  <rect class="chip" x="704" y="222" width="114" height="35" rx="6"/>
-  <text class="mono ink" x="712" y="248" font-size="27">--help</text>
-  <text class="sans ink" x="830" y="248" font-size="27">exits with 0</text>
+  <text class="sans muted" x="534" y="410" font-size="28" font-weight="700">How I checked</text>
+  <rect class="block" x="532" y="428" width="432" height="178" rx="10"/>
+  <text class="mono ink" x="550" y="462" font-size="28"><tspan class="muted">$</tspan> todo --help</text>
+  <text class="sans ink" x="794" y="462" font-size="28" font-weight="700">exit 0</text>
+  <text class="mono ink" x="550" y="502" font-size="28"><tspan class="muted">$</tspan> todo add &quot;&quot;</text>
+  <text class="sans ink" x="794" y="502" font-size="28" font-weight="700">refused</text>
+  <text class="mono ink" x="550" y="542" font-size="28"><tspan class="muted">$</tspan> todo rm 2</text>
+  <text class="sans ink" x="794" y="542" font-size="28" font-weight="700">task 3 kept</text>
+  <text class="mono ink" x="550" y="582" font-size="28"><tspan class="muted">$</tspan> pytest</text>
+  <text class="sans ink" x="794" y="582" font-size="28" font-weight="700">24 passed</text>
 
-  <text class="sans muted" x="678" y="288" font-size="27">•</text>
-  <rect class="chip" x="704" y="262" width="114" height="35" rx="6"/>
-  <text class="mono ink" x="712" y="288" font-size="27">add ""</text>
-  <text class="sans ink" x="830" y="288" font-size="27">shows an error</text>
-
-  <text class="sans muted" x="678" y="328" font-size="27">•</text>
-  <rect class="chip" x="704" y="302" width="195" height="35" rx="6"/>
-  <text class="mono ink" x="712" y="328" font-size="27">list --done</text>
-  <text class="sans ink" x="911" y="328" font-size="27">hides open tasks</text>
-
-  <text class="sans muted" x="676" y="380" font-size="27" font-weight="600">How I checked</text>
-  <rect class="block" x="676" y="396" width="560" height="162" rx="10"/>
-  <text class="mono ink" x="696" y="428" font-size="27"><tspan class="muted">$</tspan> todo --help</text>
-  <text class="sans ink" x="1008" y="428" font-size="27" font-weight="600">exit 0</text>
-  <text class="mono ink" x="696" y="466" font-size="27"><tspan class="muted">$</tspan> todo add ""</text>
-  <text class="sans ink" x="1008" y="466" font-size="27" font-weight="600">refused</text>
-  <text class="mono ink" x="696" y="504" font-size="27"><tspan class="muted">$</tspan> todo list --done</text>
-  <text class="sans ink" x="1008" y="504" font-size="27" font-weight="600">no open tasks</text>
-  <text class="mono ink" x="696" y="542" font-size="27"><tspan class="muted">$</tspan> pytest</text>
-  <text class="sans ink" x="1008" y="542" font-size="27" font-weight="600">24 passed</text>
-
-  <text class="sans ink" x="676" y="604" font-size="27"><tspan class="muted" font-weight="600">Still open:</tspan> Windows not tested.</text>
+  <text class="sans ink" x="534" y="652" font-size="28"><tspan class="muted" font-weight="700">Not checked:</tspan> Windows.</text>
 
   <!-- Caption -->
-  <text class="sans muted" x="640" y="700" font-size="27" text-anchor="middle">Example messages, for illustration</text>
+  <text class="sans muted" x="500" y="724" font-size="24" text-anchor="middle">Example messages, for illustration</text>
 </svg>
