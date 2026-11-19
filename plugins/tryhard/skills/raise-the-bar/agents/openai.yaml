@@ -1,6 +1,6 @@
 interface:
   display_name: "Raise the bar"
-  short_description: "Review and improve a result until it stops improving"
-  default_prompt: "Use $tryhard:raise-the-bar to build this and keep improving it until an expert would sign off."
+  short_description: "Max mode: stricter bar, more judged rounds, run as a goal"
+  default_prompt: "Use $tryhard:raise-the-bar to make this as good as it can get, judged with fresh eyes every round."
 policy:
   allow_implicit_invocation: false
