@@ -12,8 +12,13 @@ put no labels in front of them.
    that explains most of it and the evidence for it, such as a number, a measurement or a command
    result.
 2. What changed, in plain words. Give a path when the user will want to open the file.
-3. How you checked it, and plainly what you could not check.
-4. Any part of the request you did not do or could not finish, and why.
+3. How you checked it, which covers how you used it and what the fresh review found. When the work
+   went through rounds of improvement, give one plain sentence per round on what it improved, such
+   as "A fresh review found the restart key did nothing after a loss, so I fixed it." Then say
+   plainly what you could not check.
+4. What is still weak, and any part of the request you did not do or could not finish, with the
+   reason. When the rounds stopped at their limit, name what still falls short of the bar and what
+   it would take to close it.
 5. Decisions you made for the user that they may want to change, and anything only they can decide.
    Give each with the default you already applied and how to change it. Where no safe default
    existed, give the options with your recommendation first.
@@ -64,8 +69,9 @@ still open.
 > with no billing address get an empty cell.
 >
 > I exported the 40 sample customers and opened the file in LibreOffice, and every column lined up.
-> The existing export tests pass. I could not try the Excel import because Excel is not installed
-> here.
+> The existing export tests pass. A fresh review then found that countries with a comma in the name,
+> such as "Korea, Republic of", shifted the columns, so those values are now quoted. A second review
+> found only minor issues. I could not try the Excel import because Excel is not installed here.
 >
 > I used the billing address because the shipping address is missing for about a third of
 > customers. Switching to the shipping address is a one-line change in the same file.
