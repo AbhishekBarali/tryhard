@@ -29,7 +29,7 @@ In those cases a better answer means a cleaner solution inside the rules.
 ## How
 
 Do the planning steps in your own reasoning. The candidates and their estimates are scaffolding, so
-they stay out of the deliverable and the final message.
+they stay out of the deliverable, and the final message names only the winner and the runner-up.
 
 1. Lock what is fixed. Note what the user's words, the existing code or style, and hard constraints
    already decide. The brief wins every time, and only the open parts get explored.
@@ -47,8 +47,8 @@ they stay out of the deliverable and the final message.
 4. Write five one-line titles, or three for technical approaches. Rewrite them to be bolder and more
    different from each other, then expand each to two or three lines. Estimate how typical each one
    is, as the rough share of models that would produce it, and make sure at least two sit under
-   about one in ten. If two share a core idea, replace one. Past about seven candidates, quality
-   drops.
+   about one in ten. If two share a core idea, replace one. Stop at seven candidates, because
+   quality drops past that.
 5. Choose on fit. Score each candidate on the brief's actual goal and audience, on what can be built
    well within this task, and on how specific it is to this subject. Leave familiarity and how nice
    it sounds out of the scoring. Make one element the bold one and keep the rest disciplined.
@@ -67,9 +67,6 @@ question tool is available. Then ask with your pick as the default and keep work
 
 Keep to what was asked. A new name does not come with a tagline, a logo or an extra section unless
 the user wanted one.
-
-If the project already keeps a file that lists names or themes in use, add yours to it so the next
-request can avoid them.
 
 ## Technical approaches
 
