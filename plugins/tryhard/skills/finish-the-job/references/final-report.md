@@ -33,7 +33,8 @@ or a silent decision is what the user most needs to hear about.
 ## Writing it
 
 - Name things the way the user would, so round numbers, subagent names and scratch file names stay
-  out. Real file paths and established technical terms are fine where they add precision.
+  out. Real file paths and established technical terms are fine where they add precision, and a
+  folder of evidence can be named once by path if the user may want it.
 - Order things by what helps the user judge the result. The story of how the work went is rarely
   that.
 - Use a list only for separate items, such as several issues or several assumptions.

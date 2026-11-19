@@ -7,7 +7,7 @@ terms.
 
 ## The parts
 
-A small change needs only parts 1, 2 and 8. A big build needs all of them, in about ten to twenty
+A small change needs only parts 1, 2 and 8, with two to four bar lines. A big build needs all of them, in about ten to twenty
 short lines.
 
 1. The request, pasted as the user wrote it.
@@ -29,16 +29,17 @@ short lines.
 7. Assumptions, one line for each gap you filled, giving what you assumed, why, and whether it is
    reversible. They bind the build, the judge gets them with the fixed constraints, and the final
    report lists them.
-8. Review bar, three to eight lines saying what the user will look for when they review the result,
-   each with how it is checked (run it, a screenshot at real size, a measurement, a click-through, a
-   check that failed before the change). Name one primary measure, and turn side aims into "does not
+8. Review bar, three to eight lines saying what the user will look for when they review the result.
+   Each line describes the result the user gets, with how it is checked by a method the judge runs
+   itself (run it, a screenshot at real size, a measurement, a click-through), never a file of yours
+   to inspect. Name one primary measure, and turn side aims into "does not
    get worse" lines. For a document, write lines about the reader, such as "a new teammate can set up
    the project from this page alone". For creative or design work, include a line asking for choices
    made for this brief that a similar prompt would not produce.
 9. Must not be, three to five lazy versions of this result, written as scope outcomes, such as
    half-built, a placeholder behind a polished surface, happy path only, a template layout, or a
-   generic default. This list stays in your notes, and the judge gets it rewritten as positive
-   checks.
+   generic default. This list stays in your notes. Fold each item into the bar line it overlaps, and
+   add a bar line only for an item that no line covers.
 
 Decide all of this yourself. Stop for the user only in the cases listed in SKILL.md under "When to
 stop for the user".

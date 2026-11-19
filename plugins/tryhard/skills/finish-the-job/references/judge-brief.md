@@ -1,20 +1,21 @@
 # Judge brief
 
 Fill in the parts in braces and send everything below the line as the task of a new subagent each
-round. Spawn it with `fork_turns` set to `"none"`, or with `fork_context` set to false in tools that
-use that name. Without that setting the judge inherits your whole conversation and stops being
-fresh.
+judgment. Spawn it without your conversation history. In Codex that is `fork_turns` set to
+`"none"` (or `fork_context` set to false in tools that use that name), and elsewhere a fresh
+subagent that does not inherit the chat. A judge that inherits your conversation stops being fresh.
 
 Give it these five inputs and nothing else.
 
 1. The request, pasted as the user wrote it.
 2. The fixed constraints the user stated, and the brief's assumptions.
-3. The review bar, most important first, with the must-not-be list rewritten as positive checks.
-4. How to run or see the result, with the evidence folder.
-5. From the second round on, the blockers the previous judge found.
+3. The review bar, most important first, with each must-not-be item folded into the bar line it
+   overlaps.
+4. How to run or see the result, with the evidence folder, which holds raw material only.
+5. From round 1 on (the first judgment is round 0), the blockers the previous judge found.
 
-Leave out your summary, your round log and your view of how good it is, because a judge who reads
-them tends to agree with them. Wait for the reply, since the next step depends on it.
+Leave out your summary, your round log, your pass/fail lists and your view of how good it is,
+because a judge who reads them tends to agree with them. Wait for the reply, since the next step depends on it.
 
 If no subagent can be started, follow the same steps yourself from the same five inputs, and call
 it a self-review in the report.
@@ -40,13 +41,13 @@ narrower or weaker than the user was really after, which is then a gap:
 
 The bar, most important first:
 
-{the review-bar lines, each with how it is checked, and the must-not-be items as positive checks}
+{the review-bar lines, each with how it is checked}
 
 How to run or see the result:
 
-{the command, URL or paths, and the evidence folder}
+{the command, URL or paths, and the evidence folder of screenshots, logs and state dumps}
 
-{From the second round on: blockers the previous judge found, to check after your own verdict.}
+{From round 1 on: blockers the previous judge found, to check after your own verdict.}
 
 Work through these steps.
 
@@ -71,7 +72,7 @@ Work through these steps.
    place it occurs, report style only when the bar is about style, and keep going after the first
    finding. Worries you could not demonstrate go under risks. Seeing every line pass is what proves
    the result ready, which is more than failing to find gaps.
-6. From the second round on, after your own verdict, mark each earlier blocker fixed or not fixed.
+6. If earlier blockers are listed above, after your own verdict, mark each earlier blocker fixed or not fixed.
 
 Change none of the work's files, and keep anything you write for your checks in a temporary
 folder. Start no other agents, report only what you found, and stop any program you started.
@@ -84,6 +85,6 @@ Reply in this shape.
 4. The gaps, most serious first, each with its level, how it shows up, the evidence and what better
    looks like. If nothing above minor remains, say so in one line.
 5. Risks I could not verify.
-6. From the second round on, each earlier blocker, fixed or not fixed.
+6. If earlier blockers were listed, each one, fixed or not fixed.
 7. A last line that says READY or NOT READY. READY means every bar line is PASS and no gap above
    minor remains.

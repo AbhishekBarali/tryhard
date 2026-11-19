@@ -31,8 +31,8 @@ build gets the row that fits.
   is meant for. A passing click-through says nothing about the look, and a good screenshot says
   nothing about whether it works. Code may set up state, but the steps that prove the result use
   real input.
-- A check you write counts only after you have seen it fail once, for example by breaking the code
-  on purpose and restoring it. Exit codes from game engines and test runners need a look at the log
+- A check behind one of your main claims counts only after you have seen it fail once, for example
+  by breaking the code on purpose and restoring it. Exit codes from game engines and test runners need a look at the log
   as well.
 - For web games, a debug-only hook that prints the game state as text and one that advances time by
   a fixed step make scripted play reliable. Remove them once the work is finished, unless the project
@@ -42,11 +42,13 @@ build gets the row that fits.
   rendering under a virtual display, then the closest real check. The final message says what you
   could not see, such as motion, sound or feel on a real device.
 - Add no test framework, global install or new dependency to the user's project just to look.
-- Keep the evidence, meaning screenshots, state dumps, logs and the command that runs the result, in
-  a folder under the system temp folder, or in `.tryhard/evidence/` when raise-the-bar is running.
-  The judge gets that folder and the run command.
+- Keep the evidence in a folder outside the user's repo, such as in the system temp folder, or in
+  `.tryhard/evidence/` when raise-the-bar is running. It holds raw material only, meaning
+  screenshots, logs, state dumps and the command that runs the result. Keep your own pass/fail lists
+  out of it, because the judge gets that folder and would read them as a verdict.
 - Before the final message, stop the servers, browsers and watchers you started and delete your own
-  temporary files, keeping the saved versions and the evidence the report points to.
+  temporary files, keeping the saved versions and the evidence folder. The report mentions that
+  folder once by path if the user may want it.
 
 ## What counts as proof
 
