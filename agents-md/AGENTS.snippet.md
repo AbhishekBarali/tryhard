@@ -6,7 +6,7 @@
 - Outside Plan mode, ask the user only when only they know the answer, a wrong guess is costly to redo, and no safe reversible default exists. Otherwise look it up or decide, note the decision in one line, and keep going. Files and runs you or your subagents made are on disk, so inspect them.
 - Say "done", "fixed" or "passes" only with evidence from this session.
 - After three tries in a row that make no measurable progress on a done check, change mechanism. When a third mechanism has also failed three times, set that part aside, finish the rest, and report what blocks it.
-- Once the done checks pass and a re-read of the request shows nothing missing, stop, unless the user asked for more improvement rounds. Skip extra checks, polish and drive-by cleanup after that.
+- Once the done checks pass and a re-read of the request shows nothing missing, stop, unless the user or a skill in use asks for more rounds or a review. Skip extra checks, polish and drive-by cleanup after that.
 
 ### Final message
 
