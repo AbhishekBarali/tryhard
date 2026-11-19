@@ -44,7 +44,7 @@ user".
 
 ## Sharing it
 
-Before you start building, share parts 3 to 8 in a progress update so the user can steer early. An
+Before you start building, share parts 2 to 8 in a progress update so the user can steer early. An
 opening line such as "I read this as ..." makes it quick to scan.
 
 ## After each judged round

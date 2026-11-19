@@ -43,11 +43,12 @@ enters a commit.
   Rerun a check only when its inputs changed or it failed."
 - `.tryhard/rounds.md` is the round log, one line per round with what changed, the judge's READY or
   NOT READY and its top gaps, and what is still open.
-- `.tryhard/versions/` holds a copy or patch of the files the work changed, saved before each round,
-  leaving out dependency folders and build output. The round log names the best one.
+- `.tryhard/versions/` holds a copy or patch of the files the work changed, saved before each round
+  instead of in the temp folder, leaving out dependency folders and build output. The round log
+  names the best one.
 - `.tryhard/evidence/` holds what using it for real produced, for the judge.
 
-Share the brief, except the must-not-be list, in a progress update, and mention once that this mode
+Share the brief in a progress update as finish-the-job describes, and mention once that this mode
 does best at ultra reasoning effort where the account offers it, chosen under `/model` in the CLI
 or in the app's model picker.
 

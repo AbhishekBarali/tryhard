@@ -24,11 +24,11 @@ The user's own instructions win over anything here.
 ## The judged loop
 
 1. **Write the brief.** Read [references/brief.md](references/brief.md) unless the change is small,
-   write the brief, and share all of it except the must-not-be list in a progress update. Treat the prompt as the minimum, fill gaps as
-   a thoughtful expert would, and record each as an assumption. Exact things the user stated, such
-   as numbers, names, limits, a style to match or "don't touch X", stay exact. "Passwords of 12 or
-   more characters" means a length check of at least 12. If an exact rule causes a real problem,
-   build it as asked and say so at the end.
+   write the brief, and share it in a progress update, leaving out the request and the must-not-be
+   list. Treat the prompt as the minimum, fill gaps as a thoughtful expert would, and record each as
+   an assumption. Exact things the user stated, such as numbers, names, limits, a style to match or
+   "don't touch X", stay exact. "Passwords of 12 or more characters" means a length check of at
+   least 12. If an exact rule causes a real problem, build it as asked and say so at the end.
 2. **Settle open choices** the user will see, such as a theme, level idea, name or layout, inside the
    brief with [../fresh-ideas/SKILL.md](../fresh-ideas/SKILL.md).
 3. **Build the whole thing**, every part of the brief, working and with nothing stubbed. The
@@ -40,7 +40,7 @@ The user's own instructions win over anything here.
    the same review yourself from the same inputs and call it a self-review in the report.
 6. **Check the findings, then fix.** The judge's findings are claims. Mark each one above minor as
    confirmed, not confirmed or can't verify, using your own evidence, and fix the confirmed ones in
-   rank order. Minor gaps never start a round. Leave the bar, tests and measurements as they are
+   rank order. Minor gaps do not start a round. Leave the bar, tests and measurements as they are
    when fixing for the judge, and keep the user's constraints over the judge's advice. Write the
    fixes back into the brief, use it for real again, and judge again with a new subagent. Fixes plus
    a new judgment make one round.
@@ -85,8 +85,8 @@ this session.
 
 ## When to stop for the user
 
-Decide everything else yourself, note the decision in one line, and keep going. Stop for the user
-only in these cases, after the work that does not depend on them, and read
+Decide everything else yourself, note the decision in one line, and keep going. Outside Plan mode,
+stop for the user only in these cases, after the work that does not depend on them, and read
 [references/ask-or-decide.md](references/ask-or-decide.md) first.
 
 - The step deletes something you did not make, or cannot be undone.

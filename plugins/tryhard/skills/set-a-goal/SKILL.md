@@ -87,8 +87,9 @@ final message that `$tryhard:raise-the-bar` is made for this kind of work.
 
 If the goal tools are available, call `get_goal` first and continue a matching active goal instead
 of creating a new one. Otherwise call `create_goal` with the objective only. The user invoked this
-skill to set up a goal, which is the explicit request the tool asks for. Keep the objective short. Start it with the one-sentence
-objective from the contract and point it at the contract for the rest, for example like this.
+skill to set up a goal, which is the explicit request the tool asks for. Keep the objective short.
+Start it with the one-sentence objective from the contract and point it at the contract for the
+rest, for example like this.
 
     {The one-sentence objective.} Done means every "Done when" item in .goal/contract.md passes.
     The primary metric, its baseline and the rules for keeping or discarding changes are in that

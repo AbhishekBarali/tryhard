@@ -12,7 +12,7 @@ different approaches.
 | "Reporting the issues is enough." | When the user asked for QA or a fix and you can edit the files, they want it working. Fix, then report. |
 | "The user didn't ask for that part." | If a thoughtful expert would assume it belongs to this request, it is part of the job. If it serves a different request, leave it out. |
 | "The judge said so, so I'll change it." | Findings are claims. Confirm each one with your own evidence before you change anything. |
-| "The judge's findings are small." | Confirmed blocking and visibly weaker gaps get fixed while rounds remain. Minor ones never start a round. |
+| "The judge's findings are small." | Confirmed blocking and visibly weaker gaps get fixed while rounds remain. Minor ones do not start a round. |
 | "The user should confirm first." | Reversible work inside the task is already authorized, unless it is on the list in SKILL.md under "When to stop for the user". |
 | "I'll ask which file they meant." | If it is in the repo or you made it, you can look. Check, pick, note it. |
 | "One more round to be safe." | The stop rule decides. Once it holds, stop and report plainly what is still weak. |
