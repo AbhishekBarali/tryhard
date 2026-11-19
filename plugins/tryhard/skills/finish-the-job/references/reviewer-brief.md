@@ -19,8 +19,8 @@ The work counts as done when these checks hold:
 
 The change and how to run it:
 
-{how to see the change, for example `git diff main...HEAD` or a list of paths, and the command that
-runs or tests it}
+{how to see the change, for example `git status` and `git diff` for uncommitted work, or a list of
+paths, and the command that runs or tests it}
 
 Assume the work is unfinished until you find evidence that it is done. For each done check, gather
 your own evidence. Run the command, open the page, call the code with realistic input, and read the
