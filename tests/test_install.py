@@ -16,13 +16,14 @@ SNIPPET = "## Tryhard\n\nDefine what done means before you start.\n"
 @unittest.skipIf(shutil.which("bash") is None, "needs bash")
 class InstallTests(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.mkdtemp(prefix="tryhard-install-")
-        self.repo = os.path.join(self.tmp, "repo")
+        # Spaces in every path, as on many macOS and Windows home folders.
+        self.tmp = tempfile.mkdtemp(prefix="tryhard install ")
+        self.repo = os.path.join(self.tmp, "my repo")
         os.makedirs(os.path.join(self.repo, "agents-md"))
         shutil.copy(os.path.join(ROOT, "install.sh"), self.repo)
         self.snippet = os.path.join(self.repo, "agents-md", "AGENTS.snippet.md")
         self.write(self.snippet, SNIPPET)
-        self.home = os.path.join(self.tmp, "codex-home")
+        self.home = os.path.join(self.tmp, "codex home")
         self.agents = os.path.join(self.home, "AGENTS.md")
 
     def tearDown(self):
@@ -36,16 +37,26 @@ class InstallTests(unittest.TestCase):
         with open(path, encoding="utf-8") as handle:
             return handle.read()
 
-    def run_install(self, *args):
+    def run_install(self, *args, **options):
         env = dict(os.environ, CODEX_HOME=self.home, HOME=self.tmp)
+        env.pop("CDPATH", None)
+        env.update(options.get("env", {}))
+        for name in options.get("unset", ()):
+            env.pop(name, None)
+        script = options.get("script", os.path.join(self.repo, "install.sh"))
         return subprocess.run(
-            ["bash", os.path.join(self.repo, "install.sh")] + list(args),
+            ["bash", script] + list(args),
             capture_output=True,
             text=True,
             env=env,
+            cwd=options.get("cwd"),
             stdin=subprocess.DEVNULL,
             timeout=60,
         )
+
+    def read_bytes(self, path):
+        with open(path, "rb") as handle:
+            return handle.read()
 
     def backups(self):
         return glob.glob(self.agents + ".bak-tryhard-*")
@@ -156,6 +167,60 @@ class InstallTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertIn("--remove", result.stdout)
         self.assertFalse(os.path.exists(self.home))
+
+    def test_relative_path_with_cdpath_exported(self):
+        # With CDPATH exported, a bare cd prints the folder, which used to end
+        # up inside the script's own path.
+        result = self.run_install(
+            script=os.path.join("my repo", "install.sh"), cwd=self.tmp, env={"CDPATH": ".:" + self.tmp}
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.read(self.agents), START + "\n" + SNIPPET + END + "\n")
+        self.assertIn('codex plugin marketplace add "%s"' % os.path.realpath(self.repo), result.stdout)
+
+    def test_codex_home_unset_uses_home(self):
+        result = self.run_install(unset=["CODEX_HOME"])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(os.path.isfile(os.path.join(self.tmp, ".codex", "AGENTS.md")))
+        self.assertFalse(os.path.exists(self.home))
+        empty = self.run_install(env={"CODEX_HOME": ""})
+        self.assertEqual(empty.returncode, 0, empty.stderr)
+        self.assertIn("already has the current Tryhard block", empty.stdout)
+
+    def test_no_home_at_all_is_a_clear_error(self):
+        result = self.run_install(unset=["CODEX_HOME", "HOME"])
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Neither CODEX_HOME nor HOME is set", result.stderr)
+        self.assertNotIn("unbound variable", result.stderr)
+
+    def test_crlf_file_is_updated_and_removed_without_duplicates(self):
+        os.makedirs(self.home)
+        original = b"# Mine\r\n\r\nUse tabs.\r\n"
+        with open(self.agents, "wb") as handle:
+            handle.write(original + b"\r\n" + START.encode() + b"\r\nold\r\n" + END.encode() + b"\r\n")
+        self.assertEqual(self.run_install().returncode, 0)
+        text = self.read_bytes(self.agents)
+        self.assertEqual(text.count(START.encode()), 1)
+        self.assertIn(SNIPPET.encode(), text)
+        self.assertNotIn(b"old", text)
+        self.assertEqual(self.run_install("--remove").returncode, 0)
+        self.assertEqual(self.read_bytes(self.agents), original)
+
+    def test_crlf_snippet_is_normalised(self):
+        with open(self.snippet, "wb") as handle:
+            handle.write((START + "\r\n" + SNIPPET.replace("\n", "\r\n") + END + "\r\n").encode())
+        self.assertEqual(self.run_install().returncode, 0)
+        self.assertEqual(self.read_bytes(self.agents), (START + "\n" + SNIPPET + END + "\n").encode())
+
+    @unittest.skipUnless(hasattr(os, "symlink"), "needs symlinks")
+    def test_symlinked_agents_file_stays_a_symlink(self):
+        os.makedirs(self.home)
+        target = os.path.join(self.tmp, "dotfiles AGENTS.md")
+        self.write(target, "# Dotfiles\n")
+        os.symlink(target, self.agents)
+        self.assertEqual(self.run_install().returncode, 0)
+        self.assertTrue(os.path.islink(self.agents))
+        self.assertIn(START, self.read(target))
 
 
 if __name__ == "__main__":
