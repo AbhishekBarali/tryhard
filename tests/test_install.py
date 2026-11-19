@@ -118,6 +118,40 @@ class InstallTests(unittest.TestCase):
         again = self.run_install("--remove")
         self.assertIn("Nothing changed", again.stdout)
 
+    def test_remove_takes_away_a_file_the_installer_created(self):
+        self.run_install()
+        result = self.run_install("--remove")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertFalse(os.path.exists(self.agents))
+        self.assertIn("held only the Tryhard block", result.stdout)
+        backups = self.backups()
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(self.read(backups[0]), START + "\n" + SNIPPET + END + "\n")
+        again = self.run_install("--remove")
+        self.assertEqual(again.returncode, 0, again.stderr)
+        self.assertIn("Nothing changed", again.stdout)
+        self.assertFalse(os.path.exists(self.agents))
+
+    @unittest.skipUnless(hasattr(os, "symlink"), "needs symlinks")
+    def test_remove_keeps_a_symlink_even_when_nothing_is_left(self):
+        os.makedirs(self.home)
+        target = os.path.join(self.tmp, "dotfiles AGENTS.md")
+        self.write(target, "")
+        os.symlink(target, self.agents)
+        self.run_install()
+        self.assertEqual(self.run_install("--remove").returncode, 0)
+        self.assertTrue(os.path.islink(self.agents))
+        self.assertEqual(self.read(target), "")
+
+    def test_missing_final_newline_is_added(self):
+        # Install has to end the last line before the block, and remove can't
+        # tell afterwards whether the newline was there before.
+        os.makedirs(self.home)
+        self.write(self.agents, "# My rules\n- Use tabs.")
+        self.run_install()
+        self.assertEqual(self.run_install("--remove").returncode, 0)
+        self.assertEqual(self.read(self.agents), "# My rules\n- Use tabs.\n")
+
     def test_install_then_remove_gives_back_the_original(self):
         os.makedirs(self.home)
         original = "# My rules\n\nUse tabs.\n"

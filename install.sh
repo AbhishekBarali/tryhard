@@ -72,7 +72,9 @@ has_end() { has_line "$END_MARKER"; }
 # Print the current file with the marked block replaced by the file in $1
 # (or removed when $1 is empty). Lines outside the block are kept as they are,
 # except that removing the block also drops the one blank line the installer
-# put before it, so install then remove gives back the original file.
+# put before it, so install then remove gives back the original file. The one
+# difference: if the original had no final newline, the installer added one,
+# and it stays after removal.
 rewrite() {
   awk -v start="$START_MARKER" -v end="$END_MARKER" -v block="${1:-}" '
     function flush() { if (held) { print last; held = 0 } }
@@ -168,6 +170,15 @@ remove_block() {
   check_markers
   local new="$work/AGENTS.md"
   rewrite "" >"$new"
+  # The block was all there was (the installer created the file), so take the
+  # file away again instead of leaving it empty. A symlinked file is emptied
+  # instead, so the link stays.
+  if [ ! -s "$new" ] && [ ! -L "$agents" ]; then
+    backup
+    rm -f "$agents"
+    echo "Removed $agents, which held only the Tryhard block"
+    return
+  fi
   apply "$new" "Removed the Tryhard block from"
 }
 
