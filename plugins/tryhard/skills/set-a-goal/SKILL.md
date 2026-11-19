@@ -35,7 +35,7 @@ branch where it is.
 - If the workspace is not a git repository, initialise one. Do this only in a single project folder.
   If the workspace is the home directory or holds other repositories, set up in the project folder
   the request is about, and ask which one only if the request does not say.
-- Create `.goal/` at the workspace root and add `.goal/` to the exclude file that
+- Create `.goal/` at the project root and add `.goal/` to the exclude file that
   `git rev-parse --git-path info/exclude` prints, so resets never touch the contract or the ledger.
   Add dependency folders, build output, large data files and anything that looks like a secret to
   the same file if git does not already ignore them, so they never enter a commit.
