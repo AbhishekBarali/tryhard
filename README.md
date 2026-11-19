@@ -30,7 +30,7 @@ means before it starts, then hold it to that.
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/before-after-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="docs/assets/before-after-light.svg">
-  <img alt="The same task in Codex without Tryhard and with it" src="docs/assets/before-after-light.svg">
+  <img alt="Three habits, each shown as the model's message without Tryhard and with it: stops at a list, asks about its own files, explains in riddles" src="docs/assets/before-after-light.svg">
 </picture>
 
 What it targets:
@@ -54,6 +54,13 @@ codex plugin add tryhard@tryhard
 Then start Codex, open `/hooks` and trust the Tryhard Stop hook. Codex skips plugin hooks until
 you trust them, so without this step the hook never runs. In the desktop app the same list is
 under Settings > Hooks.
+
+Installed the earlier version under its old name? Remove it, then install and trust the hook as above:
+
+```bash
+codex plugin remove follow-through@follow-through
+codex plugin marketplace remove follow-through
+```
 
 A higher-effort profile and an always-on block for `AGENTS.md` are optional. Both are under
 [More details](#more-details).
@@ -226,8 +233,8 @@ TRYHARD_CHECKS=handback,own-work codex
 
 <br>
 
-Codex copies the plugin when you install it, so updates need two commands. The first refreshes
-Codex's copy of the GitHub repo, the second reinstalls the plugin from it:
+Codex copies the plugin when you install it, so an update takes two commands. If you installed
+from GitHub, the first refreshes Codex's copy of the repo and the second reinstalls the plugin:
 
 ```bash
 codex plugin marketplace upgrade tryhard
@@ -240,8 +247,12 @@ From a local clone you can pass the folder instead of the GitHub name:
 codex plugin marketplace add /path/to/tryhard
 ```
 
-`marketplace upgrade` only refreshes Git sources, so for a local folder run `git pull` and then
-`codex plugin add tryhard@tryhard`.
+`marketplace upgrade` works only for GitHub and other Git installs. To update a local-clone
+install, run `git pull` in the clone, then:
+
+```bash
+codex plugin add tryhard@tryhard
+```
 
 Codex asks you to trust the hook again in `/hooks` after any update to the plugin, because the
 approval covers every file in it, not only the hook. Editing a skill is enough to trigger it.
@@ -264,7 +275,9 @@ codex plugin marketplace remove tryhard
 
 To forget the hook approval too, delete the
 `[hooks.state."tryhard@tryhard:hooks/hooks.json:stop:0:0"]` table from `~/.codex/config.toml`.
-If you copied the profile, delete `~/.codex/tryhard.config.toml`.
+If you copied the profile, delete `~/.codex/tryhard.config.toml`. The Stop hook keeps small
+per-session files under `~/.codex/plugins/data/`. Delete the Tryhard folder there to remove
+everything.
 
 </details>
 
