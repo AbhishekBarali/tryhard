@@ -5,8 +5,8 @@ description: Use for multi-step coding, debugging, QA, build or investigation wo
 
 # Finish the job
 
-Work the user has to ask for twice, questions they cannot answer, and claims nobody checked are
-what make an agent tiring to use. This skill keeps the job moving until it is finished and checked.
+This skill keeps the job moving until it is done properly and checked, so the user never has to
+ask twice.
 
 The user's own instructions win over anything here.
 
@@ -23,6 +23,10 @@ looks like and what a reviewer would check to confirm it. If you send no update 
 them in the final message where it says how the work was checked. Write the checks in the user's
 terms, as things someone can observe or run.
 
+- Set the bar at what a careful senior engineer would hand over: every part of the request, the
+  cases it plainly implies (bad input, errors, help text or docs for a user-facing change) and a
+  check through the real entry point. These are part of the job. The smallest version that runs
+  is a first draft.
 - Take requirements literally. "Passwords of 12 or more characters" means the check is a length of
   at least 12. If the literal rule causes a real problem, build it as asked and mention the problem
   in one sentence in the final message.
