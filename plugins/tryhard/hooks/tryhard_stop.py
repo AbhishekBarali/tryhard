@@ -23,6 +23,8 @@ Limits:
     3 turns in a row.
   * Offers and questions about deleting, overwriting, publishing or paying
     are left alone, because those really are the user's call.
+  * Without a readable transcript only the readability check runs, since a
+    miss costs less than pushing back on a plain answer or a plan.
   * Any error or unexpected input means no output and exit status 0 (the
     turn ends as usual). Long messages and transcripts are read only up to
     fixed limits, so a run stays well inside Codex's hook timeout.
@@ -952,9 +954,11 @@ def evaluate(payload, env, transcript_reader=read_transcript):
         transcript = transcript_reader(payload.get("transcript_path"))
         if transcript is not None and transcript.plan_mode:
             return None
+        # Without the transcript there is no telling whether the user only asked
+        # a question or whether plan mode is on, so only readability can fire.
         latest = transcript.user_texts[-1] if transcript is not None else ""
         answer_only = bool(latest) and wants_answer_only(latest)
-        if offer and not answer_only:
+        if offer and transcript is not None and not answer_only:
             fired["handback"] = handback_reason(offer)
         if candidates and transcript is not None and not ASK_ME_RE.search(plain(latest)):
             names = check_own_work(message, transcript.user_texts)

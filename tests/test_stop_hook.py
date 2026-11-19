@@ -66,7 +66,8 @@ class HookTestCase(unittest.TestCase):
         data = {
             "session_id": "019a96c1-5a2e-7d31-9f0e-2b8d41c7e5a0",
             "turn_id": "turn-%d" % self.turn,
-            "transcript_path": None,
+            # The latest request in this rollout is a task ("Now make a teaser cut...").
+            "transcript_path": fixture("rollout_paginated.jsonl"),
             "cwd": "/home/dev/projects/landing",
             "hook_event_name": "Stop",
             "model": "gpt-6.2-astra",
@@ -531,8 +532,17 @@ class EvaluateTests(HookTestCase):
         output = hook.evaluate(self.payload(self.OFFER), self.env, transcript_reader=lambda path: transcript)
         self.assertIsNone(output)
 
+    def test_only_readability_runs_without_a_transcript(self):
+        # Without it there is no telling a plain answer or a plan from a task.
+        for path in (None, "/no/such/rollout.jsonl", fixture("rollout_paginated.jsonl") + ".zst"):
+            self.assertIsNone(self.run_hook(self.OFFER, transcript_path=path), path)
+            self.assertIsNone(self.run_hook(self.OWN, transcript_path=path), path)
+            result = self.run_hook(DENSE_SSD_OPENING + REPORT_TAIL + "\n\n" + self.OFFER, transcript_path=path)
+            self.assertIn("hard to follow", result["reason"])
+            self.assertNotIn("offering more work", result["reason"])
+
     def test_own_work_needs_the_transcript(self):
-        self.assertIsNone(self.run_hook(self.OWN))
+        self.assertIsNone(self.run_hook(self.OWN, transcript_path=None))
         result = self.run_hook(self.OWN, transcript_path=fixture("rollout_paginated.jsonl"))
         self.assertIn("`24_g521.mp4` and `24_p11.mp4`", result["reason"])
         self.assertIn("never appear in their messages", result["reason"])

@@ -151,6 +151,11 @@ class HookCommandRunTests(unittest.TestCase):
         self.tmp = tempfile.mkdtemp(prefix="tryhard plugin ")
         self.root = os.path.join(self.tmp, "plugins cache", "tryhard")
         shutil.copytree(os.path.join(PLUGIN, "hooks"), os.path.join(self.root, "hooks"))
+        # The hand-back check needs the transcript to see that the user asked for a task.
+        self.payload = dict(self.PAYLOAD, transcript_path=os.path.join(self.tmp, "rollout.jsonl"))
+        with open(self.payload["transcript_path"], "w", encoding="utf-8") as handle:
+            record = {"type": "event_msg", "payload": {"type": "user_message", "message": "Fix the parser."}}
+            handle.write(json.dumps(record) + "\n")
 
     def tearDown(self):
         shutil.rmtree(self.tmp, ignore_errors=True)
@@ -163,7 +168,7 @@ class HookCommandRunTests(unittest.TestCase):
             env.pop(name, None)
         return subprocess.run(
             argv,
-            input=json.dumps(self.PAYLOAD),
+            input=json.dumps(self.payload),
             capture_output=True,
             text=True,
             env=env,
