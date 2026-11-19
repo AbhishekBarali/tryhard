@@ -6,11 +6,11 @@
   <img alt="Tryhard" src="docs/assets/banner-light.svg">
 </picture>
 
-<p><b>Tryhard mode for GPT-6.2.</b> A Codex plugin that stops the model from coasting.</p>
+<p><b>GPT-6.2 coasts. Tryhard makes it finish.</b><br>
+A Codex plugin that gets GPT-6.2 to do the whole job, check it, and tell you plainly what happened.</p>
 
 <p>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-2f6feb"></a>
-  <a href="#quick-start"><img alt="Codex plugin" src="https://img.shields.io/badge/Codex-plugin-1f2328"></a>
   <a href="plugins/tryhard/.codex-plugin/plugin.json"><img alt="Version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-C2410C"></a>
   <a href="docs/why.md"><img alt="For GPT-6.2 Astra and Sol" src="https://img.shields.io/badge/GPT--6.2-Astra%20%26%20Sol-5b6170"></a>
 </p>
@@ -24,8 +24,8 @@ reporting the same habits: the model lists bugs instead of fixing them, ends a t
 "Shall I...?", asks you about files it wrote itself, and explains the result in a wall of code
 names.
 
-Tryhard flips it into tryhard mode. Five skills and a small Stop hook push it to agree what "done"
-means, do the whole task, check it, and tell you plainly what happened.
+Tryhard flips it into tryhard mode. Five skills and a small Stop hook get it to agree what "done"
+means before it starts, then hold it to that.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/before-after-dark.svg">
@@ -60,26 +60,20 @@ A higher-effort profile and an always-on block for `AGENTS.md` are optional. Bot
 
 ## What's inside
 
-| Name | How it runs | What it does |
-|---|---|---|
-| `finish-the-job` | Automatic | Agrees what done means, does the whole job, checks it. |
-| `fresh-ideas` | Automatic | Sets the obvious answer aside when a real choice is open. |
-| `explain-plainly` | Automatic | Leads with the answer or the main cause, in plain words. |
-| `raise-the-bar` | By name | Builds a first version, then improves it in expert reviews. |
-| `set-a-goal` | By name | Sets up a long-running `/goal` with a measured baseline. |
-| Stop hook | Once trusted | Catches hand-backs, needless questions and dense reports. |
+**Automatic.** These trigger from what you ask, so there is nothing to type.
+
+- `finish-the-job` agrees what done means, does the whole job and checks it. It runs for multi-step coding, debugging, QA, build or investigation work.
+- `fresh-ideas` sets the obvious answer aside and picks on fit. It runs when a task leaves open a choice you will see, such as a name, a theme, a level concept or a visual direction.
+- `explain-plainly` leads with the answer or the main cause, in plain words. It runs when you ask why something happens, ask for a summary, or say you are confused.
+
+**By name.** These run only when you call them.
+
+- `raise-the-bar` builds a first version, then improves it in expert review rounds.
+- `set-a-goal` sets up a long-running `/goal` with a measured baseline.
+
+**Stop hook.** Once you trust it, it catches hand-backs, needless questions and dense reports.
 
 ## Usage
-
-### Automatic skills
-
-These trigger from what you ask, so there is nothing to type:
-
-- `finish-the-job` for multi-step coding, debugging, QA, build or investigation work.
-- `fresh-ideas` when a task leaves open a choice you will see, such as a name, a theme, a level concept or a visual direction.
-- `explain-plainly` when you ask why something happens, ask for a summary, or say you are confused.
-
-The other two run only when you name them.
 
 ### Raise the bar
 
@@ -122,7 +116,9 @@ the first run.
   folders, build output, large data files and anything that looks like a secret go in the same
   exclude file if git doesn't already ignore them.
 - If the project folder is not a git repository yet, it runs `git init` there and commits the
-  current files. It won't do this in your home folder or in a folder that holds other repositories.
+  current files. It never does this in your home folder or in a folder that holds other
+  repositories. Started from one of those, it sets up in the project folder your request is about,
+  and asks which one if the request doesn't say.
 - It works on a new branch named `goal/` plus a short name and leaves your own branch where it was.
   Any uncommitted changes you had become the first commit on that branch. To get them back on your
   branch, `git switch` to it and run `git cherry-pick --no-commit` on that first commit. The final
@@ -202,11 +198,12 @@ once with a short note. It checks three things:
 
 1. The message ends by offering to do work that belongs to the task ("Shall I...?", "Want me to...?"). The model is told to do it if it is in scope and reversible, or to list it as an open item with a default if it truly needs you.
 2. The message ends with a question about files, IDs or paths you never mentioned. The model is told to inspect its own work, decide and continue.
-3. A long final message opens with a wall of code names or stacked semicolons. The model is told to rewrite it in plain words.
+3. A long final message is hard to read: its opening is packed with code names or runs very long, or a paragraph strings clauses together with semicolons. The model is told to rewrite the message in plain words without redoing the work.
 
-It sends the model back at most once per turn, goes quiet for the session after the same check
-fires 3 times in a row, and does nothing if anything goes wrong. A plain question or a plan you
-asked for is left alone.
+It sends the model back at most once per turn, turns a check off for the rest of the session after
+it fires 3 turns in a row, and does nothing if anything goes wrong. It stays out of Plan mode, and
+an offer at the end of an answer to a question, a review or a plan you asked for doesn't count as a
+hand-back.
 
 To turn it off, untrust or disable it in `/hooks`. The hook also reads two environment variables,
 which have to be set in the environment Codex starts with:
@@ -222,9 +219,17 @@ TRYHARD_CHECKS=handback,own-work codex       # run only these checks
 </details>
 
 <details>
-<summary><b>Updating, and installing from a local clone</b></summary>
+<summary><b>Updating and installing from a local clone</b></summary>
 
 <br>
+
+Codex copies the plugin when you install it, so updates need two commands. The first refreshes
+Codex's copy of the GitHub repo, the second reinstalls the plugin from it:
+
+```bash
+codex plugin marketplace upgrade tryhard
+codex plugin add tryhard@tryhard
+```
 
 From a local clone you can pass the folder instead of the GitHub name:
 
@@ -232,12 +237,8 @@ From a local clone you can pass the folder instead of the GitHub name:
 codex plugin marketplace add /path/to/tryhard
 ```
 
-Codex copies the plugin when you install it, so after pulling changes run these again:
-
-```bash
-codex plugin marketplace upgrade tryhard
-codex plugin add tryhard@tryhard
-```
+`marketplace upgrade` only refreshes Git sources, so for a local folder run `git pull` and then
+`codex plugin add tryhard@tryhard`.
 
 Codex asks you to trust the hook again in `/hooks` after any update to the plugin, because the
 approval covers every file in it, not only the hook. Editing a skill is enough to trigger it.
