@@ -26,25 +26,26 @@ too. These changes take precedence.
 - The bar is what a top expert in the field would be proud to put their name to. Write five to eight
   review-bar lines, and write the ambition, first impression and detail inventory out in full.
 - The run ends when a fresh judge says READY, or when eight rounds after the first judgment are
-  logged (or the number the user gave). A plateau, a regression or a big gap that survives two
-  rounds does not end it. Go back to the best version, note what the stuck approach showed, and
+  logged (or the number the user gave). A plateau, a regression or a gap above minor that survives
+  two rounds does not end it. Go back to the best version, note what the stuck approach showed, and
   change approach for the weakest bar line.
-- When running at ultra effort, keep parallel subagents to about four or five.
+- Keep parallel subagents to about four or five.
 - A new goal or a user request for more rounds starts a fresh count from the best version.
 
 ## Files
 
-Before building, create `.tryhard/` in the folder Codex is working in. In a git repository, add
-`.tryhard/` to the exclude file that `git rev-parse --git-path info/exclude` prints, so none of it
-enters a commit.
+Before building, create `.tryhard/` in the folder Codex is working in, with a `.gitignore` inside it
+that holds the single line `*`. Git then ignores the whole folder, including that file, so none of
+it enters a commit, and nothing under `.git` has to change.
 
-- `.tryhard/brief.md` holds the brief, with a non-empty review bar, the full path of
-  finish-the-job's judge brief, and this line: "Checks already run on the current state stand.
+- `.tryhard/brief.md` holds the brief, with a non-empty review bar, the full paths of this skill and
+  of finish-the-job's judge brief, and this line: "Checks already run on the current state stand.
   Rerun a check only when its inputs changed or it failed."
-- `.tryhard/rounds.md` is the round log, one line per round with what changed, the judge's READY or
-  NOT READY and its top gaps, and what is still open.
-- `.tryhard/versions/` holds a copy or patch of the files the work changed, saved before each round
-  instead of in the temp folder, leaving out dependency folders and build output. The round log
+- `.tryhard/rounds.md` is the round log. The first build and its judgment are round 0, then one line
+  per round with what changed, the judge's READY or NOT READY and its top gaps, and what is still
+  open.
+- `.tryhard/versions/` holds a copy of the files the work changed or created, saved before each
+  round instead of in the temp folder, leaving out dependency folders and build output. The round log
   names the best one.
 - `.tryhard/evidence/` holds what using it for real produced, for the judge.
 
@@ -56,14 +57,13 @@ or in the app's model picker.
 
 Call `get_goal` first, then follow the first case that fits.
 
-- No goal is set. Call `create_goal` with the objective below and no other field, adding
-  `token_budget` only when the user named a budget. The user invoked this skill by name, which is
-  the explicit request the tool asks for.
+- No goal is set, or the goal is complete. Call `create_goal` with the objective below and no other
+  field, adding `token_budget` only when the user named a budget. It replaces a complete goal. The
+  user invoked this skill by name, which is the explicit request the tool asks for.
 - The same objective is already active. Continue it.
-- A different unfinished goal is active. Leave it alone, tell the user in one line, and run the
-  rounds in this turn.
-- A finished goal is still set, so a new one cannot be created. Give the user `/goal clear` followed
-  by the `/goal` line below, and run the rounds in this turn meanwhile.
+- Any other goal that is not complete is set, such as a different one, or this one paused, blocked
+  or out of budget, so a new one cannot be created. Leave it alone, run the rounds in this turn, and
+  tell the user that `/goal clear` followed by the `/goal` line below starts this one as a goal.
 - The goal tools are missing. Run the rounds in this turn, and give the `/goal` line in the final
   message. If goals are turned off, `goals = true` under `[features]` in Codex's `config.toml` turns
   them on.
