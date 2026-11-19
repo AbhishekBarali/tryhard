@@ -1,12 +1,12 @@
 ---
 name: finish-the-job
-description: Use for real work that should end finished and good, such as building a feature, app, game, page or design, fixing or debugging, QA or checking that something works when you can edit the files, or writing a document. Not for questions, explanations, plans, review-only requests or one-line edits.
+description: Use for real work that should end finished and good, such as building or changing a feature, app, game, page or design, multi-step coding, debugging and fixing, QA or checking that something works when you can edit the files, or writing a document. Not for questions, explanations, plans, review-only requests or one-line edits.
 ---
 
 # Finish the job
 
 This skill gets a result a demanding expert would accept from one normal request, so the user
-never has to spell everything out or push twice. It takes longer than one pass on purpose.
+never has to spell everything out or push twice. It takes longer than one pass, on purpose.
 
 The user's own instructions win over anything here.
 
@@ -17,21 +17,22 @@ The user's own instructions win over anything here.
 - A small but real change, such as a fix in one place, gets a brief of a line or two, one real use
   and one judge pass. Fix what the judge marks blocking, recheck that part, and stop.
 - A new feature, command, page, game, design, document or a QA pass over a flow gets the whole loop.
-- Questions, explanations, reviews and Plan mode follow "Do the whole job" and get no loop.
+- Questions, explanations and reviews get only an answer, as "Do the whole job" says. In Plan mode,
+  put the brief and the bar in the plan and leave building and judging for after Plan mode ends.
 
 ## The judged loop
 
-1. **Understand the real request.** Before building, write a short brief in your first progress
-   update, reading [references/brief.md](references/brief.md) first unless the change is small. It
-   says what the user is really after, what a thoughtful expert would include without being told,
-   the bar (three to six checks ranked with the main goal first), and what the result must not be.
+1. **Understand the real request.** Before building, share a short brief in a progress update,
+   reading [references/brief.md](references/brief.md) first unless the change is small. It says
+   what the user is really after, what a thoughtful expert would include without being told, the
+   bar (three to six checks ranked with the main goal first), and what the result must not be.
    Treat the prompt as the minimum and decide these yourself. Exact things the user stated, such as
    numbers, names, limits, a style to match or "don't touch X", stay exact. "Passwords of 12 or more
    characters" means a length check of at least 12. Inference fills the gaps around them and never
    adds unrelated features. If an exact rule causes a real problem, build it as asked and say so in
    one sentence at the end.
-2. **Open choices get fresh ideas.** When the work leaves open a choice the user will see, such as
-   a theme, level idea, name, layout or approach, settle it inside the brief with
+2. **Open choices get fresh ideas.** Settle any open choice the user will see, such as a theme,
+   level idea, name, layout or approach, inside the brief with
    [../fresh-ideas/SKILL.md](../fresh-ideas/SKILL.md).
 3. **Build the whole thing**, every part of the brief, working and with nothing stubbed. The
    smallest version that runs is a first draft.
@@ -60,8 +61,8 @@ The user's own instructions win over anything here.
 7. **Report plainly**, as "Final message" below says.
 
 When raise-the-bar or set-a-goal is in use, follow that skill. Under another Codex goal the same
-loop and cap apply, and the goal's completion audit decides whether its objective is met. In Plan
-mode, put the brief and the bar in the plan and leave building and judging for after Plan mode ends.
+loop and cap apply across its turns, and the goal's completion audit decides whether its objective
+is met.
 
 ## Do the whole job
 
@@ -98,7 +99,7 @@ this session.
 
 | Claim | Evidence |
 | --- | --- |
-| It works or is fixed | The real entry point or original symptom, run now and behaving right |
+| It works or is fixed | The real entry point, or the check that failed before the change, now passing |
 | Tests pass | This session's test output with zero failures |
 | It looks right | A render or screenshot you looked at, at real size |
 | It meets the request | The request and brief re-read line by line against the result |

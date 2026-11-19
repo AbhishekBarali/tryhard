@@ -34,11 +34,13 @@ changes take precedence.
 - When a round fixes none of the last judge's blocking or visibly weaker findings, change approach
   once, using a different mechanism for the weakest check instead of new values for the same idea.
   If the next round also fixes none, stop.
+- Before each round, save a copy or patch of the files the work changed under `.tryhard/versions/`
+  instead of the temp folder, leaving out dependency folders and build output.
 
 ## Write the brief file
 
-Before building, write `.tryhard/brief.md` in the project folder, so the brief survives across
-turns and compaction. In a git repository, add `.tryhard/` to the exclude file that
+Before building, write `.tryhard/brief.md` in the folder Codex is working in, so the brief survives
+across turns and compaction. In a git repository, add `.tryhard/` to the exclude file that
 `git rev-parse --git-path info/exclude` prints, so it never enters a commit. Give the file one
 heading per part, with short plain text under each.
 
@@ -49,15 +51,15 @@ heading per part, with short plain text under each.
 - How to see the result the way the user will.
 - The judge procedure. Give the full path of judge-brief.md, and say that each round a new subagent
   without your history judges from this file's request, brief, bar and must-not-be list.
-- The stop rule and the cap, as above.
-- Where versions are kept. Before each round, save a copy or patch of the files the work changed
-  under `.tryhard/versions/`, leaving out dependency folders and build output, and mark the best.
+- The stop rule. Stop when a judge finds only minor issues, when a round after a change of approach
+  still fixes none of the last findings, or when the cap is reached.
+- Where the saved versions are, and which one is the best so far.
 - The round log, one line per round giving what changed, the judge's verdict, and whether it beat
   the best version.
 
-Put the brief and the bar in your first update too, with one line saying this mode does best at
-ultra reasoning effort, chosen under `/model` in the CLI or in the app's model picker where the
-account offers it.
+Share the brief and the bar in a progress update too, with one line saying this mode does best at
+ultra reasoning effort, which also lets Codex split work across subagents. It is chosen under
+`/model` in the CLI or in the app's model picker where the account offers it.
 
 ## Start the goal
 
@@ -73,19 +75,21 @@ Pass `token_budget` only when the user named one. Then start building in the sam
 
 If `create_goal` is unavailable, or fails because an unfinished goal exists, leave any existing goal
 alone and run the rounds in this turn with the same cap. In the final message, give the line to
-paste to continue as a goal, which is `/goal ` followed by the objective above.
+paste to continue as a goal, which is `/goal ` followed by the objective above. If goals are off,
+`goals = true` under `[features]` in Codex's `config.toml` turns them on.
 
-## Each goal turn
+## Running and stopping
 
-Read `.tryhard/brief.md` and its round log, and check the current state of the work before relying
-on memory. Then take the next step of the loop. Log each round when its judgment comes back. Codex's
-goal instructions still apply, including that a plan or a status update alone is no progress.
+At the start of each goal turn, read `.tryhard/brief.md` and its round log, and check the current
+state of the work before relying on memory. Then take the next step of the loop. Log each round when
+its judgment comes back. Codex's goal instructions still apply, including that a plan or a status
+update alone is no progress.
 
 When the stop rule holds, go back to the best version if the last one is worse, stop any programs
-you started, and record the final verdict and what is still weak in the round log. Run the goal's
-completion audit against the file, then call `update_goal` with status `complete`. If the same
-blocker, such as a missing dependency only the user can supply, holds for three goal turns in a
-row, follow Codex's blocked rule.
+you started, and record the final verdict and what is still weak in the round log. When a goal is
+running, then run its completion audit against the file and call `update_goal` with status
+`complete`. If the same blocker, such as a missing dependency only the user can supply, holds for
+three goal turns in a row, follow Codex's blocked rule.
 
 ## Final message
 

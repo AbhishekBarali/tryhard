@@ -44,8 +44,8 @@ Judge it in this order.
    the evidence is uncertain or indirect, count the check as failing and say what is missing.
 3. Check that each part exists, has real content, is connected to the real entry point and works
    with realistic input. Stubs, placeholders, hard-coded results, dead controls and skipped branches
-   count as missing. Look for parts of the request that were dropped or quietly narrowed, and for
-   tests or checks that were edited so they pass.
+   count as missing. Look for parts of the request that were dropped or quietly narrowed, for tests
+   or checks that were edited so they pass, and for tests or proofs that never exercise the new work.
 4. Check the must-not-be list, and ask whether a stranger would guess this was made for this request
    or could have come from any similar prompt.
 5. Name the weakest parts, most important first. For each one, give what is wrong, the evidence, and

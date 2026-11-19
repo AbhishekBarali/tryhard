@@ -6,7 +6,8 @@ message. It is also the yardstick the judge uses, so write it in the user's term
 
 ## What goes in
 
-Put it in your first progress update, in about five to fifteen short lines for a big build.
+Share it in a progress update before you start building, in about five to fifteen short lines for a
+big build.
 
 1. What the user is really after, in a sentence or two, and who will use the result.
 2. What a thoughtful expert would include without being told. Think through what the situation
@@ -18,8 +19,10 @@ Put it in your first progress update, in about five to fifteen short lines for a
 3. Exact constraints, copied as the user stated them, such as numbers, names, limits, files to leave
    alone, or a style or existing design to match. These hold exactly, and inference works around
    them.
-4. The bar, three to six checks a demanding expert in the field would apply. Make each one something
-   you can observe or measure, in the user's terms, and rank them with the user's main goal first.
+4. The bar, three to six checks a demanding expert in the field would apply, which is what the user
+   will look for when they review the result. Make each one something you can observe or measure,
+   in the user's terms, and rank them with the user's main goal first. For a document, write checks
+   about the reader, such as "a new teammate can set up the project from this page alone".
    For anything people see or play, include a first-impression check, such as "a new player knows
    what to do within ten seconds and wants another go".
 5. What the result must not be, meaning the lazy or generic version of this request. Typical entries

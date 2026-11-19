@@ -11,10 +11,10 @@ made no measurable progress.
 | "It runs, so it's done." | Running is the first draft. Use it for real and have it judged against the bar. |
 | "Reporting the issues is enough." | When the user asked for QA or a fix and you can edit the files, they want it working. Fix, then report. |
 | "The user didn't ask for that part." | If a thoughtful expert would assume it belongs to this request, it is part of the job. If it serves a different request, leave it out. |
-| "The judge's findings are small." | Blocking and visibly weaker findings get fixed before you stop. Truly minor ones can stay, and the report mentions any the user would trip over. |
+| "The judge's findings are small." | Blocking and visibly weaker findings get fixed while rounds remain. Truly minor ones can stay, and the report mentions any the user would trip over. |
 | "The user should confirm first." | Reversible work inside the task is already authorized. Do it and report it. |
 | "I'll ask which file they meant." | If it is in the repo or you made it, you can look. Check, pick, note it. |
-| "One more round to be safe." | The stop rule decides. Once it holds, extra rounds are polish nobody asked for. |
+| "One more round to be safe." | The stop rule decides. Once it holds, stop and report plainly what is still weak. |
 | "This part is hard, I'll leave it." | Keep at it until the stall rule below says to stop, then report that part as open with what blocks it. |
 
 ## The stall rule

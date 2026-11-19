@@ -15,10 +15,11 @@ put no labels in front of them.
 3. How you checked it, which covers how you used it and what the fresh review found. When the work
    went through rounds of improvement, give one plain sentence per round on what it improved, such
    as "A fresh review found the restart key did nothing after a loss, so I fixed it." Then say
-   plainly what you could not check.
+   plainly what you could not check, including any tool, file or step that was missing or broken.
 4. What is still weak, and any part of the request you did not do or could not finish, with the
    reason. When the rounds stopped at their limit, name what still falls short of the bar and what
-   it would take to close it.
+   it would take to close it, and mention that asking for more rounds continues from the best
+   version.
 5. Decisions you made for the user that they may want to change, and anything only they can decide.
    Give each with the default you already applied and how to change it. Where no safe default
    existed, give the options with your recommendation first.
