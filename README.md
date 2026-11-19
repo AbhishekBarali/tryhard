@@ -7,7 +7,7 @@
 </picture>
 
 <p><b>GPT-6.2 coasts. Tryhard makes it finish.</b><br>
-A Codex plugin that gets GPT-6.2 to do the whole job, check it, and tell you plainly what happened.</p>
+A Codex plugin that makes it do the whole job, check it, and say plainly what happened.</p>
 
 <p>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-2f6feb"></a>
@@ -152,17 +152,17 @@ codex --profile tryhard
 It sets these:
 
 ```toml
-model_reasoning_effort = "high"        # "xhigh" for hard investigations, "ultra" for parallel work
+model_reasoning_effort = "high"
 plan_mode_reasoning_effort = "high"
-# Codex defaults to low verbosity, and the launch reviews found 6.2 answers over-compressed.
 model_verbosity = "medium"
 
 [agents]
 default_subagent_reasoning_effort = "high"
 ```
 
-So reasoning effort is high, including in Plan mode and for subagents, and verbosity is medium.
-The comments in the file say when to switch to xhigh or ultra. Codex layers the profile on top of
+So reasoning effort is high, including in Plan mode and for subagents, and verbosity is medium
+instead of Codex's low default, which leaves room in the final message for how the work was checked
+and what is still open. The comments in the file say when to switch to xhigh or ultra. Codex layers the profile on top of
 your `~/.codex/config.toml`, so nothing else changes.
 
 </details>
@@ -209,8 +209,11 @@ To turn it off, untrust or disable it in `/hooks`. The hook also reads two envir
 which have to be set in the environment Codex starts with:
 
 ```bash
-TRYHARD_HOOK=off codex                       # hook off for this session
-TRYHARD_CHECKS=handback,own-work codex       # run only these checks
+# Hook off for this session
+TRYHARD_HOOK=off codex
+
+# Run only some of the checks
+TRYHARD_CHECKS=handback,own-work codex
 ```
 
 `TRYHARD_CHECKS` takes a comma-separated list of `handback`, `own-work` and `readability`, or
