@@ -47,6 +47,8 @@ find it.
 Ask once, with a concrete proposal and after the rest is done, before deleting files or discarding
 uncommitted changes that you did not make in this session, deploying or publishing where other
 people use it, sending messages or comments to other people, spending money or large paid quotas,
-changing shared infrastructure or production data, and changing the goal or loosening the bar or an
-exact constraint. The bar may get stricter as you learn. Ask in the final message, or through the
-approval prompt when a tool raises one.
+changing shared infrastructure or production data, and changing the goal or an exact constraint the
+user stated. Ask in the final message, or through the approval prompt when a tool raises one.
+
+A check you wrote into the bar that turns out wrong for the user's goal can be corrected with a
+one-line note. The bar may get stricter as you learn, and it never drops just so the work passes.

@@ -22,8 +22,9 @@ The user's own instructions win over anything here.
 
 ## The judged loop
 
-1. **Understand the real request.** Before building, share a short brief in a progress update,
-   reading [references/brief.md](references/brief.md) first unless the change is small. It says
+1. **Understand the real request.** Before building, write a short brief and share its gist in a
+   progress update, reading [references/brief.md](references/brief.md) first unless the change is
+   small. It says
    what the user is really after, what a thoughtful expert would include without being told, the
    bar (three to six checks ranked with the main goal first), and what the result must not be.
    Treat the prompt as the minimum and decide these yourself. Exact things the user stated, such as
@@ -105,8 +106,8 @@ this session.
 | It meets the request | The request and brief re-read line by line against the result |
 | A subagent did it | The diff or output it points to, read by you |
 
-Missing or indirect evidence means unchecked, and the report says so. Add a test only for changed
-behaviour in code the repo already tests, and never add a test framework the repo lacks.
+Missing or indirect evidence means unchecked, and the report says so. Add no test framework the
+repo lacks.
 
 ## When it stalls
 

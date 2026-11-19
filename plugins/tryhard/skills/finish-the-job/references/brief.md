@@ -6,8 +6,9 @@ message. It is also the yardstick the judge uses, so write it in the user's term
 
 ## What goes in
 
-Share it in a progress update before you start building, in about five to fifteen short lines for a
-big build.
+Keep it to about five to fifteen short lines for a big build. Before you start building, share the
+first four parts and your decisions in a progress update so the user can steer early. The
+must-not-be list stays in your notes and goes to the judge.
 
 1. What the user is really after, in a sentence or two, and who will use the result.
 2. What a thoughtful expert would include without being told. Think through what the situation
@@ -43,7 +44,7 @@ words. Check that 'café' finds 'Café Lumen' and the old searches still work."
 
 The details below are made up. Take the pattern, and draw your own content from the user's subject.
 
-The user wrote "make a snake game I can play in the browser".
+The user wrote "make a snake game I can play in the browser". The progress update says this.
 
 > You want a snake game that opens in a browser and is fun for a few minutes on a laptop keyboard.
 > The one exact constraint is that it plays in the browser.
@@ -52,13 +53,14 @@ The user wrote "make a snake game I can play in the browser".
 > that rises as the snake grows, food that never appears inside the snake, a game-over screen with
 > the score and a one-key restart, and a best score kept between visits.
 >
-> I will judge it on these, most important first. A new player starts and understands the controls
-> within ten seconds. Fast key presses are never lost and never turn the snake back into itself.
-> Losing, restarting and the best score all work. It looks deliberate in a laptop window and a
-> phone-sized one. It stays smooth at top speed.
->
-> It must not be a bare grid with no start or end, a snake that dies when two keys land in one tick,
-> the default green-on-black look, or a board that ignores the window size.
+> I will check the result against these, most important first. A new player starts and understands
+> the controls within ten seconds. Fast key presses are never lost and never turn the snake back
+> into itself. Losing, restarting and the best score all work. It looks deliberate in a laptop window
+> and a phone-sized one. It stays smooth at top speed.
 >
 > I chose plain HTML, CSS and JavaScript in one folder with no build step, so it opens straight from
 > the file.
+
+The must-not-be list in the notes for the judge reads "a bare grid with no start or end, a snake
+that dies when two keys land in one tick, the default green-on-black look, a board that ignores the
+window size".
