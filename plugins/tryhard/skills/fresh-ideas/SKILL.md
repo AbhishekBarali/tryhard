@@ -30,6 +30,8 @@ In those cases a better answer means a cleaner solution inside the rules.
 
 Do the planning steps in your own reasoning. The candidates and their estimates are scaffolding, so
 they stay out of the deliverable, and the final message names only the winner and the runner-up.
+When the work has a brief (finish-the-job or raise-the-bar), record the winner and why in its
+open-choices part, and the obvious default in your notes.
 
 1. Lock what is fixed. Note what the user's words, the existing code or style, and hard constraints
    already decide. The brief wins every time, and only the open parts get explored.
@@ -54,8 +56,9 @@ they stay out of the deliverable, and the final message names only the winner an
    it sounds out of the scoring. Make one element the bold one and keep the rest disciplined.
 6. Build it, then look at the result (render or screenshot it when it is visual) and compare it with
    your list of defaults. If a part drifted back to a default, such as the name, the palette or the
-   layout, fix that part. Ask whether a stranger would guess it was made for this brief. One
-   comparison and one round of fixes is enough.
+   layout, fix that part. Ask whether a stranger would guess it was made for this brief. When a
+   judge reviews the work, the brief's line about choices made for this brief carries this check
+   into each review. Otherwise one comparison and one round of fixes is enough.
 
 ## Decide
 

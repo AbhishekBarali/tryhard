@@ -1,6 +1,6 @@
 {
   "name": "tryhard",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Gets Codex to carry a task to the end: agree what done means, do the whole job, decide routine things itself, stop loops that make no progress, and report results in plain words.",
   "author": {
     "name": "Abhishek Barali",

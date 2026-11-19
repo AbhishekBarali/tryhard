@@ -2,7 +2,8 @@
 
 Read this before writing the goal contract and again after the conversation is compacted or a new
 context window starts. Codex's own goal instructions still apply on every turn. These rules add a
-measurement, so that each turn's work is judged by the numbers in `.goal/contract.md`.
+measurement, so that each turn's work is judged by the numbers in `.goal/contract.md`. For this run
+they take the place of finish-the-job's judged loop, and the evaluator brief is the judge.
 
 ## Start of every turn
 
@@ -81,8 +82,8 @@ Codex's goal instructions already ask whether each turn made progress. This rule
 ## Done
 
 Before claiming the goal is complete, have a fresh evaluator check the work using
-`references/evaluator-brief.md`. Give it to a subagent started without your conversation history
-(with `fork_turns` set to `none` where the spawn tool has that option). If subagents are
+`references/evaluator-brief.md`. Give it to a subagent spawned with `fork_turns` set to `"none"`,
+so it starts without your conversation history. If subagents are
 unavailable, do the same check yourself, starting from only the contract, the diff and the commands.
 
 When the evaluator fails an item, fix it or revert, then run the evaluator again. If the same item

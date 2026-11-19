@@ -1,4 +1,4 @@
 interface:
   display_name: "Finish the job"
-  short_description: "Carry multi-step work to a checked finish"
-  default_prompt: "Use $tryhard:finish-the-job to fix this, confirm it works, and tell me plainly what changed."
+  short_description: "Build, use, judge and improve real work until it is good"
+  default_prompt: "Use $tryhard:finish-the-job to build this properly, try it for real, and improve it until a fresh review finds only minor issues."

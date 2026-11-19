@@ -1,6 +1,6 @@
 ---
 name: set-a-goal
-description: Turn a request into a strong Codex /goal for a long run. Writes a goal contract with a measured baseline, ranked goals and checkable done items, starts the goal, and sets rules for keeping only what improves and for handling stalls. Use when the user invokes it by name.
+description: Turn a request with a measurable target, such as speed, size or a score, into a strong Codex /goal for a long run. Writes a goal contract with a measured baseline, ranked goals and checkable done items, starts the goal, and sets rules for keeping only what improves and for handling stalls. Use when the user invokes it by name.
 ---
 
 # Set a goal
@@ -80,24 +80,27 @@ first step, since every later turn begins by reading them.
 
 For work without a number, such as a game level or a design, leave out the primary metric and write
 a rubric of three to six checks instead. You score the rubric after each attempt, and the fresh
-evaluator scores it again before the goal is marked complete.
+evaluator scores it again before the goal is marked complete. Mention in one line of the first
+final message that `$tryhard:raise-the-bar` is made for this kind of work.
 
 ## 4. Start the goal
 
-If the `create_goal` tool is available, call it. The user invoked this skill to set up a goal, which
-is the explicit request the tool asks for. Keep the objective short. Start it with the one-sentence
-objective from the contract and point it at the contract for the rest, for example like this.
+Call `get_goal` first. If a matching goal is active, continue it. If no goal is set or the goal is
+complete, call `create_goal` with the objective only, which replaces a complete goal. The user
+invoked this skill to set up a goal, which is the explicit request the tool asks for. Keep the
+objective short. Start it with the one-sentence objective from the contract and point it at the
+contract for the rest, for example like this.
 
     {The one-sentence objective.} Done means every "Done when" item in .goal/contract.md passes.
     The primary metric, its baseline and the rules for keeping or discarding changes are in that
     file, and the current state is in .goal/status.md.
 
-Pass `token_budget` only when the user named a budget. If `create_goal` fails because an unfinished
-goal already exists, leave that goal alone, since replacing it is the user's call. Give them the
-`/goal` line to use once the current goal is cleared or finished.
+Pass `token_budget` only when the user named a budget. If another goal is set and not complete,
+leave it alone, since replacing it is the user's call, and give them the `/goal` line to use after
+`/goal clear`.
 
-If the tool is not available, end the turn after the contract and the baseline, and give the user
-the exact line to paste, starting with `/goal `.
+If the goal tools are not available, end the turn after the contract and the baseline, and give the
+user the exact line to paste, starting with `/goal `.
 
 ## 5. Run it
 

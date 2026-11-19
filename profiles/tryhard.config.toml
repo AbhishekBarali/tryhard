@@ -1,4 +1,4 @@
-# Tryhard profile for Codex (optional).
+# Tryhard profile for Codex. The recommended setup for real work.
 #
 # Copy this file to ~/.codex/tryhard.config.toml and start Codex with
 #
@@ -7,21 +7,35 @@
 # Codex layers it on top of ~/.codex/config.toml, so only the settings below
 # change. Remove any line you don't want.
 
-# Codex's model catalog starts GPT-6.2 Astra and Sol at low reasoning effort.
-# Low effort does poorly on multi-step work, so this profile uses high. Switch
-# to "xhigh" for hard investigations, or to "ultra" (where your account offers
-# it) for large work that splits into parallel parts, since ultra also lets
-# Codex decide when to use subagents.
-model_reasoning_effort = "high"
+# Codex's model catalog starts GPT-6.2 Astra and Sol at low reasoning effort,
+# and low effort does poorly on multi-step work. Tryhard's judge-and-improve
+# loop needs the model to stay with a task through the final checks, so this
+# profile uses "xhigh". Every GPT-6 model offers it. If yours doesn't, Codex
+# uses the highest level below it that the model offers.
+#
+# For the biggest asks, use "ultra" with $tryhard:raise-the-bar. Ultra reasons
+# at the same depth as xhigh on GPT-6.2 and also lets Codex hand parts of the
+# work to subagents on its own. Turn it on for one session with
+#
+#   codex --profile tryhard -c model_reasoning_effort=ultra
+#
+# or pick Ultra under /model, or change the line below to "ultra" to make it
+# your default. Ultra is limited to some accounts. When your account's model
+# list doesn't offer it, Codex quietly falls back to the model's default
+# effort, which is low for GPT-6.2. That is why xhigh is the default here.
+model_reasoning_effort = "xhigh"
 
 # Plan mode has its own effort setting.
-plan_mode_reasoning_effort = "high"
+plan_mode_reasoning_effort = "xhigh"
 
 # The catalog also starts these models at low verbosity. Medium leaves room in
-# the final report for how the work was checked and what is still open. Delete
+# the final report for what each round improved and what is still open. Delete
 # this line if replies get longer than you like.
 model_verbosity = "medium"
 
 [agents]
-# Subagents get the same effort unless a spawn call picks one.
-default_subagent_reasoning_effort = "high"
+# Subagents, including the fresh judge, get the same effort unless a spawn call
+# picks one. Keep this at xhigh even when you use ultra above. Codex refuses to
+# start a subagent at a level its model doesn't offer, so ultra here would
+# make every spawn fail on accounts without it.
+default_subagent_reasoning_effort = "xhigh"

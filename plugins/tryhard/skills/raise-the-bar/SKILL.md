@@ -1,83 +1,96 @@
 ---
 name: raise-the-bar
-description: Iterate on a result until a demanding expert would sign off. Sets a quality bar, builds a complete version, reviews it against the bar, fixes the biggest gaps, and repeats until another round stops making it visibly better. Use when the user invokes it by name.
+description: Max mode for the biggest asks. Runs the same brief, bar and fresh-eyes judge as finish-the-job with a stricter bar and more rounds, as a Codex goal that keeps going across turns when the goal tools are available. Use when the user invokes it by name.
 ---
 
 # Raise the bar
 
-The user invoked this because they want more than a first working version. Treat the first complete
-version as a draft. Review it the way a demanding expert in the field would, fix the biggest gaps,
-and repeat until another round stops making it visibly better. Because the user asked for these
-rounds, this replaces the usual rule of stopping as soon as the work first passes its checks. The
-stopping rule below decides when to finish.
+The user invoked this because they want the best result the work can reach, and they accept that
+it takes longer and uses more than the default. It runs the judged loop from finish-the-job with a
+stricter bar and up to eight rounds, as a Codex goal when it can, so the work continues across turns
+until a fresh judge says READY or the rounds run out.
 
-The user's own words win over anything here, including a number of rounds they name.
+The user's own words win over anything here, including a number of rounds or a token budget.
 
-In Plan mode, put the bar in the plan and leave building and review rounds for after Plan mode ends.
+In Plan mode, put the brief in the plan, and leave the files, the goal and the building for after
+Plan mode ends.
 
-## Write the bar first
+## The loop it reuses
 
-Before building, put the bar in your first update so the user can see it.
+Read [../finish-the-job/SKILL.md](../finish-the-job/SKILL.md) and follow "The judged loop" with its
+references. Its rules on scope, evidence, stopping for the user, stalls and the final message apply
+too. These changes take precedence.
 
-- Three to six checks a demanding expert in this field would apply to the result. Make each one
-  something you can observe or measure, in the user's terms, and rank them with the user's main goal
-  first.
-- A short list of what the result must not be, such as a placeholder, a stub behind a polished
-  surface, the first idea any model would give, or something that was never run.
-- If the task leaves a creative or design choice open, settle it before building. Follow the
-  fresh-ideas skill from this plugin ([../fresh-ideas/SKILL.md](../fresh-ideas/SKILL.md)) if it is
-  installed. If it is not, write down the two or three answers most models would give, come up with
-  at least three genuinely different candidates drawn from the user's own subject, and choose on fit
-  to the brief.
+- Run the whole loop whatever the size of the change. If the work already exists, use it for real
+  and judge it before changing anything, and count that as the first judgment.
+- The bar is what a top expert in the field would be proud to put their name to. Write five to eight
+  review-bar lines, and write the ambition, first impression and detail inventory out in full.
+- The run ends when a fresh judge says READY, or when eight rounds after the first judgment are
+  logged (or the number the user gave). A plateau, a regression or a gap above minor that survives
+  two rounds does not end it. Go back to the best version, note what the stuck approach showed, and
+  change approach for the weakest bar line.
+- Keep parallel subagents to about four or five.
+- A new goal or a user request for more rounds starts a fresh count from the best version.
 
-The bar raises the quality of what was asked for. New features, sections or files the brief did not
-ask for are outside it.
+## Files
 
-## Build a complete first version
+Before building, create `.tryhard/` in the folder Codex is working in, with a `.gitignore` inside it
+that holds the single line `*`. Git then ignores the whole folder, including that file, so none of
+it enters a commit, and nothing under `.git` has to change.
 
-Every part of the brief is present and working, and nothing is stubbed. Keep each version
-recoverable without touching the user's branches or commits, for example as a patch or a copy under
-the system temp folder, so a round that makes things worse can be undone.
+- `.tryhard/brief.md` holds the brief, with a non-empty review bar, the full paths of this skill and
+  of finish-the-job's judge brief, and this line: "Checks already run on the current state stand.
+  Rerun a check only when its inputs changed or it failed."
+- `.tryhard/rounds.md` is the round log. The first build and its judgment are round 0, then one line
+  per round with what changed, the judge's READY or NOT READY and its top gaps, and what is still
+  open.
+- `.tryhard/versions/` holds a copy of the files the work changed or created, saved before each
+  round instead of in the temp folder, leaving out dependency folders and build output. The round log
+  names the best one.
+- `.tryhard/evidence/` holds what using it for real produced, for the judge.
 
-## Look at it for real
+Share the brief in a progress update as finish-the-job describes, and mention once that this mode
+does best at ultra reasoning effort where the account offers it, chosen under `/model` in the CLI
+or in the app's model picker.
 
-Run it, render it, take a screenshot, play it or measure it, whichever shows the result the way the
-user will meet it, and judge what you observed. If the environment cannot show it, use the closest
-real check and say in the final message what you could not see.
+## Start the goal
 
-## Review it as the expert
+Call `get_goal` first, then follow the first case that fits.
 
-Read [references/expert-review.md](references/expert-review.md), fill it in, and give it to a new
-subagent each round, started without your conversation history (with `fork_turns` set to `none`
-where the spawn tool has that option). A fresh reviewer each round judges the result itself, without
-anchoring on the last round's verdict. If subagents are unavailable, do the review yourself,
-starting from only the brief, the bar and the result. Either way, the review ends with the gaps
-ranked and each one marked as blocking the bar, visibly weaker than an expert would accept, or
-minor.
+- No goal is set, or the goal is complete. Call `create_goal` with the objective below and no other
+  field, adding `token_budget` only when the user named a budget. It replaces a complete goal. The
+  user invoked this skill by name, which is the explicit request the tool asks for.
+- The same objective is already active. Continue it.
+- Any other goal that is not complete is set, such as a different one, or this one paused, blocked
+  or out of budget, so a new one cannot be created. Leave it alone, run the rounds in this turn, and
+  tell the user that `/goal clear` followed by the `/goal` line below starts this one as a goal.
+- The goal tools are missing. Run the rounds in this turn, and give the `/goal` line in the final
+  message. If goals are turned off, `goals = true` under `[features]` in Codex's `config.toml` turns
+  them on.
 
-## Fix the biggest gaps
+The objective, kept short and stable, with the user's number in place of 8 if they gave one:
 
-Fix everything that blocks the bar, then the visibly weaker items in order. A gap that three
-different tries have not closed stays open for the final message. Then look at the result
-for real again and compare it with the previous version. When a fix improves a lower-ranked check
-but makes a higher-ranked one worse, undo it, because the main goal outranks every side goal.
+    Deliver {the outcome, in the user's words} as specified in .tryhard/brief.md. Done means every
+    review-bar line there is met with current evidence and a fresh judge finds only minor issues,
+    or 8 improvement rounds are logged in .tryhard/rounds.md with the remaining gaps recorded. Keep
+    the brief's fixed constraints exactly.
 
-## When to stop
+Then start building in the same turn.
 
-One review followed by its fixes is one round. Stop when any of these is true.
+## Each turn and the end
 
-- A review finds only minor issues.
-- A round made no visible or measurable improvement over the version before it. If the last round
-  made things worse, go back to the best version.
-- Five rounds are done, or the number of rounds the user gave.
+At the start of each goal turn, read `.tryhard/brief.md` and `.tryhard/rounds.md`, check the current
+state of the work before relying on memory, and take the next step of the loop.
 
-When you stop at the round limit, keep the best version and report which checks still fall short
-and what it would take to close them.
+When the run ends, go back to the best version if the last one is worse, and stop any programs you
+started. Call `update_goal` with status `complete` only after the final real use and a fresh
+judge's READY, or once the last allowed round is logged with its remaining gaps. If the same
+blocker, such as a missing dependency only the user can supply, holds for three goal turns in a row,
+follow Codex's blocked rule. A run in this turn ends the same way, without the goal calls.
 
 ## Final message
 
-Lead with the result and how it now measures against the checks you set at the start, restated in
-plain words. Then say what the rounds improved, in the user's terms, and what still falls short. If
-the report guide from this plugin is installed
-([../finish-the-job/references/final-report.md](../finish-the-job/references/final-report.md)),
-follow its shape. Keep the names of this process and its scaffolding out of the work itself.
+Follow [../finish-the-job/references/final-report.md](../finish-the-job/references/final-report.md).
+Lead with the result against the bar, give one sentence per round on what it improved (grouping
+rounds that made the same kind of fix), then say what still falls short and where the `.tryhard/`
+folder is. Keep the names of this process out of the work itself.
