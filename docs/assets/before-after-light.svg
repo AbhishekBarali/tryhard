@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="965" viewBox="0 0 1280 965" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1194" viewBox="0 0 1280 1194" role="img" aria-labelledby="title desc">
   <title id="title">Without Tryhard and with Tryhard</title>
-  <desc id="desc">Three habits of a coding agent, each shown as the message it sends without Tryhard and with Tryhard. Stops at a list: without, “Found 3 bugs. Want me to fix them?”; with, “Fixed all 3 bugs and checked each one. All 24 tests pass.” Asks about its own files: without, “Blocked: should the reviewer write to 24_g521.mp4 or 24_p11.mp4?”; with, “Used 24_g521.mp4, the newer clip, and kept going.” Explains in riddles: without, “Root cause is pnpm’s per-tree link phase falling back to copy across mounts (EXDEV)…”; with, “It’s slow because this machine’s SSD is slow.”</desc>
+  <desc id="desc">Four ways a coding agent leaves work unfinished, each shown as the message it sends without Tryhard and with Tryhard. Stops at a list: without, “Found 3 bugs. Want me to fix them?”; with, “Fixed all 3 bugs and checked each one. All 24 tests pass.” Stops halfway: without, “Done with the first 2 screens. Shall I continue with the rest?”; with, “Built all 5 screens and clicked through each one.” Does the bare minimum: without, “Added the --limit flag.”; with, “Added --limit and refused negative numbers. Updated the help and README. Tested 0, 3, 50.” Ships the first draft: without, “Here’s your landing page.”; with, “Built it, reviewed it like a designer, and fixed the weakest parts in 2 more rounds.”</desc>
   <style>
     .sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif; }
     .mono { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace; }
@@ -16,7 +16,7 @@
     .t-on { fill: #1f2328; }
   </style>
 
-  <rect class="page" width="1280" height="965" rx="16"/>
+  <rect class="page" width="1280" height="1194" rx="16"/>
 
   <text class="sans muted" x="42" y="72" font-size="36" font-weight="800">Without Tryhard</text>
   <g><circle class="hot" cx="670" cy="59" r="18"/><path class="tick" d="M662.2 59.6l5.4 5.4l10.8 -12"/></g>
@@ -32,29 +32,37 @@
   <path class="b-on" d="M674 184H1218a22 22 0 0 1 22 22V295a22 22 0 0 1 -22 22H658a6 6 0 0 1 -6 -6V206a22 22 0 0 1 22 -22Z"/>
   <text class="sans t-on" x="684" y="239" font-size="32">Fixed all 3 bugs and checked</text>
   <text class="sans t-on" x="684" y="285" font-size="32">each one. All 24 tests pass.</text>
-  <g><circle class="hot" cx="1199" cy="250.5" r="15"/><path class="tick" d="M1192.5 251l4.5 4.5l9 -10"/></g>
+  <g><circle class="hot" cx="1199" cy="227.5" r="15"/><path class="tick" d="M1192.5 228l4.5 4.5l9 -10"/></g>
 
-  <!-- Asks about its own files -->
-  <text class="sans ink" x="42" y="391" font-size="30" font-weight="700">Asks about its own files</text>
-  <path class="b-off" d="M62 413H606a22 22 0 0 1 22 22V570a22 22 0 0 1 -22 22H46a6 6 0 0 1 -6 -6V435a22 22 0 0 1 22 -22Z"/>
-  <text class="sans t-off" x="72" y="468" font-size="32">Blocked: should the reviewer</text>
-  <text class="sans t-off" x="72" y="514" font-size="32">write to <tspan class="mono" font-size="30">24_g521.mp4</tspan> or</text>
-  <text class="sans t-off" x="72" y="560" font-size="32"><tspan class="mono" font-size="30">24_p11.mp4</tspan>?</text>
-  <path class="b-on" d="M674 413H1218a22 22 0 0 1 22 22V570a22 22 0 0 1 -22 22H658a6 6 0 0 1 -6 -6V435a22 22 0 0 1 22 -22Z"/>
-  <text class="sans t-on" x="684" y="491" font-size="32">Used <tspan class="mono" font-size="30">24_g521.mp4</tspan>,</text>
-  <text class="sans t-on" x="684" y="537" font-size="32">the newer clip, and kept going.</text>
-  <g><circle class="hot" cx="1199" cy="502.5" r="15"/><path class="tick" d="M1192.5 503l4.5 4.5l9 -10"/></g>
+  <!-- Stops halfway -->
+  <text class="sans ink" x="42" y="391" font-size="30" font-weight="700">Stops halfway</text>
+  <path class="b-off" d="M62 413H606a22 22 0 0 1 22 22V524a22 22 0 0 1 -22 22H46a6 6 0 0 1 -6 -6V435a22 22 0 0 1 22 -22Z"/>
+  <text class="sans t-off" x="72" y="468" font-size="32">Done with the first 2 screens.</text>
+  <text class="sans t-off" x="72" y="514" font-size="32">Shall I continue with the rest?</text>
+  <path class="b-on" d="M674 413H1218a22 22 0 0 1 22 22V524a22 22 0 0 1 -22 22H658a6 6 0 0 1 -6 -6V435a22 22 0 0 1 22 -22Z"/>
+  <text class="sans t-on" x="684" y="468" font-size="32">Built all 5 screens and</text>
+  <text class="sans t-on" x="684" y="514" font-size="32">clicked through each one.</text>
+  <g><circle class="hot" cx="1199" cy="456.5" r="15"/><path class="tick" d="M1192.5 457l4.5 4.5l9 -10"/></g>
 
-  <!-- Explains in riddles -->
-  <text class="sans ink" x="42" y="666" font-size="30" font-weight="700">Explains in riddles</text>
-  <path class="b-off" d="M62 688H606a22 22 0 0 1 22 22V845a22 22 0 0 1 -22 22H46a6 6 0 0 1 -6 -6V710a22 22 0 0 1 22 -22Z"/>
-  <text class="sans t-off" x="72" y="743" font-size="32">Root cause is pnpm’s per-tree</text>
-  <text class="sans t-off" x="72" y="789" font-size="32">link phase falling back to copy</text>
-  <text class="sans t-off" x="72" y="835" font-size="32">across mounts (EXDEV)…</text>
-  <path class="b-on" d="M674 688H1218a22 22 0 0 1 22 22V845a22 22 0 0 1 -22 22H658a6 6 0 0 1 -6 -6V710a22 22 0 0 1 22 -22Z"/>
-  <text class="sans t-on" x="684" y="766" font-size="32">It’s slow because</text>
-  <text class="sans t-on" x="684" y="812" font-size="32">this machine’s SSD is slow.</text>
-  <g><circle class="hot" cx="1199" cy="777.5" r="15"/><path class="tick" d="M1192.5 778l4.5 4.5l9 -10"/></g>
+  <!-- Does the bare minimum -->
+  <text class="sans ink" x="42" y="620" font-size="30" font-weight="700">Does the bare minimum</text>
+  <path class="b-off" d="M62 642H606a22 22 0 0 1 22 22V799a22 22 0 0 1 -22 22H46a6 6 0 0 1 -6 -6V664a22 22 0 0 1 22 -22Z"/>
+  <text class="sans t-off" x="72" y="743" font-size="32">Added the <tspan class="mono" font-size="30">--limit</tspan> flag.</text>
+  <path class="b-on" d="M674 642H1218a22 22 0 0 1 22 22V799a22 22 0 0 1 -22 22H658a6 6 0 0 1 -6 -6V664a22 22 0 0 1 22 -22Z"/>
+  <text class="sans t-on" x="684" y="697" font-size="32">Added <tspan class="mono" font-size="30">--limit</tspan> and refused</text>
+  <text class="sans t-on" x="684" y="743" font-size="32">negative numbers. Updated the</text>
+  <text class="sans t-on" x="684" y="789" font-size="32">help and README. Tested 0, 3, 50.</text>
+  <g><circle class="hot" cx="1199" cy="685.5" r="15"/><path class="tick" d="M1192.5 686l4.5 4.5l9 -10"/></g>
 
-  <text class="sans muted" x="640" y="925" font-size="26" text-anchor="middle">Example messages, for illustration</text>
+  <!-- Ships the first draft -->
+  <text class="sans ink" x="42" y="895" font-size="30" font-weight="700">Ships the first draft</text>
+  <path class="b-off" d="M62 917H606a22 22 0 0 1 22 22V1074a22 22 0 0 1 -22 22H46a6 6 0 0 1 -6 -6V939a22 22 0 0 1 22 -22Z"/>
+  <text class="sans t-off" x="72" y="1018" font-size="32">Here’s your landing page.</text>
+  <path class="b-on" d="M674 917H1218a22 22 0 0 1 22 22V1074a22 22 0 0 1 -22 22H658a6 6 0 0 1 -6 -6V939a22 22 0 0 1 22 -22Z"/>
+  <text class="sans t-on" x="684" y="972" font-size="32">Built it, reviewed it like a</text>
+  <text class="sans t-on" x="684" y="1018" font-size="32">designer, and fixed the weakest</text>
+  <text class="sans t-on" x="684" y="1064" font-size="32">parts in 2 more rounds.</text>
+  <g><circle class="hot" cx="1199" cy="960.5" r="15"/><path class="tick" d="M1192.5 961l4.5 4.5l9 -10"/></g>
+
+  <text class="sans muted" x="640" y="1154" font-size="26" text-anchor="middle">Example messages, for illustration</text>
 </svg>
