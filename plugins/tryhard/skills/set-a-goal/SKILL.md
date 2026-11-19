@@ -85,22 +85,22 @@ final message that `$tryhard:raise-the-bar` is made for this kind of work.
 
 ## 4. Start the goal
 
-If the goal tools are available, call `get_goal` first and continue a matching active goal instead
-of creating a new one. Otherwise call `create_goal` with the objective only. The user invoked this
-skill to set up a goal, which is the explicit request the tool asks for. Keep the objective short.
-Start it with the one-sentence objective from the contract and point it at the contract for the
-rest, for example like this.
+Call `get_goal` first. If a matching goal is active, continue it. If no goal is set or the goal is
+complete, call `create_goal` with the objective only, which replaces a complete goal. The user
+invoked this skill to set up a goal, which is the explicit request the tool asks for. Keep the
+objective short. Start it with the one-sentence objective from the contract and point it at the
+contract for the rest, for example like this.
 
     {The one-sentence objective.} Done means every "Done when" item in .goal/contract.md passes.
     The primary metric, its baseline and the rules for keeping or discarding changes are in that
     file, and the current state is in .goal/status.md.
 
-Pass `token_budget` only when the user named a budget. If a different goal is set, leave it alone,
-since replacing it is the user's call. Give them the `/goal` line to use once that goal is cleared
-or finished.
+Pass `token_budget` only when the user named a budget. If another goal is set and not complete,
+leave it alone, since replacing it is the user's call, and give them the `/goal` line to use after
+`/goal clear`.
 
-If the tool is not available, end the turn after the contract and the baseline, and give the user
-the exact line to paste, starting with `/goal `.
+If the goal tools are not available, end the turn after the contract and the baseline, and give the
+user the exact line to paste, starting with `/goal `.
 
 ## 5. Run it
 
