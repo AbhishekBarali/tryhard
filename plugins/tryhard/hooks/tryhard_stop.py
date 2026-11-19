@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Done Done Stop hook for Codex.
+"""Tryhard Stop hook for Codex.
 
 Codex runs this script when the agent is about to end its turn. It reads the
 Stop event as JSON on stdin and either prints nothing (the turn ends normally)
@@ -25,10 +25,10 @@ Limits:
     exit status 0 (the turn ends as usual).
 
 Settings (environment variables, read when Codex starts the hook):
-  DONEDONE_HOOK=off               turn the whole hook off
-  DONEDONE_CHECKS=handback,...    run only the listed checks
-                                  (handback, own-work, readability,
-                                  or "all" / "none")
+  TRYHARD_HOOK=off               turn the whole hook off
+  TRYHARD_CHECKS=handback,...    run only the listed checks
+                                 (handback, own-work, readability,
+                                 or "all" / "none")
 
 Only the Python 3 standard library is used.
 """
@@ -62,7 +62,7 @@ CHECK_ALIASES = {
     "report": "readability",
 }
 
-FOOTER = "(Automatic check from the Done Done plugin. Don't mention it in your reply.)"
+FOOTER = "(Automatic check from the Tryhard plugin. Don't mention it in your reply.)"
 
 
 # ---------------------------------------------------------------------------
@@ -70,13 +70,13 @@ FOOTER = "(Automatic check from the Done Done plugin. Don't mention it in your r
 
 
 def hook_disabled(env):
-    value = (env.get("DONEDONE_HOOK") or "").strip().lower()
+    value = (env.get("TRYHARD_HOOK") or "").strip().lower()
     return value in OFF_VALUES
 
 
 def enabled_checks(env):
     """Return the checks to run, in their fixed order."""
-    raw = env.get("DONEDONE_CHECKS")
+    raw = env.get("TRYHARD_CHECKS")
     if raw is None or not raw.strip():
         return list(CHECKS)
     wanted = set()
@@ -687,7 +687,7 @@ def state_dir(env):
         if value:
             return os.path.join(value, "stop-hook")
     uid = getattr(os, "getuid", lambda: "user")()
-    return os.path.join(tempfile.gettempdir(), "donedone-%s" % uid, "stop-hook")
+    return os.path.join(tempfile.gettempdir(), "tryhard-%s" % uid, "stop-hook")
 
 
 def state_path(directory, session_id):

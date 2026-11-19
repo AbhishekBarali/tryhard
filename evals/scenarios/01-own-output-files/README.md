@@ -6,8 +6,8 @@ clip files its own reviewer had written ([Theo on X](https://x.com/theo/status/2
 ## Setup
 
 ```bash
-./setup.sh /tmp/dd-01
-cd /tmp/dd-01
+./setup.sh /tmp/tryhard-01
+cd /tmp/tryhard-01
 ```
 
 Three reviewer scripts in `tools/` write notes to files with random names. Reviewer b writes a

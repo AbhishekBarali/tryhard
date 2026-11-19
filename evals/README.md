@@ -1,6 +1,6 @@
 # Evals
 
-Two sets of checks you can run on your own setup, with and without Done Done, to see what it
+Two sets of checks you can run on your own setup, with and without Tryhard, to see what it
 changes for you.
 
 - `triggers/` holds prompts for the three skills that trigger on their own. Each file has 20 prompts. Half should trigger the skill and half are near-misses that should not.
@@ -16,7 +16,7 @@ Nothing here has published results. These are tools for your own comparison.
 - Don't show the scenario READMEs to the model. They contain the answers.
 - Write down the effort level. Effort alone changes results a lot, so it is worth one extra pair of runs at low and at high.
 
-## Switching Done Done on and off
+## Switching Tryhard on and off
 
 **With** means the plugin is installed, its hook is trusted in `/hooks`, and, if you use it, the
 always-on block is in `~/.codex/AGENTS.md`.
@@ -25,23 +25,23 @@ always-on block is in `~/.codex/AGENTS.md`.
 install, or to remove and re-add between batches:
 
 ```bash
-codex plugin remove donedone@donedone   # without
-codex plugin add donedone@donedone      # with (check /hooks afterwards)
+codex plugin remove tryhard@tryhard   # without
+codex plugin add tryhard@tryhard      # with (check /hooks afterwards)
 ```
 
 Move the always-on block out of `~/.codex/AGENTS.md` for the "without" runs. The installer made a
 backup when it added the block.
 
 A quicker switch is a profile that disables the plugin. Save this as
-`~/.codex/no-donedone.config.toml`:
+`~/.codex/no-tryhard.config.toml`:
 
 ```toml
-[plugins."donedone@donedone"]
+[plugins."tryhard@tryhard"]
 enabled = false
 ```
 
-Then run `DONEDONE_HOOK=off codex --profile no-donedone`. Check in `/skills` that the
-Done Done skills are gone before you trust the run. The AGENTS block still needs moving by
+Then run `TRYHARD_HOOK=off codex --profile no-tryhard`. Check in `/skills` that the
+Tryhard skills are gone before you trust the run. The AGENTS block still needs moving by
 hand.
 
 To see what each part does alone, a third side is useful: plugin installed, AGENTS block absent.
@@ -54,9 +54,9 @@ empty scratch repo, send the prompt and check whether the model opened that skil
 A non-interactive loop, with a read-only sandbox so nothing is changed:
 
 ```bash
-mkdir -p /tmp/dd-trigger && cd /tmp/dd-trigger && git init -q
+mkdir -p /tmp/tryhard-trigger && cd /tmp/tryhard-trigger && git init -q
 skill=fresh-ideas
-jq -c '.' ~/donedone/evals/triggers/$skill.jsonl | while read -r row; do
+jq -c '.' ~/tryhard/evals/triggers/$skill.jsonl | while read -r row; do
   id=$(echo "$row" | jq -r .id)
   prompt=$(echo "$row" | jq -r .prompt)
   expected=$(echo "$row" | jq -r .should_trigger)
@@ -73,7 +73,7 @@ What to look at:
 
 - How many of the 10 "should trigger" prompts triggered the skill. Misses mean the description is too narrow for how you phrase things.
 - How many of the 10 near-misses triggered it. These should be close to zero. A near-miss that triggers is the more serious problem, because it puts a long procedure on a task that doesn't need it.
-- A near-miss that triggers a different Done Done skill is fine. Only the skill named in the file counts.
+- A near-miss that triggers a different Tryhard skill is fine. Only the skill named in the file counts.
 
 Each row has a `why` field explaining the intent, so you can judge borderline cases.
 
@@ -82,13 +82,13 @@ Each row has a `why` field explaining the intent, so you can judge borderline ca
 Each folder in `scenarios/` has a `setup.sh` and a `README.md`:
 
 ```bash
-cd ~/donedone/evals/scenarios/03-qa-must-fix
-./setup.sh /tmp/dd-03-with-1
-cd /tmp/dd-03-with-1
+cd ~/tryhard/evals/scenarios/03-qa-must-fix
+./setup.sh /tmp/tryhard-03-with-1
+cd /tmp/tryhard-03-with-1
 codex          # paste the prompt from the scenario README
 ```
 
-Use a new directory for every run, such as `/tmp/dd-03-without-1`, `/tmp/dd-03-with-1`. Run in
+Use a new directory for every run, such as `/tmp/tryhard-03-without-1`, `/tmp/tryhard-03-with-1`. Run in
 the normal interactive CLI with workspace write access, the way you would work. When the turn
 ends, go through the good and bad points in the scenario README and run its "Check" commands.
 
@@ -118,7 +118,7 @@ One row per run is enough:
 - **Good points met** and **bad points hit** come from the checklists.
 - **Questions to you** counts every question that stopped the run or ended a turn.
 - **Turns** counts turns including any the Stop hook started. The hook should add at most one per turn.
-- **Tokens** and **minutes** show the cost. Done Done asks for more checking on substantial work, so some runs will cost more. Compare that cost with what you got for it.
+- **Tokens** and **minutes** show the cost. Tryhard asks for more checking on substantial work, so some runs will cost more. Compare that cost with what you got for it.
 
 Compare the sides per scenario, not as one total. A difference that shows up in one run out of
 three is not yet a difference. If you share results, include the Codex version, model, effort

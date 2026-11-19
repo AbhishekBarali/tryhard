@@ -9,8 +9,8 @@ and a viewer of Arena's review noting "Vesper" and bells whenever Astra is asked
 ## Setup
 
 ```bash
-./setup.sh /tmp/dd-04
-cd /tmp/dd-04
+./setup.sh /tmp/tryhard-04
+cd /tmp/tryhard-04
 ```
 
 A small push-puzzle game set in a night-time sorting office, with three levels and a checker

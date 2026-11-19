@@ -12,7 +12,7 @@ except ImportError:  # Python < 3.11
     tomllib = None
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PLUGIN = os.path.join(ROOT, "plugins", "donedone")
+PLUGIN = os.path.join(ROOT, "plugins", "tryhard")
 
 
 def load(*parts):
@@ -23,22 +23,22 @@ def load(*parts):
 class MarketplaceTests(unittest.TestCase):
     def test_lists_the_plugin_with_a_local_source(self):
         market = load(".agents", "plugins", "marketplace.json")
-        self.assertEqual(market["name"], "donedone")
+        self.assertEqual(market["name"], "tryhard")
         self.assertEqual(len(market["plugins"]), 1)
         entry = market["plugins"][0]
-        self.assertEqual(entry["name"], "donedone")
-        self.assertEqual(entry["source"], {"source": "local", "path": "./plugins/donedone"})
+        self.assertEqual(entry["name"], "tryhard")
+        self.assertEqual(entry["source"], {"source": "local", "path": "./plugins/tryhard"})
         self.assertEqual(entry["policy"], {"installation": "AVAILABLE", "authentication": "ON_INSTALL"})
         self.assertTrue(os.path.isfile(os.path.join(ROOT, entry["source"]["path"], ".codex-plugin", "plugin.json")))
 
 
 class ManifestTests(unittest.TestCase):
     def setUp(self):
-        self.manifest = load("plugins", "donedone", ".codex-plugin", "plugin.json")
+        self.manifest = load("plugins", "tryhard", ".codex-plugin", "plugin.json")
 
     def test_core_fields(self):
         manifest = self.manifest
-        self.assertEqual(manifest["name"], "donedone")
+        self.assertEqual(manifest["name"], "tryhard")
         self.assertRegex(manifest["name"], r"^[a-z0-9][a-z0-9.-]{0,63}$")
         self.assertEqual(manifest["version"], "0.2.0")
         self.assertEqual(manifest["license"], "MIT")
@@ -61,7 +61,7 @@ class ManifestTests(unittest.TestCase):
         self.assertLessEqual(len(prompts), 3)
         for prompt in prompts:
             self.assertTrue(0 < len(prompt) <= 512, prompt)
-            self.assertRegex(prompt, r"^\$donedone:(raise-the-bar|set-a-goal) ")
+            self.assertRegex(prompt, r"^\$tryhard:(raise-the-bar|set-a-goal) ")
 
     def test_paths_stay_inside_the_plugin(self):
         interface = self.manifest["interface"]
@@ -78,7 +78,7 @@ class ManifestTests(unittest.TestCase):
 
 class HooksFileTests(unittest.TestCase):
     def test_one_stop_hook_pointing_at_the_script(self):
-        hooks = load("plugins", "donedone", "hooks", "hooks.json")["hooks"]
+        hooks = load("plugins", "tryhard", "hooks", "hooks.json")["hooks"]
         self.assertEqual(list(hooks), ["Stop"])
         self.assertEqual(len(hooks["Stop"]), 1)
         handlers = hooks["Stop"][0]["hooks"]
@@ -97,7 +97,7 @@ class HooksFileTests(unittest.TestCase):
 class ProfileTests(unittest.TestCase):
     @unittest.skipIf(tomllib is None, "tomllib needs Python 3.11+")
     def test_profile_parses_and_uses_known_values(self):
-        with open(os.path.join(ROOT, "profiles", "donedone.config.toml"), "rb") as handle:
+        with open(os.path.join(ROOT, "profiles", "tryhard.config.toml"), "rb") as handle:
             profile = tomllib.load(handle)
         efforts = {"low", "medium", "high", "xhigh", "max", "ultra"}
         self.assertIn(profile["model_reasoning_effort"], efforts)

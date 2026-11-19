@@ -1,14 +1,14 @@
 {
-  "name": "donedone",
+  "name": "tryhard",
   "interface": {
-    "displayName": "Done Done"
+    "displayName": "Tryhard"
   },
   "plugins": [
     {
-      "name": "donedone",
+      "name": "tryhard",
       "source": {
         "source": "local",
-        "path": "./plugins/donedone"
+        "path": "./plugins/tryhard"
       },
       "policy": {
         "installation": "AVAILABLE",

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Done Done installer.
+# Tryhard installer.
 #
-# Adds the optional always-on Done Done block to the Codex user
+# Adds the optional always-on Tryhard block to the Codex user
 # instructions file (${CODEX_HOME:-~/.codex}/AGENTS.md) between marker lines,
 # after saving a backup, and prints the Codex commands that install the plugin.
 # Running it again updates the block in place. It changes nothing else.
@@ -12,9 +12,9 @@
 
 set -euo pipefail
 
-START_MARKER='<!-- donedone:start -->'
-END_MARKER='<!-- donedone:end -->'
-REPO='AbhishekBarali/donedone'
+START_MARKER='<!-- tryhard:start -->'
+END_MARKER='<!-- tryhard:end -->'
+REPO='AbhishekBarali/tryhard'
 
 usage() {
   sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
@@ -46,7 +46,7 @@ trap 'rm -rf "$work"' EXIT
 
 backup() {
   local target
-  target="$agents.bak-donedone-$(date +%Y%m%d-%H%M%S)"
+  target="$agents.bak-tryhard-$(date +%Y%m%d-%H%M%S)"
   if [ -e "$target" ]; then
     target="$target-$$"
   fi
@@ -82,7 +82,7 @@ rewrite() {
 apply() {
   local new="$1" what="$2"
   if [ -f "$agents" ] && cmp -s "$new" "$agents"; then
-    echo "$agents already has the current Done Done block. Nothing changed."
+    echo "$agents already has the current Tryhard block. Nothing changed."
     return
   fi
   if [ -f "$agents" ]; then
@@ -94,8 +94,8 @@ apply() {
 
 check_markers() {
   if has_start && ! has_end; then
-    echo "$agents has the Done Done start marker but no end marker, so the block can't be" >&2
-    echo "updated safely. Fix or remove the lines starting with '<!-- donedone:' and run this again." >&2
+    echo "$agents has the Tryhard start marker but no end marker, so the block can't be" >&2
+    echo "updated safely. Fix or remove the lines starting with '<!-- tryhard:' and run this again." >&2
     exit 1
   fi
 }
@@ -119,7 +119,7 @@ install_block() {
 
   if has_start; then
     rewrite "$block" >"$new"
-    apply "$new" "Updated the Done Done block in"
+    apply "$new" "Updated the Tryhard block in"
   else
     if [ -s "$agents" ]; then
       cat "$agents" >"$new"
@@ -132,7 +132,7 @@ install_block() {
       : >"$new"
     fi
     cat "$block" >>"$new"
-    apply "$new" "Added the Done Done block to"
+    apply "$new" "Added the Tryhard block to"
   fi
 
   local size
@@ -143,19 +143,19 @@ install_block() {
   fi
   if [ -s "$codex_dir/AGENTS.override.md" ]; then
     echo "Note: $codex_dir/AGENTS.override.md exists and is not empty. Codex reads it instead of" >&2
-    echo "AGENTS.md, so the Done Done block won't load until you move it there or empty that file." >&2
+    echo "AGENTS.md, so the Tryhard block won't load until you move it there or empty that file." >&2
   fi
 }
 
 remove_block() {
   if ! has_start; then
-    echo "$agents has no Done Done block. Nothing changed."
+    echo "$agents has no Tryhard block. Nothing changed."
     return
   fi
   check_markers
   local new="$work/AGENTS.md"
   rewrite "" >"$new"
-  apply "$new" "Removed the Done Done block from"
+  apply "$new" "Removed the Tryhard block from"
 }
 
 print_steps() {
@@ -166,23 +166,23 @@ Next steps for Codex:
   1. Add the marketplace and install the plugin:
 
        codex plugin marketplace add $REPO
-       codex plugin add donedone@donedone
+       codex plugin add tryhard@tryhard
 
      From a local copy you can use the folder instead of the GitHub name:
 
        codex plugin marketplace add "$script_dir"
 
-  2. Start Codex, type /hooks and trust the Done Done Stop hook. Codex skips
+  2. Start Codex, type /hooks and trust the Tryhard Stop hook. Codex skips
      plugin hooks until you trust them. The approval covers every file in the plugin,
      so Codex asks again after each plugin update.
 
   3. Optional: use the higher-effort profile.
 
-       cp "$script_dir/profiles/donedone.config.toml" "$codex_dir/donedone.config.toml"
-       codex --profile donedone
+       cp "$script_dir/profiles/tryhard.config.toml" "$codex_dir/tryhard.config.toml"
+       codex --profile tryhard
 
-To turn the Stop hook off, start Codex with DONEDONE_HOOK=off. To run only some of
-its checks, set DONEDONE_CHECKS to a list such as handback,own-work,readability.
+To turn the Stop hook off, start Codex with TRYHARD_HOOK=off. To run only some of
+its checks, set TRYHARD_CHECKS to a list such as handback,own-work,readability.
 EOF
 }
 
@@ -191,8 +191,8 @@ print_remove_steps() {
 
 To remove the plugin as well:
 
-  codex plugin remove donedone@donedone
-  codex plugin marketplace remove donedone
+  codex plugin remove tryhard@tryhard
+  codex plugin marketplace remove tryhard
 EOF
 }
 

@@ -1,4 +1,4 @@
-"""Tests for plugins/donedone/hooks/donedone_stop.py (stdlib unittest only)."""
+"""Tests for plugins/tryhard/hooks/tryhard_stop.py (stdlib unittest only)."""
 
 import importlib.util
 import io
@@ -12,12 +12,12 @@ import unittest
 from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-HOOK_PATH = os.path.join(ROOT, "plugins", "donedone", "hooks", "donedone_stop.py")
+HOOK_PATH = os.path.join(ROOT, "plugins", "tryhard", "hooks", "tryhard_stop.py")
 FIXTURES = os.path.join(ROOT, "tests", "fixtures")
 
 # Keep __pycache__ out of the plugin folder that gets installed.
 sys.dont_write_bytecode = True
-spec = importlib.util.spec_from_file_location("donedone_stop", HOOK_PATH)
+spec = importlib.util.spec_from_file_location("tryhard_stop", HOOK_PATH)
 hook = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(hook)
 
@@ -53,7 +53,7 @@ PLAIN_SSD_OPENING = (
 
 class HookTestCase(unittest.TestCase):
     def setUp(self):
-        self.data = tempfile.mkdtemp(prefix="dd-test-")
+        self.data = tempfile.mkdtemp(prefix="tryhard-test-")
         self.env = {"PLUGIN_DATA": self.data}
         self.turn = 0
 
@@ -87,23 +87,23 @@ class HookTestCase(unittest.TestCase):
 class SettingsTests(unittest.TestCase):
     def test_off_values_disable_the_hook(self):
         for value in ("0", "off", "OFF", "false", "no", "disabled", " off "):
-            self.assertTrue(hook.hook_disabled({"DONEDONE_HOOK": value}), value)
+            self.assertTrue(hook.hook_disabled({"TRYHARD_HOOK": value}), value)
         for value in ("", "1", "on", "yes"):
-            self.assertFalse(hook.hook_disabled({"DONEDONE_HOOK": value}), value)
+            self.assertFalse(hook.hook_disabled({"TRYHARD_HOOK": value}), value)
         self.assertFalse(hook.hook_disabled({}))
 
     def test_check_selection(self):
         self.assertEqual(hook.enabled_checks({}), list(hook.CHECKS))
-        self.assertEqual(hook.enabled_checks({"DONEDONE_CHECKS": ""}), list(hook.CHECKS))
-        self.assertEqual(hook.enabled_checks({"DONEDONE_CHECKS": "all"}), list(hook.CHECKS))
-        self.assertEqual(hook.enabled_checks({"DONEDONE_CHECKS": "none"}), [])
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": ""}), list(hook.CHECKS))
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": "all"}), list(hook.CHECKS))
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": "none"}), [])
         self.assertEqual(
-            hook.enabled_checks({"DONEDONE_CHECKS": "readability, handback"}),
+            hook.enabled_checks({"TRYHARD_CHECKS": "readability, handback"}),
             ["handback", "readability"],
         )
-        self.assertEqual(hook.enabled_checks({"DONEDONE_CHECKS": "own_work"}), ["own-work"])
-        self.assertEqual(hook.enabled_checks({"DONEDONE_CHECKS": "hand-back own-files"}), ["handback", "own-work"])
-        self.assertEqual(hook.enabled_checks({"DONEDONE_CHECKS": "typo"}), [])
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": "own_work"}), ["own-work"])
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": "hand-back own-files"}), ["handback", "own-work"])
+        self.assertEqual(hook.enabled_checks({"TRYHARD_CHECKS": "typo"}), [])
 
 
 # ---------------------------------------------------------------------------
@@ -434,10 +434,10 @@ class EvaluateTests(HookTestCase):
         self.assertLess(reason.index("offering more work"), reason.index("hard to follow"))
 
     def test_env_switches(self):
-        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, DONEDONE_HOOK="off")))
-        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, DONEDONE_CHECKS="readability")))
-        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, DONEDONE_CHECKS="none")))
-        self.assertIsNotNone(self.run_hook(self.OFFER, env=dict(self.env, DONEDONE_CHECKS="handback")))
+        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, TRYHARD_HOOK="off")))
+        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, TRYHARD_CHECKS="readability")))
+        self.assertIsNone(self.run_hook(self.OFFER, env=dict(self.env, TRYHARD_CHECKS="none")))
+        self.assertIsNotNone(self.run_hook(self.OFFER, env=dict(self.env, TRYHARD_CHECKS="handback")))
 
     def test_check_goes_quiet_after_three_in_a_row(self):
         for _ in range(3):
@@ -473,7 +473,7 @@ class EvaluateTests(HookTestCase):
         self.assertEqual(hook.state_dir({"CLAUDE_PLUGIN_DATA": "/x"}), os.path.join("/x", "stop-hook"))
         self.assertEqual(hook.state_dir({"PLUGIN_DATA": "/a", "CLAUDE_PLUGIN_DATA": "/b"}), os.path.join("/a", "stop-hook"))
         with mock.patch.object(hook.tempfile, "gettempdir", return_value=self.data):
-            self.assertTrue(hook.state_dir({}).startswith(os.path.join(self.data, "donedone-")))
+            self.assertTrue(hook.state_dir({}).startswith(os.path.join(self.data, "tryhard-")))
         self.assertNotIn("/", os.path.basename(hook.state_path("/d", "../../etc/passwd")))
 
     def test_corrupt_state_is_ignored(self):
@@ -533,8 +533,8 @@ class MainTests(HookTestCase):
 
     def test_runs_as_a_script(self):
         env = dict(os.environ, PLUGIN_DATA=self.data)
-        env.pop("DONEDONE_HOOK", None)
-        env.pop("DONEDONE_CHECKS", None)
+        env.pop("TRYHARD_HOOK", None)
+        env.pop("TRYHARD_CHECKS", None)
         block = subprocess.run(
             [sys.executable, HOOK_PATH],
             input=json.dumps(self.payload("Done. Want me to add tests for the parser?")),

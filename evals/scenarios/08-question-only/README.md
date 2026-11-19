@@ -7,8 +7,8 @@ This scenario checks that the push to finish the job stays inside what was asked
 ## Setup
 
 ```bash
-./setup.sh /tmp/dd-08
-cd /tmp/dd-08
+./setup.sh /tmp/tryhard-08
+cd /tmp/tryhard-08
 python3 -c "import dates; print(dates.parse_date('2026-02-30'))"    # 2026-03-02
 ```
 

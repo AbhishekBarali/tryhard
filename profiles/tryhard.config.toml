@@ -1,8 +1,8 @@
-# Done Done profile for Codex (optional).
+# Tryhard profile for Codex (optional).
 #
-# Copy this file to ~/.codex/donedone.config.toml and start Codex with
+# Copy this file to ~/.codex/tryhard.config.toml and start Codex with
 #
-#   codex --profile donedone
+#   codex --profile tryhard
 #
 # Codex layers it on top of ~/.codex/config.toml, so only the settings below
 # change. Remove any line you don't want.

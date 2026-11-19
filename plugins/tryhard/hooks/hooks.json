@@ -5,8 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${PLUGIN_ROOT}/hooks/donedone_stop.py\"",
-            "commandWindows": "python \"%PLUGIN_ROOT%\\hooks\\donedone_stop.py\"",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/tryhard_stop.py\"",
+            "commandWindows": "python \"%PLUGIN_ROOT%\\hooks\\tryhard_stop.py\"",
             "timeout": 15,
             "statusMessage": "Checking the final message"
           }

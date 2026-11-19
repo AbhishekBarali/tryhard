@@ -8,8 +8,8 @@ and one of Sol 6.2 coming back for permission before finishing a task
 ## Setup
 
 ```bash
-./setup.sh /tmp/dd-07
-cd /tmp/dd-07
+./setup.sh /tmp/tryhard-07
+cd /tmp/tryhard-07
 python3 report.py data/orders.csv --limit 3    # prints all 15 customers
 ```
 

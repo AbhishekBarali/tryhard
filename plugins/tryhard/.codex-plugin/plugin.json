@@ -1,0 +1,45 @@
+{
+  "name": "tryhard",
+  "version": "0.2.0",
+  "description": "Gets Codex to carry a task to the end: agree what done means, do the whole job, decide routine things itself, stop loops that make no progress, and report results in plain words.",
+  "author": {
+    "name": "Abhishek Barali",
+    "url": "https://github.com/AbhishekBarali"
+  },
+  "homepage": "https://github.com/AbhishekBarali/tryhard",
+  "repository": "https://github.com/AbhishekBarali/tryhard",
+  "license": "MIT",
+  "keywords": [
+    "finish the job",
+    "definition of done",
+    "verification",
+    "long-running goals",
+    "plain reports",
+    "fewer questions",
+    "creative options",
+    "gpt-6.2"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Tryhard",
+    "shortDescription": "Finish the whole job, check it, and report it in plain words",
+    "longDescription": "Tryhard mode for GPT-6.2. It makes Codex agree what done means before it starts, do the whole job instead of the minimum, answer its own questions by looking instead of blocking on them, change approach or stop with a clear report when a long run stalls, explore real options when a task leaves a creative choice open, and end with a report written for someone who only saw their own request. It adds an explicit raise-the-bar loop, a skill that sets up a strong /goal, and a small Stop hook that catches hand-back offers, questions about the agent's own files, and hard-to-read reports.",
+    "developerName": "Abhishek Barali",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/AbhishekBarali/tryhard",
+    "defaultPrompt": [
+      "$tryhard:raise-the-bar Build this, then keep improving it until another pass no longer makes it better",
+      "$tryhard:set-a-goal Set up a long-running goal for this task with a measured baseline and clear done checks",
+      "$tryhard:raise-the-bar Review what you built like a demanding expert and fix the biggest gaps"
+    ],
+    "brandColor": "#C2410C",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "screenshots": []
+  }
+}

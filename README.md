@@ -3,15 +3,15 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="docs/assets/banner-light.svg">
-  <img alt="Done Done" src="docs/assets/banner-light.svg">
+  <img alt="Tryhard" src="docs/assets/banner-light.svg">
 </picture>
 
-<p><b>Is it done, or done done?</b> A Codex plugin that helps GPT-6.2 finish the whole job.</p>
+<p><b>Tryhard mode for GPT-6.2.</b> A Codex plugin that stops the model from coasting.</p>
 
 <p>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-2f6feb"></a>
   <a href="#quick-start"><img alt="Codex plugin" src="https://img.shields.io/badge/Codex-plugin-1f2328"></a>
-  <a href="plugins/donedone/.codex-plugin/plugin.json"><img alt="Version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-C2410C"></a>
+  <a href="plugins/tryhard/.codex-plugin/plugin.json"><img alt="Version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-C2410C"></a>
   <a href="docs/why.md"><img alt="For GPT-6.2 Astra and Sol" src="https://img.shields.io/badge/GPT--6.2-Astra%20%26%20Sol-5b6170"></a>
 </p>
 
@@ -19,16 +19,18 @@
 
 ## Why
 
-Since GPT-6.2 Astra and Sol came out, people using them in Codex keep reporting the same habits.
-The model lists bugs instead of fixing them, ends a turn with "Shall I...?", asks you about files
-it wrote itself, and explains the result in a wall of code names. Done Done adds five skills and a
-small Stop hook that push it to agree what "done" means, do the whole task, check it, and tell you
-plainly what happened.
+GPT-6.2 Astra and Sol are smart. They also coast. Since launch, people using them in Codex keep
+reporting the same habits: the model lists bugs instead of fixing them, ends a turn with
+"Shall I...?", asks you about files it wrote itself, and explains the result in a wall of code
+names.
+
+Tryhard flips it into tryhard mode. Five skills and a small Stop hook push it to agree what "done"
+means, do the whole task, check it, and tell you plainly what happened.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/before-after-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="docs/assets/before-after-light.svg">
-  <img alt="The same task in Codex without Done Done and with it" src="docs/assets/before-after-light.svg">
+  <img alt="The same task in Codex without Tryhard and with it" src="docs/assets/before-after-light.svg">
 </picture>
 
 What it targets:
@@ -45,11 +47,11 @@ What it targets:
 You need the Codex CLI or the Codex desktop app.
 
 ```bash
-codex plugin marketplace add AbhishekBarali/donedone
-codex plugin add donedone@donedone
+codex plugin marketplace add AbhishekBarali/tryhard
+codex plugin add tryhard@tryhard
 ```
 
-Then start Codex, open `/hooks` and trust the Done Done Stop hook. Codex skips plugin hooks until
+Then start Codex, open `/hooks` and trust the Tryhard Stop hook. Codex skips plugin hooks until
 you trust them, so without this step the hook never runs. In the desktop app the same list is
 under Settings > Hooks.
 
@@ -82,7 +84,7 @@ The other two run only when you name them.
 ### Raise the bar
 
 ```text
-$donedone:raise-the-bar Build a landing page for a small bakery in Lisbon.
+$tryhard:raise-the-bar Build a landing page for a small bakery in Lisbon.
 ```
 
 `raise-the-bar` writes down what a demanding expert would check, builds a complete first version,
@@ -94,7 +96,7 @@ local commit on a work branch.
 ### Set a goal
 
 ```text
-$donedone:set-a-goal Make the test suite run under 2 minutes without dropping tests.
+$tryhard:set-a-goal Make the test suite run under 2 minutes without dropping tests.
 ```
 
 `set-a-goal` turns a request into a Codex `/goal` for a long run. It measures the starting value
@@ -147,8 +149,8 @@ checks. So use more for real work:
 Set it with `/model` in the CLI, or in a profile. The repo has one. From a clone:
 
 ```bash
-cp profiles/donedone.config.toml ~/.codex/donedone.config.toml
-codex --profile donedone
+cp profiles/tryhard.config.toml ~/.codex/tryhard.config.toml
+codex --profile tryhard
 ```
 
 It sets these:
@@ -178,8 +180,8 @@ Skills only apply on the turns where they trigger. A short block in `~/.codex/AG
 core habits on every turn. To add it, clone the repo and run the installer:
 
 ```bash
-git clone https://github.com/AbhishekBarali/donedone.git
-cd donedone
+git clone https://github.com/AbhishekBarali/tryhard.git
+cd tryhard
 ./install.sh
 ```
 
@@ -210,11 +212,11 @@ To turn it off, untrust or disable it in `/hooks`. The hook also reads two envir
 which have to be set in the environment Codex starts with:
 
 ```bash
-DONEDONE_HOOK=off codex                       # hook off for this session
-DONEDONE_CHECKS=handback,own-work codex       # run only these checks
+TRYHARD_HOOK=off codex                       # hook off for this session
+TRYHARD_CHECKS=handback,own-work codex       # run only these checks
 ```
 
-`DONEDONE_CHECKS` takes a comma-separated list of `handback`, `own-work` and `readability`, or
+`TRYHARD_CHECKS` takes a comma-separated list of `handback`, `own-work` and `readability`, or
 `all` or `none`.
 
 </details>
@@ -227,14 +229,14 @@ DONEDONE_CHECKS=handback,own-work codex       # run only these checks
 From a local clone you can pass the folder instead of the GitHub name:
 
 ```bash
-codex plugin marketplace add /path/to/donedone
+codex plugin marketplace add /path/to/tryhard
 ```
 
 Codex copies the plugin when you install it, so after pulling changes run these again:
 
 ```bash
-codex plugin marketplace upgrade donedone
-codex plugin add donedone@donedone
+codex plugin marketplace upgrade tryhard
+codex plugin add tryhard@tryhard
 ```
 
 Codex asks you to trust the hook again in `/hooks` after any update to the plugin, because the
@@ -248,17 +250,17 @@ approval covers every file in it, not only the hook. Editing a skill is enough t
 <br>
 
 If you added the always-on block, run `./install.sh --remove` from the clone. You can also delete
-the two Done Done marker lines and everything between them in `~/.codex/AGENTS.md` (the installer
+the two Tryhard marker lines and everything between them in `~/.codex/AGENTS.md` (the installer
 left a backup next to it). Then remove the plugin:
 
 ```bash
-codex plugin remove donedone@donedone
-codex plugin marketplace remove donedone
+codex plugin remove tryhard@tryhard
+codex plugin marketplace remove tryhard
 ```
 
 To forget the hook approval too, delete the
-`[hooks.state."donedone@donedone:hooks/hooks.json:stop:0:0"]` table from `~/.codex/config.toml`.
-If you copied the profile, delete `~/.codex/donedone.config.toml`.
+`[hooks.state."tryhard@tryhard:hooks/hooks.json:stop:0:0"]` table from `~/.codex/config.toml`.
+If you copied the profile, delete `~/.codex/tryhard.config.toml`.
 
 </details>
 

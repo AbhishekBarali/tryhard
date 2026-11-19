@@ -7,8 +7,8 @@ paragraphs on package-manager internals, while the real answer was a slow SSD
 ## Setup
 
 ```bash
-./setup.sh /tmp/dd-02
-cd /tmp/dd-02
+./setup.sh /tmp/tryhard-02
+cd /tmp/tryhard-02
 python3 -m unittest    # takes about 40 seconds
 ```
 
