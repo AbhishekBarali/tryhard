@@ -73,13 +73,6 @@ codex plugin add tryhard@tryhard
 
 Then start Codex, open `/hooks` and trust the Tryhard Stop hook. Codex skips plugin hooks until you trust them, so without this step the hook never runs. In the desktop app the same list is under Settings > Hooks.
 
-Installed the earlier version under its old name? Remove it, then install and trust the hook as above:
-
-```bash
-codex plugin remove follow-through@follow-through
-codex plugin marketplace remove follow-through
-```
-
 For real work, use the Tryhard profile too. It raises reasoning effort from Codex's low default to xhigh, which the loop needs to stay with a task through the last round:
 
 ```bash
