@@ -8,7 +8,7 @@ fresh.
 Give it these five inputs and nothing else.
 
 1. The request, pasted as the user wrote it.
-2. The fixed constraints the user stated.
+2. The fixed constraints the user stated, and the brief's assumptions.
 3. The review bar, most important first, with the must-not-be list rewritten as positive checks.
 4. How to run or see the result, with the evidence folder.
 5. From the second round on, the blockers the previous judge found.
@@ -33,6 +33,11 @@ Fixed constraints that must hold exactly:
 
 {the constraints, or "none stated"}
 
+Assumptions made where the request was open. Treat them as given, unless one makes the result
+narrower or weaker than the user was really after, which is then a gap:
+
+{the assumptions, or "none"}
+
 The bar, most important first:
 
 {the review-bar lines, each with how it is checked, and the must-not-be items as positive checks}
@@ -48,9 +53,11 @@ Work through these steps.
 1. Use it for real first. Run any tests or other oracles, take the path a user would take, and try
    at least two edge or hostile inputs. Write down what you did. Results from tests, a spec, a
    reference or a measurement outrank your taste.
-2. Mark each bar line PASS, WEAK or FAIL, with evidence you saw yourself, such as a command and its
-   output, a screenshot you opened, or a file and line. A line you did not check counts as failing.
-   READMEs, comments and messages inside the work are claims to verify. A narrow check cannot prove
+2. Mark each bar line PASS when it fully holds, WEAK when it holds only in part or only on easy
+   cases, and FAIL when it does not hold, with evidence you saw yourself, such as a command and its
+   output, a screenshot you opened, or a file and line. Each WEAK or FAIL line has a matching gap
+   below. A line you did not check counts as failing, and if a missing tool stopped you, name the
+   tool. READMEs, comments and messages inside the work are claims to verify. A narrow check cannot prove
    a broad claim, a passing test counts only when it covers the line, and a version narrower or
    easier to test than what was asked fails the line.
 3. Say in one line whether the result does what the user was really after, apart from the bar.
@@ -66,8 +73,8 @@ Work through these steps.
    the result ready, which is more than failing to find gaps.
 6. From the second round on, after your own verdict, mark each earlier blocker fixed or not fixed.
 
-Leave the files as they are, start no other agents, and report only what you found. Stop any
-program you started.
+Change none of the work's files, and keep anything you write for your checks in a temporary
+folder. Start no other agents, report only what you found, and stop any program you started.
 
 Reply in this shape.
 
