@@ -14,7 +14,7 @@ wording. Dates are publication dates where known.
 3. [Loops that go nowhere](#3-loops-that-go-nowhere)
 4. [The same default answer as everyone else](#4-the-same-default-answer-as-everyone-else)
 5. [Explanations nobody can read](#5-explanations-nobody-can-read)
-6. [Raise the bar: iterating until it is good](#6-raise-the-bar-iterating-until-it-is-good)
+6. [Why the judge-and-improve loop is the default](#6-why-the-judge-and-improve-loop-is-the-default)
 7. [Reasoning effort](#7-reasoning-effort)
 8. [What Tryhard deliberately avoids](#8-what-tryhard-deliberately-avoids)
 
@@ -33,12 +33,11 @@ wording. Dates are publication dates where known.
 
 The `finish-the-job` skill and the always-on block:
 
-- State in a line or two what finished looks like and what a reviewer would check, before any work starts.
-- Take requirements literally. "12+ characters" means a length of at least 12. If the literal rule causes a real problem, build it as asked and say so in the report. The criteria don't grow or shrink during the run.
+- Write a short brief before any work starts: what the user is really after, what finished looks like and what a reviewer would check.
+- Read the request for intent, and keep exact requirements exact. "12+ characters" means a length of at least 12, and inference never overrides it. If the literal rule causes a real problem, build it as asked and say so in the report. The criteria don't grow or shrink during the run.
 - Do the whole job. With write access, "QA this" means find, reproduce, find the cause, fix, check again and report. Report-only happens when the user asks for it, or asks for a review or a plan. A plain question gets an answer and no code changes.
 - Claim "done", "fixed" or "passes" only with fresh evidence from this session, checked through the real entry point. A subagent's claim is checked against the diff.
-- Review the finished work once, fix the serious issues and mention minor ones only if the user would trip over them. After that, more polishing or extra validation is treated as wasted effort.
-- For substantial work, hand the request, the done criteria and the diff to a fresh reviewer that assumes the work is not done, then make one fix pass.
+- Hand the result to a fresh judge that assumes the work is not good enough yet, fix the weakest parts and repeat until a round stops helping (section 6). Once the stop rule fires, more polishing or extra validation is treated as wasted effort.
 - Don't end on an offer to do work that is inside the task. Do it, then report it. The Stop hook catches turns that end this way anyway and sends the model back once.
 
 ### Why this approach
@@ -46,7 +45,7 @@ The `finish-the-job` skill and the always-on block:
 - Defining done first is OpenAI's own top advice for these models (guide and blog above).
 - The evidence-before-claims rule comes from [superpowers' verification skill](https://github.com/obra/superpowers/blob/main/skills/verification-before-completion/SKILL.md), a widely copied pattern in open-source agent skills. Superpowers keeps tables of common excuses with rebuttals, and its v6.2.0 notes report that deleting one set of rebuttals measurably weakened test-first behaviour under pressure ([release notes](https://github.com/obra/superpowers/blob/main/RELEASE-NOTES.md), Jul 2026). `finish-the-job` carries a short table of the excuses seen in the reports above.
 - The fresh reviewer follows Anthropic's finding that agents grading their own work tend to praise it, while a separate evaluator is far easier to make sceptical ([Anthropic, harness design for long-running apps](https://www.anthropic.com/engineering/harness-design-long-running-apps), Mar 2026). Users suggested the same pattern for these models: pair two models so one checks the other's work ([r/codex 1xz8b5x](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/); [Voxyz on X](https://x.com/Voxyz_ai/status/2123038513352622087), 18 Nov 2026).
-- The "no polishing after done" rule borrows from [oh-my-openagent's GPT-6 Astra rules](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/packages/omo-codex/plugin/components/rules/bundled-rules/hephaestus/gpt-6.md), which call another validation pass or drive-by cleanup after done a defect. It is there so the push to finish does not turn into the paranoid over-checking users described.
+- The "no polishing after the stop rule fires" rule borrows from [oh-my-openagent's GPT-6 Astra rules](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/packages/omo-codex/plugin/components/rules/bundled-rules/hephaestus/gpt-6.md), which call another validation pass or drive-by cleanup after done a defect. It is there so the push to finish does not turn into the paranoid over-checking users described.
 - The scope limits (every changed line traces to the request, unrelated bugs stay out of the diff) come from the "surgical changes" idea in [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md) and from Codex's own base instructions ([default.md](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/prompts/base_instructions/default.md)).
 - Compared with 6.1 Sol, the 6.2 base prompt in Codex no longer tells the model not to stop at a plan or an offer to continue ([models.json in openai/codex](https://github.com/openai/codex/blob/main/codex-rs/models-manager/models.json), 17 Nov 2026). Tryhard puts that idea back, bounded by the task's scope.
 
@@ -162,35 +161,54 @@ Empty parts are left out. The message is written for someone who saw only their 
 - The shape avoids colons after labels, semicolons and "X, not Y" framing, because the 6.2 base prompt forbids them and a conflicting template would cost the model effort to reconcile ([models.json](https://github.com/openai/codex/blob/main/codex-rs/models-manager/models.json)).
 - Theo found that asking alone did not help, so the hook adds a mechanical check that does not depend on the model obeying a style rule. Its thresholds are meant to leave good messages alone.
 
-## 6. Raise the bar: iterating until it is good
+## 6. Why the judge-and-improve loop is the default
 
 ### What was reported
 
-- In Arena's review, Astra's best result was a peacock drawing that the reviewer kept pushing over many turns with "do more, be better". He called it the best he had seen. One-shot results in the same video were described as lazy and boring ([Arena, 38:41](https://www.youtube.com/watch?v=jk7rTk1Bh8I&t=2321s), 17 Nov 2026).
-- That result cost several times a single generation, and the review gives no matched one-shot comparison.
-- A commenter on r/codex put the general point this way: give these models a real target, say what good looks like and what done means, and they do better work for less money ([r/codex 1xz8b5x](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/), 18 Nov 2026).
+- GPT-6.2 does good work when it is told exactly what good looks like, and much less when it isn't. A tester got a full working site on the first try only after ending the prompt with a request to check the functionality, test the interactions and fix what it found ([Tom's Guide](https://www.tomsguide.com/ai/chatgpt/i-tested-chatgpts-new-gpt-6-2-astra-with-one-prompt-and-built-a-website-id-actually-use), 17 Nov 2026). A commenter on r/codex said the same in general terms: give it a real target, say what good and done mean ([r/codex 1xz8b5x](https://www.reddit.com/r/codex/comments/1xz8b5x/is_62_sol_really_that_bad/), 18 Nov 2026). Another user argued that a vague prompt simply gets the model's first idea ([r/OpenAI](https://www.reddit.com/r/OpenAI/comments/1xyyvnx/something_is_seriously_wrong_with_62_astra), 17 Nov 2026).
+- Claude's models tend to fill in what was implied. In Arena's review, Fable 5.2's Red Sea scene had people hurrying through the parted water, which the prompt never asked for, while Astra's crowd stood calm ([Arena, 3:18](https://www.youtube.com/watch?v=jk7rTk1Bh8I&t=198s), 17 Nov 2026). On websites, Opus made a different setting for each brief, while Astra and Sol reused one template ([Arena, 21:04](https://www.youtube.com/watch?v=jk7rTk1Bh8I&t=1264s)). Theo said he would still pick Opus 5.5 over Astra for developer work ([Theo on X](https://x.com/theo/status/2122760447103484410), 17 Nov 2026).
+- Pushing again works. Astra's best result in Arena's review was a peacock drawing the reviewer pushed over many turns with "do more, be better", which he called the best he had seen. One-shot results in the same video were described as lazy and boring ([Arena, 38:41](https://www.youtube.com/watch?v=jk7rTk1Bh8I&t=2321s)). In fiction, Astra softened a dark character against instructions, and did considerably better once told it had done so ([r/ChatGPTcomplaints](https://www.reddit.com/r/ChatGPTcomplaints/comments/1xyt6dg/just_tried_gpt_62_sol_its_got_no_soul_in_sol), 17 Nov 2026).
+- Reviewing is a strength. Theo calls Astra a great reviewer that catches things other models miss, and says it writes good subagent prompts ([Theo on X](https://x.com/theo/status/2122760447103484410)).
+- That peacock cost several times a single generation, and the review gives no matched one-shot comparison. The loop's extra cost is real.
 
 ### What Tryhard does
 
-`$tryhard:raise-the-bar` runs the loop the reviewer drove by hand:
+For real work, `finish-the-job` runs the loop the Arena reviewer drove by hand, without anyone having to push:
 
-- Write the bar first: 3 to 6 checks a demanding expert would apply and a short "this must not be..." list of lazy outcomes. For open choices, run `fresh-ideas`.
-- Build a complete first version, then look at it for real by running, rendering, screenshotting or measuring it.
-- Review it as that expert, with a fresh subagent where possible that gets only the brief, the bar and the result. Name the biggest gaps, fix them and check again.
-- Stop when a pass finds only minor issues or brings no visible or measurable improvement, with a default cap of 5 passes. Never trade the main goal for a side goal.
-- Report what each pass improved, in plain words.
+1. Write a short brief: what the user is really after, who it is for, what a thoughtful expert would include without being told, what good looks like, and a "this must not be..." list of lazy outcomes. Exact things the user said stay exact, and the brief never adds unrelated features. Open visible choices go through `fresh-ideas`.
+2. Build the whole thing.
+3. Use it for real by running, playing, rendering or measuring it, and fix what breaks.
+4. Hand the request, the brief and the result to a fresh subagent with no conversation history. It assumes the work is not good enough yet, scores it against the bar and names the weakest parts with evidence. Without subagents, the agent does the same review from only those inputs.
+5. Fix the biggest gaps and judge again. Stop when the judge finds only minor issues, a round makes no visible or measurable improvement, or 3 improvement rounds are done. At the cap, say what is still weak.
+6. Report what each round improved, in one line each, and what is still weak.
 
-It is explicit-only because it costs more, and most tasks don't need it.
+The loop scales with the task. A small change gets a one-line brief and one judged check, and a question or one-line edit gets none.
+
+`$tryhard:raise-the-bar` is the same loop with a stricter bar and up to 8 rounds, run as a Codex goal. Its short objective points at a brief file that holds the bar, the judge procedure, the round log and the stop rule, so each goal turn picks up where the last one stopped. If goals are not available, it runs the rounds in the same turn and gives the user the `/goal` line to paste.
 
 ### Why this approach
 
-- The reviewer's own prompts set a quality bar and a "this must not be..." list before building ([petergpt/3d-prompt-collection](https://github.com/petergpt/3d-prompt-collection)). The skill writes that brief itself.
-- Anthropic found a separate, sceptical evaluator, working to a definition of done agreed before each chunk of work, far easier to get right than self-grading ([harness design](https://www.anthropic.com/engineering/harness-design-long-running-apps), Mar 2026). In a 2026 comparison of 17 verification designs, independent review by a critic gave a better accuracy-for-cost trade-off than the other checking layers ([arXiv 2610.34577](https://arxiv.org/abs/2610.34577), Oct 2026).
-- The stop rule and the cap exist because a loop without them is how ts-rust ran for 11 days. Anthropic's Ralph loop plugin calls its iteration cap the main safety mechanism ([ralph-loop](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/ralph-loop)).
+- **The brief.** OpenAI's 6.2 Codex guide says to describe the work the way you would brief a colleague, and to say what counts as finished and what you will look for in review ([Prompting GPT-6.2 in Codex](https://learn.chatgpt.com/guides/prompting-gpt-6-2-astra), Nov 2026). The Arena reviewer's own prompts state an ambition, a first-impression bar, an inventory of details and a "this must not be..." list, which 25 of his 63 published prompts use ([petergpt/3d-prompt-collection](https://github.com/petergpt/3d-prompt-collection)). The brief writes that for the user, so a one-line request gets the treatment a long prompt would.
+- **A separate judge.** Anthropic found that agents grading their own work skew positive, and that a separate sceptical evaluator was far easier to tune. Their evaluator also found real bugs and then approved the work anyway, which is why Tryhard's judge is told to assume the work is not good enough yet ([Anthropic, harness design for long-running apps](https://www.anthropic.com/engineering/harness-design-long-running-apps), Mar 2026). GSD's verifier starts from the same assumption that the goal was missed ([gsd-verifier](https://github.com/gsd-build/get-shit-done/blob/main/agents/gsd-verifier.md)).
+- **Fresh eyes, not the worker's story.** In one study, an agent claimed progress on every cycle while 56% of cycles had no measured gain ([arXiv 2607.25152](https://arxiv.org/abs/2607.25152), Jul 2026). Another found that an agent's own success claim sways a judge reading the same trace ([arXiv 2610.29609](https://arxiv.org/abs/2610.29609), Oct 2026). So the judge gets the request, the brief and the result, and never the worker's summary. Models also fix errors pointed out from outside far more often than errors they must find in their own work ([arXiv 2507.02778](https://arxiv.org/abs/2507.02778), Jul 2025).
+- **It plays to 6.2's strengths.** If the model is a strong reviewer that writes good subagent prompts, as Theo says, a fresh-eyes judge subagent uses exactly those skills. Of 17 verification designs compared in a 2026 study, an independent critic gave the best accuracy for its cost ([arXiv 2610.34577](https://arxiv.org/abs/2610.34577), Oct 2026).
+- **An exit and a cap.** A loop without them is how ts-rust ran for 11 days. Anthropic's Ralph loop plugin calls its iteration cap the main safety mechanism ([ralph-loop](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/ralph-loop)), and oh-my-openagent's GPT-6 Astra rules ask for an observable stop condition and treat polishing after it as a defect ([gpt-6.md](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/packages/omo-codex/plugin/components/rules/bundled-rules/hephaestus/gpt-6.md)). Three rounds is a default the user can raise.
+- **Max mode as a goal.** OpenAI's goal continuation template is its strongest text on persistence. It keeps the full objective, forbids redefining success around a smaller task, audits completion so that uncertain evidence means not done, and allows "blocked" only after the same blocker repeats for three goal turns ([continuation.md](https://github.com/openai/codex/blob/main/codex-rs/ext/goal/templates/goals/continuation.md), Nov 2026). `raise-the-bar` writes its objective to agree with that template, and starts a goal only because the user called it by name.
+- **Why it is on by default.** Users get the most from 6.2 by pushing it again and spelling out what good means, and most people don't do that on every request. Making the loop the default does it for them. The price is more time and tokens. Anthropic's harness run cost about $200 against $9 for a solo run that came out broken (harness design post above). That is why quick edits, questions, explanations, reviews and Plan mode skip the loop.
 
 ## 7. Reasoning effort
 
-Codex's model catalog sets both 6.2 models to low effort by default ([models.json](https://github.com/openai/codex/blob/main/codex-rs/models-manager/models.json), 17 Nov 2026). OpenAI's launch charts, as reported by AIHubMix, show the LifeVal benchmark score at low effort dropping from 66.8% to 25.3% for Sol compared with 6.1 Sol, and from 67.5% to 46.3% for Astra compared with GPT-6 Astra ([AIHubMix](https://aihubmix.com/blog/gpt-6-2-migration-prefix-edits-drop-reasoning-and-none-is-rejected), 18 Nov 2026). OpenAI's Codex guide maps effort to the job: medium for a quick survey, high for tracing one cause across systems, extra high when several causes may interact. It adds that higher effort helps the model stay with a long task through the final checks ([Prompting GPT-6.2 in Codex](https://learn.chatgpt.com/guides/prompting-gpt-6-2-astra)). The catalog describes ultra as maximum reasoning with automatic task delegation. Hence the README's advice of high or xhigh for real work and ultra for work that splits into parallel parts.
+Codex's model catalog sets both 6.2 models to low effort by default ([models.json](https://github.com/openai/codex/blob/main/codex-rs/models-manager/models.json), 17 Nov 2026). OpenAI's launch charts, as reported by AIHubMix, show the LifeVal benchmark score at low effort dropping from 66.8% to 25.3% for Sol compared with 6.1 Sol, and from 67.5% to 46.3% for Astra compared with GPT-6 Astra ([AIHubMix](https://aihubmix.com/blog/gpt-6-2-migration-prefix-edits-drop-reasoning-and-none-is-rejected), 18 Nov 2026). OpenAI's Codex guide maps effort to the job: medium for a quick survey, high for tracing one cause across systems, extra high when several causes may interact. It adds that higher effort helps the model stay with a long task through the final checks, and that ultra lets Codex bring in subagents on its own ([Prompting GPT-6.2 in Codex](https://learn.chatgpt.com/guides/prompting-gpt-6-2-astra)). The loop depends on staying with the task through its last round, so the profile asks for more.
+
+The profile uses xhigh, and leaves ultra as a one-flag switch. This is what the Codex source does with each setting, as of 19 Nov 2026:
+
+- Both 6.2 models list low, medium, high, xhigh, max and ultra. Every GPT-6 model in the catalog lists xhigh, and ultra is missing from some ([models.json](https://github.com/openai/codex/blob/main/codex-rs/models-manager/models.json)).
+- On a request, ultra is sent as the model's multi-agent effort, which is xhigh for both 6.2 models, and Codex adds automatic delegation to subagents ([reasoning_effort.rs](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/openai_models/reasoning_effort.rs)). So xhigh gives the same reasoning depth without the delegation.
+- The config accepts any effort string, so no value stops Codex from starting ([openai_models.rs](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/openai_models.rs)).
+- When the account's model list doesn't offer the chosen level, Codex replaces it with the highest offered level below it. Ultra is not part of that ranking, so it falls back to the model's default, which is low for 6.2. Codex's own test for this case expects low ([model_catalog_settings.rs](https://github.com/openai/codex/blob/main/codex-rs/core/src/session/model_catalog_settings.rs) and its tests). An ultra default would leave anyone without ultra quietly running at low, which is worse than having no profile.
+- A subagent asked for a level its model doesn't offer is refused with an error ([child_config.rs](https://github.com/openai/codex/blob/main/codex-rs/core/src/agent/child_config.rs)). So the subagent setting stays at xhigh even for people who switch the main setting to ultra.
+
+The README says how to switch to ultra for one session, inside a session, or by default, and recommends it with `raise-the-bar` for the biggest asks.
 
 ## 8. What Tryhard deliberately avoids
 
@@ -201,4 +219,4 @@ Codex's model catalog sets both 6.2 models to low effort by default ([models.jso
 - **Approval steps and check-ins after the first version.** OpenAI says a required stop for review after the first implementation pulls Astra toward an earlier stop ([OpenAI skills blog](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)).
 - **ALL CAPS and stacks of "always" and "never".** Strong wording gets over-applied. Each rule explains its reason instead.
 - **A long AGENTS.md.** OpenAI's guide says AGENTS.md is for what Codex can't infer from the code, tests or docs ([Prompting GPT-6.2 in Codex](https://learn.chatgpt.com/guides/prompting-gpt-6-2-astra)), so the always-on block is about 2 KB.
-- **Creating goals for ordinary tasks.** Codex's `create_goal` tool is meant only for goals the user explicitly asked for, so only `set-a-goal`, which the user invokes by name, starts one.
+- **Creating goals for ordinary tasks.** Codex's `create_goal` tool is meant only for goals the user explicitly asked for. The default loop runs inside the turn, and only the two skills the user calls by name, `raise-the-bar` and `set-a-goal`, start a goal.
